@@ -131,6 +131,10 @@ const updateProject = async (projectId, newData) => {
     else await updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'projects', projectId), newData);
 };
 
+window.saveScriptRealtime = async (projectId, text) => {
+    await updateProject(projectId, { script: text });
+};
+
 const getStatusIcon = (status) => {
     const icons = { 'Idea': '💡', 'Scripting': '📝', 'Storyboard': '🎨', 'Producción': '🎬', 'Finalizado': '✅' };
     return icons[status] || '❓';
@@ -383,7 +387,7 @@ const renderApp = () => {
                             <h3 class="font-bold text-xl mb-6 text-[#581845] flex items-center"><span class="mr-2">📝</span> Scripting (Guion)</h3>
                             <div class="transition-all">
                                 <label class="text-xs font-bold text-gray-400 uppercase tracking-widest">Guion Literario</label>
-                                <div id="scriptContent" class="bg-gray-50 p-4 rounded-xl mt-2 text-sm text-gray-600 min-h-[200px] outline-none border border-transparent focus:border-[#C70039] focus:bg-white transition-all shadow-inner" contenteditable="true">
+                                <div id="scriptContent" class="bg-gray-50 p-4 rounded-xl mt-2 text-sm text-gray-600 min-h-[200px] outline-none border border-transparent focus:border-[#C70039] focus:bg-white transition-all shadow-inner" contenteditable="true" oninput="window.saveScriptRealtime('${p.id}', this.innerText)">
                                     ${p.script || 'Escribe aquí el guion literario de tu video...'}
                                 </div>
                             </div>
