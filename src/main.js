@@ -112,18 +112,34 @@ onAuthStateChanged(auth, (user) => {
     }
 });
 
+let unsubscribe = null;
 const loadData = () => {
     if (isMock) {
-        db.onSnapshot({}, (snapshot) => {
+        if (unsubscribe) unsubscribe();
+        unsubscribe = db.onSnapshot({}, (snapshot) => {
             window.appState.projects = snapshot.docs.map(doc => ({ ...doc.data() }));
             renderApp();
         });
         return;
     }
+    
+    console.log("🛰️ Iniciando escucha en tiempo real:", `artifacts/${appId}/public/data/projects`);
     const q = collection(db, 'artifacts', appId, 'public', 'data', 'projects');
-    onSnapshot(q, (snapshot) => {
-        console.log("📥 Datos recibidos de Firestore:", snapshot.size, "documentos");
+    
+    if (unsubscribe) unsubscribe();
+    unsubscribe = onSnapshot(q, (snapshot) => {
+        console.log("📥 [Firestore Sync] Recibidos:", snapshot.size, "documentos");
         window.appState.projects = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+        
+        // Actualizar referencia al proyecto actual si estamos en la vista de detalle
+        if (window.appState.view === 'detail' && window.appState.currentProject) {
+            const updatedProject = window.appState.projects.find(p => p.id === window.appState.currentProject.id);
+            if (updatedProject) {
+                console.log("🔄 Actualizando vista de detalle con nuevos datos de la nube");
+                window.appState.currentProject = updatedProject;
+            }
+        }
+        
         renderApp();
     }, (error) => {
         console.error("❌ Error al cargar datos de Firestore:", error.code, error.message);
@@ -161,6 +177,8 @@ const updateProject = async (projectId, newData) => {
     }
 };
 
+window.saveProject = saveProject;
+window.updateProject = updateProject;
 window.saveScriptRealtime = async (projectId, text) => {
     await updateProject(projectId, { script: text });
 };
