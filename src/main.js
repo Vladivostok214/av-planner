@@ -131,21 +131,28 @@ const loadData = () => {
         console.log("📥 [Firestore Sync] Recibidos:", snapshot.size, "documentos");
         window.appState.projects = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
         
-        // --- Auto-Seeding en la NUBE (Solo si está vacío) ---
-        if (snapshot.size === 0 && !window.appState.isSeeding) {
-            window.appState.isSeeding = true;
-            console.log("🌱 Base de datos vacía. Iniciando siembra de ideas originales...");
-            const seedIdeas = [
-                { title: "Hack #1: El 'Frankenstein'", category: "Educativo", description: "Puntajes no se promedian.", script: "¡El sistema toma tus mejores puntajes!", team: "Equipo AV", dueDate: "2026-06-01" },
-                { title: "Foco Estratégico", category: "Social Media", description: "Prepararse para 1 o 2 materias.", script: "Asegura una o dos pruebas específicas.", team: "Equipo AV", dueDate: "2026-06-05" },
-                { title: "Hack #2: Distractores", category: "Educativo", description: "Trampas en alternativas.", script: "Las falsas no son al azar.", team: "Equipo AV", dueDate: "2026-06-10" },
-                { title: "Entrenamiento Inteligente", category: "Publicidad", description: "Ensayos en puntajenacional.cl", script: "Aprende a esquivar trampas.", team: "Equipo AV", dueDate: "2026-06-15" },
-                { title: "Logística del Día D", category: "Institucional", description: "Qué llevar y qué no.", script: "Ropa en capas, carnet y lápiz.", team: "Equipo AV", dueDate: "2026-06-20" },
-                { title: "Planificación Post-Prueba", category: "Social Media", description: "Puntajes como colchón.", script: "Si aseguraste Ciencias, enfócate en Mate.", team: "Equipo AV", dueDate: "2026-06-25" },
-                { title: "Manejo de Ansiedad", category: "Social Media", description: "Técnicas de respiración.", script: "Respira en 4 tiempos. ¡Tú puedes!", team: "Equipo AV", dueDate: "2026-06-30" }
-            ];
-            seedIdeas.forEach(idea => saveProject(idea));
-        }
+        // --- Auto-Seeding Inteligente (Añadir si faltan) ---
+        const originalIdeas = [
+            { title: "Hack #1: El 'Frankenstein'", category: "Educativo", description: "Puntajes no se promedian.", script: "¡El sistema toma tus mejores puntajes!", team: "Equipo AV", dueDate: "2026-06-01" },
+            { title: "Foco Estratégico", category: "Social Media", description: "Prepararse para 1 o 2 materias.", script: "Asegura una o dos pruebas específicas.", team: "Equipo AV", dueDate: "2026-06-05" },
+            { title: "Hack #2: Distractores", category: "Educativo", description: "Trampas en alternativas.", script: "Las falsas no son al azar.", team: "Equipo AV", dueDate: "2026-06-10" },
+            { title: "Entrenamiento Inteligente", category: "Publicidad", description: "Ensayos en puntajenacional.cl", script: "Aprende a esquivar trampas.", team: "Equipo AV", dueDate: "2026-06-15" },
+            { title: "Logística del Día D", category: "Institucional", description: "Qué llevar y qué no.", script: "Ropa en capas, carnet y lápiz.", team: "Equipo AV", dueDate: "2026-06-20" },
+            { title: "Planificación Post-Prueba", category: "Social Media", description: "Puntajes como colchón.", script: "Si aseguraste Ciencias, enfócate en Mate.", team: "Equipo AV", dueDate: "2026-06-25" },
+            { title: "Manejo de Ansiedad", category: "Social Media", description: "Técnicas de respiración.", script: "Respira en 4 tiempos. ¡Tú puedes!", team: "Equipo AV", dueDate: "2026-06-30" }
+        ];
+
+        let hasNewSeed = false;
+        originalIdeas.forEach(seed => {
+            const exists = window.appState.projects.find(p => p.title === seed.title);
+            if (!exists) {
+                console.log(`🌱 Sembrando idea faltante: ${seed.title}`);
+                saveProject(seed);
+                hasNewSeed = true;
+            }
+        });
+
+        if (hasNewSeed) return; // Esperar a que el siguiente snapshot traiga los nuevos datos
         
         // Actualizar referencia al proyecto actual si estamos en la vista de detalle
         if (window.appState.view === 'detail' && window.appState.currentProject) {
