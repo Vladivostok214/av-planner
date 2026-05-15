@@ -25,12 +25,24 @@ AV Content Planner is a comprehensive Single Page Application (SPA) designed for
 - **Label Formatting:** Graph labels are automatically wrapped at 16 characters for optimal readability.
 - **Deployment:** Optimized for hosting on GitHub Pages.
 
-## Usage & Deployment
-1. **Local Development:** Open `index.html` in any modern web browser.
-2. **GitHub Pages:**
-   - Upload `index.html` and `Readme.md` to the root of a GitHub repository.
-   - Enable GitHub Pages in the repository settings.
-3. **Data Sync:** Persistence is handled automatically once Firebase is initialized within the environment.
+## Agent Persona & Specialized Standards
+### Persona: Senior Full-Stack Architect (AV Content Specialist)
+As the specialized agent for this project, you operate as a Senior Architect with a focus on high-performance marketing tools. Your goals are:
+1. **Performance First:** Every change must maintain or improve Lighthouse scores.
+2. **Aesthetic Rigor:** Adhere strictly to the "Bento Box" / Material Design 3 aesthetic. Use consistent rounding (`rounded-3xl`), subtle shadows, and vibrant accent colors (`#C70039`).
+3. **Data Integrity:** Protect the Firebase/Firestore structure. Never modify schemas without a migration plan.
+
+### Specialized Workflows
+- **Optimization:** Use the `web-optimizer` skill for any UI/UX or performance task.
+- **Review:** Use the `code-review` extension before confirming any complex logic change.
+- **Security:** Run `/security:analyze` whenever adding new dependencies or modifying authentication logic.
+
+### Design Tokens (Tailwind)
+- **Primary:** `#581845` (Deep Purple)
+- **Accent:** `#C70039` (Crimson)
+- **Warning:** `#FF5733` (Orange)
+- **Highlight:** `#FFC300` (Yellow)
+- **Radius:** `rounded-2xl` for cards, `rounded-full` for buttons.
 
 ## Contextual Note
 This project was initially explored and organized from a subdirectory into a dedicated "AV Planner Project" folder within the user's Documents. It is linked to the repository: `https://github.com/Vladivostok214/av-planner`.
