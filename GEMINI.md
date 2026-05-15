@@ -5,7 +5,9 @@ AV Content Planner is a comprehensive Single Page Application (SPA) designed for
 
 ### Core Features
 - **Real-time Dashboard:** Visualizes production metrics using dynamic charts.
-- **Idea Management:** Advanced forms for capturing briefs, core themes, and initial scripts.
+- **Idea Management:** Advanced forms for capturing briefs, core themes, and initial scripts, now with **instant deletion** support.
+- **Multi-device Sync:** Seamless real-time synchronization between PC and mobile via Firestore.
+- **Self-Healing Data:** Automated seeding mechanism to restore core ideas if missing.
 - **360° Detail View:** Includes an integrated script editor, interactive visual storyboard (CSS Grid-based), and video progress preview.
 - **Cloud Persistence:** Automatic synchronization via Firebase/Firestore for collaborative and remote work.
 
