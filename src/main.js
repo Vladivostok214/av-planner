@@ -131,15 +131,15 @@ const loadData = () => {
         console.log("📥 [Firestore Sync] Recibidos:", snapshot.size, "documentos");
         window.appState.projects = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
         
-        // --- Auto-Seeding Inteligente (Añadir si faltan) ---
+        // --- Auto-Seeding Inteligente (Añadir si faltan o actualizar textos cortos) ---
         const originalIdeas = [
-            { title: "Hack #1: El 'Frankenstein'", category: "Educativo", description: "Puntajes no se promedian.", script: "¡El sistema toma tus mejores puntajes!", team: "Equipo AV", dueDate: "2026-06-01" },
-            { title: "Foco Estratégico", category: "Social Media", description: "Prepararse para 1 o 2 materias.", script: "Asegura una o dos pruebas específicas.", team: "Equipo AV", dueDate: "2026-06-05" },
-            { title: "Hack #2: Distractores", category: "Educativo", description: "Trampas en alternativas.", script: "Las falsas no son al azar.", team: "Equipo AV", dueDate: "2026-06-10" },
-            { title: "Entrenamiento Inteligente", category: "Publicidad", description: "Ensayos en puntajenacional.cl", script: "Aprende a esquivar trampas.", team: "Equipo AV", dueDate: "2026-06-15" },
-            { title: "Logística del Día D", category: "Institucional", description: "Qué llevar y qué no.", script: "Ropa en capas, carnet y lápiz.", team: "Equipo AV", dueDate: "2026-06-20" },
-            { title: "Planificación Post-Prueba", category: "Social Media", description: "Puntajes como colchón.", script: "Si aseguraste Ciencias, enfócate en Mate.", team: "Equipo AV", dueDate: "2026-06-25" },
-            { title: "Manejo de Ansiedad", category: "Social Media", description: "Técnicas de respiración.", script: "Respira en 4 tiempos. ¡Tú puedes!", team: "Equipo AV", dueDate: "2026-06-30" }
+            { title: "Hack #1: El 'Frankenstein'", category: "Educativo", description: "Explicar que el DEMRE combina tus mejores puntajes de distintas rendiciones (no se promedian).", script: "¡El sistema toma tu 800 de Invierno y tu 900 de Verano! Nadie promedia nada. Es un buffet." },
+            { title: "Foco Estratégico", category: "Social Media", description: "Recomendación de prepararse para rendir al máximo en solo 1 o 2 materias específicas en esta ocasión.", script: "Por eso, la estrategia de Invierno es ir a asegurar UNA O DOS pruebas específicas. No te estreses por todas." },
+            { title: "Hack #2: Distractores", category: "Educativo", description: "Entender que las alternativas falsas no son al azar, sino trampas diseñadas a partir de errores comunes.", script: "Se llaman 'Distractores'. Si en mate te olvidas de cambiar un signo negativo, el resultado va a estar en la B esperándote..." },
+            { title: "Entrenamiento Inteligente", category: "Publicidad", description: "La importancia de armar ensayos personalizados en puntajenacional.cl para aprender a esquivar estas trampas.", script: "Entra a puntajenacional.cl y arma ensayos personalizados. No solo te dice que la 'C' está mala, te explica la trampa..." },
+            { title: "Logística del Día D", category: "Institucional", description: "Qué llevar (carnet, tarjeta, lápiz, goma), prohibiciones (celulares) y el consejo de vestirse en capas.", script: "Hará frío. Las salas son heladas. Lleva ropa en capas... Solo necesitas tu carnet, tarjeta impresa, lápiz y goma." },
+            { title: "Planificación Post-Prueba", category: "Social Media", description: "Cómo usar los puntajes obtenidos como un colchón de seguridad para enfocar el resto del año.", script: "Esos puntajes quedan congelados... Son tu colchón de seguridad. Si aseguraste Ciencias ahora, dedícate a Matemáticas." },
+            { title: "Manejo de Ansiedad", category: "Social Media", description: "Técnicas rápidas de respiración y mentalidad para el momento de entrar a la sala.", script: "Si te bloqueas, respira en 4 tiempos. Es solo una prueba, no define tu valor como persona. ¡Tú puedes!" }
         ];
 
         let hasNewSeed = false;
@@ -147,8 +147,12 @@ const loadData = () => {
             const exists = window.appState.projects.find(p => p.title === seed.title);
             if (!exists) {
                 console.log(`🌱 Sembrando idea faltante: ${seed.title}`);
-                saveProject(seed);
+                saveProject({ ...seed, team: "Equipo AV", dueDate: "2026-06-01" });
                 hasNewSeed = true;
+            } else if (exists.description && exists.description.length < 40) {
+                // Actualizar textos si son las versiones resumidas de las pruebas anteriores
+                console.log(`🔄 Restaurando textos originales completos para: ${seed.title}`);
+                updateProject(exists.id, { description: seed.description, script: seed.script });
             }
         });
 
