@@ -195,6 +195,8 @@ const updateProject = async (projectId, newData) => {
 
 window.saveProject = saveProject;
 window.updateProject = updateProject;
+window.renderApp = renderApp;
+window.loadData = loadData;
 window.saveScriptRealtime = async (projectId, text) => {
     await updateProject(projectId, { script: text });
 };
