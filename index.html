@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MediaPlanner Pro</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#3B82F6',
+                        secondary: '#8B5CF6',
+                        accent: '#F472B6',
+                        surface: '#F8FAFC'
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif']
+                    },
+                    borderRadius: {
+                        'xl2': '1.5rem'
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body { background-color: #f1f5f9; scroll-behavior: smooth; }
+        .bento-card { transition: transform 0.2s ease, box-shadow 0.2s ease; }
+        .bento-card:hover { transform: translateY(-4px); box-shadow: 0 10px 25px -5px rgba(59, 130, 246, 0.1); }
+        .custom-scrollbar::-webkit-scrollbar { width: 6px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+        .view-transition { transition: opacity 0.3s ease-in-out; }
+    </style>
+</head>
+<body class="font-sans text-slate-900">
+    <div id="app" class="min-h-screen flex flex-col">
+        <nav class="bg-white/80 backdrop-blur-md border-b border-slate-200 sticky top-0 z-50">
+            <div class="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
+                <div class="flex items-center space-x-2">
+                    <div class="w-10 h-10 bg-gradient-to-br from-primary to-secondary rounded-xl flex items-center justify-center text-white text-xl font-bold">M</div>
+                    <span class="text-xl font-bold tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-primary to-secondary">MediaPlanner</span>
+                </div>
+                <div class="flex space-x-2">
+                    <button onclick="router.navigate('dashboard')" class="px-4 py-2 rounded-lg font-medium transition-colors hover:bg-slate-100">📋 Dashboard</button>
+                    <button onclick="appState.openNewIdeaForm()" class="px-4 py-2 bg-primary text-white rounded-lg font-medium shadow-lg shadow-primary/20 hover:bg-blue-700 transition-all">✚ Nueva Idea</button>
+                </div>
+            </div>
+        </nav>
+
+        <main id="content-area" class="flex-grow p-6 max-w-7xl mx-auto w-full view-transition">
+        </main>
+    </div>
+
+    <template id="dashboard-view">
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div class="md:col-span-2 bg-white p-6 rounded-xl2 shadow-sm border border-slate-100 bento-card">
+                <h3 class="text-lg font-bold mb-4 text-slate-700">Pipeline de Producción</h3>
+                <div class="h-64">
+                    <canvas id="productionChart"></canvas>
+                </div>
+            </div>
+            <div class="bg-gradient-to-br from-primary to-secondary p-6 rounded-xl2 shadow-lg text-white bento-card flex flex-col justify-between">
+                <div>
+                    <h3 class="text-lg font-bold opacity-90">Resumen Semanal</h3>
+                    <p class="text-3xl font-bold mt-2" id="totalIdeas">0</p>
+                    <p class="text-sm opacity-75">Proyectos activos en el radar</p>
+                </div>
+                <div class="mt-4 pt-4 border-t border-white/20">
+                    <div class="flex justify-between items-center">
+                        <span class="text-sm">Meta alcanzada</span>
+                        <span class="text-sm font-bold">75%</span>
+                    </div>
+                    <div class="w-full bg-white/20 rounded-full h-2 mt-2">
+                        <div class="bg-white h-2 rounded-full" style="width: 75%"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="md:col-span-3">
+                <div class="flex items-center justify-between mb-6">
+                    <h2 class="text-2xl font-bold text-slate-800">Proyectos Recientes</h2>
+                    <div class="flex bg-white rounded-lg p-1 border border-slate-200">
+                        <button class="px-3 py-1 text-sm rounded-md bg-slate-100 font-medium">Todos</button>
+                        <button class="px-3 py-1 text-sm rounded-md hover:bg-slate-50">Activos</button>
+                    </div>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" id="projectsGrid">
+                </div>
+            </div>
+        </div>
+    </template>
+
+    <template id="editor-view">
+        <div class="flex flex-col space-y-6">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center space-x-4">
+                    <button onclick="router.navigate('dashboard')" class="w-10 h-10 flex items-center justify-center rounded-full bg-white border border-slate-200 hover:bg-slate-50 transition-colors">⬅</button>
+                    <h2 class="text-2xl font-bold text-slate-800" id="editorTitle">Nueva Idea</h2>
+                </div>
+                <div class="flex space-x-3">
+                    <button onclick="appState.saveCurrentIdea()" class="px-6 py-2 bg-primary text-white rounded-xl font-bold shadow-lg shadow-primary/20 hover:bg-blue-700 transition-all">💾 Guardar</button>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <div class="lg:col-span-2 space-y-6">
+                    <div class="bg-white p-8 rounded-xl2 shadow-sm border border-slate-100">
+                        <div class="grid grid-cols-2 gap-4 mb-6">
+                            <div>
+                                <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Título del Proyecto</label>
+                                <input type="text" id="inputTitle" class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all" placeholder="Ej: Lanzamiento Producto X">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Tema Central</label>
+                                <input type="text" id="inputTopic" class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all" placeholder="Ej: Innovación y Estilo">
+                            </div>
+                        </div>
+                        <div class="mb-6">
+                            <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Descripción</label>
+                            <textarea id="inputDesc" rows="2" class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all" placeholder="Breve resumen de la visión..."></textarea>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Script Inicial</label>
+                            <textarea id="inputScript" rows="12" class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all font-mono text-sm leading-relaxed" placeholder="[ESCENA 1]..."></textarea>
+                        </div>
+                    </div>
+
+                    <div class="bg-white p-8 rounded-xl2 shadow-sm border border-slate-100">
+                        <h3 class="text-lg font-bold mb-6 flex items-center">
+                            <span class="mr-2">🖼️</span> Storyboard
+                        </h3>
+                        <div class="grid grid-cols-2 md:grid-cols-4 gap-4" id="storyboardGrid">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="space-y-6">
+                    <div class="bg-slate-900 rounded-xl2 p-4 shadow-xl overflow-hidden group">
+                        <div class="aspect-video bg-slate-800 rounded-lg flex items-center justify-center relative overflow-hidden">
+                            <div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent flex items-end p-4">
+                                <span class="text-white text-xs font-medium px-2 py-1 bg-white/20 backdrop-blur-md rounded">VISTA PREVIA</span>
+                            </div>
+                            <div class="text-white opacity-20 text-6xl group-hover:scale-110 transition-transform">▶</div>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-white p-6 rounded-xl2 shadow-sm border border-slate-100">
+                        <h3 class="text-sm font-bold text-slate-400 uppercase mb-4">Estado de Producción</h3>
+                        <div class="space-y-2">
+                            <label class="flex items-center p-3 rounded-xl border border-slate-100 hover:bg-slate-50 cursor-pointer transition-colors">
+                                <input type="radio" name="status" value="Idea" class="w-4 h-4 text-primary">
+                                <span class="ml-3 text-sm font-medium">💡 Idea</span>
+                            </label>
+                            <label class="flex items-center p-3 rounded-xl border border-slate-100 hover:bg-slate-50 cursor-pointer transition-colors">
+                                <input type="radio" name="status" value="Guion" class="w-4 h-4 text-primary">
+                                <span class="ml-3 text-sm font-medium">📝 Guion</span>
+                            </label>
+                            <label class="flex items-center p-3 rounded-xl border border-slate-100 hover:bg-slate-50 cursor-pointer transition-colors">
+                                <input type="radio" name="status" value="Storyboard" class="w-4 h-4 text-primary">
+                                <span class="ml-3 text-sm font-medium">🎨 Storyboard</span>
+                            </label>
+                            <label class="flex items-center p-3 rounded-xl border border-slate-100 hover:bg-slate-50 cursor-pointer transition-colors">
+                                <input type="radio" name="status" value="Producción" class="w-4 h-4 text-primary">
+                                <span class="ml-3 text-sm font-medium">🎬 Producción</span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </template>
+
+    <script>
+        const appState = {
+            ideas: [
+                {
+                    id: 1,
+                    title: 'Campaña Summer 2026',
+                    description: 'Enfoque en vitalidad y colores saturados para RRSS.',
+                    topic: 'Moda Sostenible',
+                    script: '[ESCENA 1]\nPlano medio de modelo caminando por la playa.\nNARRADOR: El futuro es hoy.',
+                    status: 'Idea'
+                },
+                {
+                    id: 2,
+                    title: 'Documental Tech',
+                    description: 'Entrevistas con ingenieros sobre IA generativa.',
+                    topic: 'Inteligencia Artificial',
+                    script: '[INTRO]\nMontaje de racks de servidores con luces parpadeantes.',
+                    status: 'Producción'
+                },
+                {
+                    id: 3,
+                    title: 'Short Ad: Coffee Moment',
+                    description: 'Comercial de 15s para café premium.',
+                    topic: 'Lifestyle',
+                    script: '[DETALLE]\nCafé cayendo en cámara lenta sobre una taza de porcelana.',
+                    status: 'Guion'
+                }
+            ],
+            editingId: null,
+
+            getIdea(id) {
+                return this.ideas.find(i => i.id === parseInt(id));
+            },
+
+            saveCurrentIdea() {
+                const title = document.getElementById('inputTitle').value;
+                const topic = document.getElementById('inputTopic').value;
+                const description = document.getElementById('inputDesc').value;
+                const script = document.getElementById('inputScript').value;
+                const status = document.querySelector('input[name="status"]:checked')?.value || 'Idea';
+
+                if (!title) return alert('Por favor, ingresa un título');
+
+                if (this.editingId) {
+                    const idx = this.ideas.findIndex(i => i.id === this.editingId);
+                    this.ideas[idx] = { ...this.ideas[idx], title, topic, description, script, status };
+                } else {
+                    const newId = this.ideas.length > 0 ? Math.max(...this.ideas.map(i => i.id)) + 1 : 1;
+                    this.ideas.push({ id: newId, title, topic, description, script, status });
+                }
+                router.navigate('dashboard');
+            },
+
+            openNewIdeaForm() {
+                this.editingId = null;
+                router.navigate('editor');
+            }
+        };
+
+        const router = {
+            navigate(view, params = {}) {
+                const container = document.getElementById('content-area');
+                container.style.opacity = '0';
+                
+                setTimeout(() => {
+                    container.innerHTML = '';
+                    const template = document.getElementById(`${view}-view`);
+                    const clone = template.content.cloneNode(true);
+                    container.appendChild(clone);
+
+                    if (view === 'dashboard') {
+                        this.initDashboard();
+                    } else if (view === 'editor') {
+                        this.initEditor(params.id);
+                    }
+                    
+                    container.style.opacity = '1';
+                }, 200);
+            },
+
+            initDashboard() {
+                document.getElementById('totalIdeas').textContent = appState.ideas.length;
+                const grid = document.getElementById('projectsGrid');
+                appState.ideas.forEach(idea => {
+                    const card = document.createElement('div');
+                    card.className = 'bg-white p-6 rounded-xl2 border border-slate-100 shadow-sm bento-card cursor-pointer group';
+                    card.onclick = () => this.navigate('editor', { id: idea.id });
+                    
+                    let statusColor = 'bg-slate-100 text-slate-600';
+                    if (idea.status === 'Idea') statusColor = 'bg-blue-100 text-blue-600';
+                    if (idea.status === 'Guion') statusColor = 'bg-violet-100 text-violet-600';
+                    if (idea.status === 'Storyboard') statusColor = 'bg-pink-100 text-pink-600';
+                    if (idea.status === 'Producción') statusColor = 'bg-green-100 text-green-600';
+
+                    card.innerHTML = `
+                        <div class="flex justify-between items-start mb-4">
+                            <span class="px-3 py-1 rounded-full text-xs font-bold uppercase tracking-widest ${statusColor}">${idea.status}</span>
+                            <span class="text-xl group-hover:scale-125 transition-transform">📄</span>
+                        </div>
+                        <h4 class="text-lg font-bold text-slate-800 mb-2">${idea.title}</h4>
+                        <p class="text-sm text-slate-500 line-clamp-2 mb-4">${idea.description}</p>
+                        <div class="flex items-center text-xs text-slate-400 font-medium">
+                            <span class="mr-2">🏷️ ${idea.topic}</span>
+                        </div>
+                    `;
+                    grid.appendChild(card);
+                });
+
+                const ctx = document.getElementById('productionChart').getContext('2d');
+                const counts = { Idea: 0, Guion: 0, Storyboard: 0, Producción: 0 };
+                appState.ideas.forEach(i => counts[i.status]++);
+
+                new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: Object.keys(counts),
+                        datasets: [{
+                            label: 'Proyectos',
+                            data: Object.values(counts),
+                            backgroundColor: ['#3B82F6', '#8B5CF6', '#F472B6', '#10B981'],
+                            borderRadius: 8
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: { legend: { display: false } },
+                        scales: {
+                            y: { beginAtZero: true, grid: { display: false }, ticks: { stepSize: 1 } },
+                            x: { grid: { display: false } }
+                        }
+                    }
+                });
+            },
+
+            initEditor(id) {
+                const sbGrid = document.getElementById('storyboardGrid');
+                for (let i = 0; i < 4; i++) {
+                    const canvasBox = document.createElement('div');
+                    canvasBox.className = 'aspect-square bg-slate-50 rounded-xl border-2 border-dashed border-slate-200 flex flex-col items-center justify-center p-2 group hover:border-primary hover:bg-white transition-all';
+                    canvasBox.innerHTML = `
+                        <canvas width="100" height="100" class="w-full h-full opacity-10 group-hover:opacity-100 transition-opacity" id="canvas-sb-${i}"></canvas>
+                        <span class="absolute text-[10px] font-bold text-slate-300 pointer-events-none uppercase">Frame ${i+1}</span>
+                    `;
+                    sbGrid.appendChild(canvasBox);
+                    const ctx = canvasBox.querySelector('canvas').getContext('2d');
+                    ctx.strokeStyle = '#cbd5e1';
+                    ctx.setLineDash([5, 5]);
+                    ctx.strokeRect(10, 10, 80, 80);
+                }
+
+                if (id) {
+                    const idea = appState.getIdea(id);
+                    appState.editingId = idea.id;
+                    document.getElementById('editorTitle').textContent = `Editando: ${idea.title}`;
+                    document.getElementById('inputTitle').value = idea.title;
+                    document.getElementById('inputTopic').value = idea.topic;
+                    document.getElementById('inputDesc').value = idea.description;
+                    document.getElementById('inputScript').value = idea.script;
+                    const radio = document.querySelector(`input[name="status"][value="${idea.status}"]`);
+                    if (radio) radio.checked = true;
+                }
+            }
+        };
+
+        window.onload = () => router.navigate('dashboard');
+    </script>
+</body>
+</html>
