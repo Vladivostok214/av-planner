@@ -8,10 +8,19 @@ Chart.register(...registerables);
 
 // --- Firebase Mock & Initialization Logic ---
 let db, auth;
-const isMock = !import.meta.env.VITE_FIREBASE_API_KEY || import.meta.env.VITE_FIREBASE_API_KEY === "dummy-key";
+const firebaseConfig = {
+    apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
+    authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
+    projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID,
+    storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET,
+    messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID,
+    appId: import.meta.env.VITE_FIREBASE_APP_ID
+};
+
+const isMock = !firebaseConfig.apiKey || firebaseConfig.apiKey === "tu_api_key_aqui" || firebaseConfig.apiKey === "dummy-key";
 
 if (isMock) {
-    console.warn("Using Local Mock Database (localStorage)");
+    console.warn("🏠 Modo LOCAL (localStorage): No se detectaron credenciales de Firebase.");
     auth = {
         currentUser: { uid: 'mock-user-123' },
         onAuthStateChanged: (cb) => {
@@ -64,14 +73,7 @@ if (isMock) {
         doc: (db, ...path) => ({ id: path[path.length - 1] })
     };
 } else {
-    const firebaseConfig = {
-        apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
-        authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
-        projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID,
-        storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET,
-        messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID,
-        appId: import.meta.env.VITE_FIREBASE_APP_ID
-    };
+    console.log("🚀 Conectado a la NUBE de Firebase:", firebaseConfig.projectId);
     const app = initializeApp(firebaseConfig);
     auth = getAuth(app);
     db = getFirestore(app);
@@ -91,16 +93,23 @@ window.appState = {
 
 const initAuth = async () => {
     if (isMock) return;
-    if (typeof window.__initial_auth_token !== 'undefined' && window.__initial_auth_token) {
-        await signInWithCustomToken(auth, window.__initial_auth_token);
-    } else {
-        await signInAnonymously(auth);
+    try {
+        if (typeof window.__initial_auth_token !== 'undefined' && window.__initial_auth_token) {
+            await signInWithCustomToken(auth, window.__initial_auth_token);
+        } else {
+            await signInAnonymously(auth);
+        }
+    } catch (error) {
+        console.error("❌ Error en Autenticación Firebase:", error.code, error.message);
     }
 };
 
 onAuthStateChanged(auth, (user) => {
     window.appState.user = user;
-    if (user) loadData();
+    if (user) {
+        console.log("👤 Usuario Autenticado:", user.uid, user.isAnonymous ? "(Anónimo)" : "");
+        loadData();
+    }
 });
 
 const loadData = () => {
@@ -113,22 +122,43 @@ const loadData = () => {
     }
     const q = collection(db, 'artifacts', appId, 'public', 'data', 'projects');
     onSnapshot(q, (snapshot) => {
+        console.log("📥 Datos recibidos de Firestore:", snapshot.size, "documentos");
         window.appState.projects = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
         renderApp();
-    }, (error) => console.error("Error loading data", error));
+    }, (error) => {
+        console.error("❌ Error al cargar datos de Firestore:", error.code, error.message);
+        if (error.code === 'permission-denied') {
+            alert("Error: No tienes permisos para leer la base de datos. Revisa las reglas en la consola de Firebase.");
+        }
+    });
 };
 
 const saveProject = async (projectData) => {
-    if (!window.appState.user) return;
+    if (!window.appState.user) {
+        alert("No estás autenticado. Espera a que la app conecte.");
+        return;
+    }
     const payload = { ...projectData, status: 'Idea', createdAt: new Date().toISOString() };
-    if (isMock) await db.addDoc({}, payload);
-    else await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'projects'), payload);
+    try {
+        if (isMock) await db.addDoc({}, payload);
+        else {
+            console.log("📤 Guardando nuevo proyecto en la nube...");
+            await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'projects'), payload);
+        }
+    } catch (error) {
+        console.error("❌ Error al guardar en Firestore:", error.code, error.message);
+        alert("Error al guardar: " + error.message);
+    }
 };
 
 const updateProject = async (projectId, newData) => {
     if (!window.appState.user) return;
-    if (isMock) await db.updateDoc({ id: projectId }, newData);
-    else await updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'projects', projectId), newData);
+    try {
+        if (isMock) await db.updateDoc({ id: projectId }, newData);
+        else await updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'projects', projectId), newData);
+    } catch (error) {
+        console.error("❌ Error al actualizar en Firestore:", error.code, error.message);
+    }
 };
 
 window.saveScriptRealtime = async (projectId, text) => {
