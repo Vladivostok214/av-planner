@@ -3,343 +3,397 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MediaPlanner Pro</title>
+    <title>AV Planner | Marketing Team</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    colors: {
-                        primary: '#3B82F6',
-                        secondary: '#8B5CF6',
-                        accent: '#F472B6',
-                        surface: '#F8FAFC'
-                    },
-                    fontFamily: {
-                        sans: ['Inter', 'sans-serif']
-                    },
-                    borderRadius: {
-                        'xl2': '1.5rem'
-                    }
-                }
-            }
-        }
-    </script>
-    <style>
-        body { background-color: #f1f5f9; scroll-behavior: smooth; }
-        .bento-card { transition: transform 0.2s ease, box-shadow 0.2s ease; }
-        .bento-card:hover { transform: translateY(-4px); box-shadow: 0 10px 25px -5px rgba(59, 130, 246, 0.1); }
-        .custom-scrollbar::-webkit-scrollbar { width: 6px; }
-        .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
-        .custom-scrollbar::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
-        .view-transition { transition: opacity 0.3s ease-in-out; }
-    </style>
-</head>
-<body class="font-sans text-slate-900">
-    <div id="app" class="min-h-screen flex flex-col">
-        <nav class="bg-white/80 backdrop-blur-md border-b border-slate-200 sticky top-0 z-50">
-            <div class="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
-                <div class="flex items-center space-x-2">
-                    <div class="w-10 h-10 bg-gradient-to-br from-primary to-secondary rounded-xl flex items-center justify-center text-white text-xl font-bold">M</div>
-                    <span class="text-xl font-bold tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-primary to-secondary">MediaPlanner</span>
-                </div>
-                <div class="flex space-x-2">
-                    <button onclick="router.navigate('dashboard')" class="px-4 py-2 rounded-lg font-medium transition-colors hover:bg-slate-100">📋 Dashboard</button>
-                    <button onclick="appState.openNewIdeaForm()" class="px-4 py-2 bg-primary text-white rounded-lg font-medium shadow-lg shadow-primary/20 hover:bg-blue-700 transition-all">✚ Nueva Idea</button>
-                </div>
-            </div>
-        </nav>
+    <script src="https://cdn.jsdelivr.net/npm/plotly.js-dist-min"></script>
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, onAuthStateChanged, signInAnonymously, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, collection, doc, setDoc, onSnapshot, query, addDoc, updateDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-        <main id="content-area" class="flex-grow p-6 max-w-7xl mx-auto w-full view-transition">
-        </main>
-    </div>
+        const firebaseConfig = JSON.parse(__firebase_config);
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'av-planner-default';
 
-    <template id="dashboard-view">
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <div class="md:col-span-2 bg-white p-6 rounded-xl2 shadow-sm border border-slate-100 bento-card">
-                <h3 class="text-lg font-bold mb-4 text-slate-700">Pipeline de Producción</h3>
-                <div class="h-64">
-                    <canvas id="productionChart"></canvas>
-                </div>
-            </div>
-            <div class="bg-gradient-to-br from-primary to-secondary p-6 rounded-xl2 shadow-lg text-white bento-card flex flex-col justify-between">
-                <div>
-                    <h3 class="text-lg font-bold opacity-90">Resumen Semanal</h3>
-                    <p class="text-3xl font-bold mt-2" id="totalIdeas">0</p>
-                    <p class="text-sm opacity-75">Proyectos activos en el radar</p>
-                </div>
-                <div class="mt-4 pt-4 border-t border-white/20">
-                    <div class="flex justify-between items-center">
-                        <span class="text-sm">Meta alcanzada</span>
-                        <span class="text-sm font-bold">75%</span>
-                    </div>
-                    <div class="w-full bg-white/20 rounded-full h-2 mt-2">
-                        <div class="bg-white h-2 rounded-full" style="width: 75%"></div>
-                    </div>
-                </div>
-            </div>
-            <div class="md:col-span-3">
-                <div class="flex items-center justify-between mb-6">
-                    <h2 class="text-2xl font-bold text-slate-800">Proyectos Recientes</h2>
-                    <div class="flex bg-white rounded-lg p-1 border border-slate-200">
-                        <button class="px-3 py-1 text-sm rounded-md bg-slate-100 font-medium">Todos</button>
-                        <button class="px-3 py-1 text-sm rounded-md hover:bg-slate-50">Activos</button>
-                    </div>
-                </div>
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" id="projectsGrid">
-                </div>
-            </div>
-        </div>
-    </template>
+        window.appState = {
+            user: null,
+            projects: [],
+            currentProject: null,
+            view: 'dashboard'
+        };
 
-    <template id="editor-view">
-        <div class="flex flex-col space-y-6">
-            <div class="flex items-center justify-between">
-                <div class="flex items-center space-x-4">
-                    <button onclick="router.navigate('dashboard')" class="w-10 h-10 flex items-center justify-center rounded-full bg-white border border-slate-200 hover:bg-slate-50 transition-colors">⬅</button>
-                    <h2 class="text-2xl font-bold text-slate-800" id="editorTitle">Nueva Idea</h2>
-                </div>
-                <div class="flex space-x-3">
-                    <button onclick="appState.saveCurrentIdea()" class="px-6 py-2 bg-primary text-white rounded-xl font-bold shadow-lg shadow-primary/20 hover:bg-blue-700 transition-all">💾 Guardar</button>
-                </div>
-            </div>
-
-            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                <div class="lg:col-span-2 space-y-6">
-                    <div class="bg-white p-8 rounded-xl2 shadow-sm border border-slate-100">
-                        <div class="grid grid-cols-2 gap-4 mb-6">
-                            <div>
-                                <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Título del Proyecto</label>
-                                <input type="text" id="inputTitle" class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all" placeholder="Ej: Lanzamiento Producto X">
-                            </div>
-                            <div>
-                                <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Tema Central</label>
-                                <input type="text" id="inputTopic" class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all" placeholder="Ej: Innovación y Estilo">
-                            </div>
-                        </div>
-                        <div class="mb-6">
-                            <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Descripción</label>
-                            <textarea id="inputDesc" rows="2" class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all" placeholder="Breve resumen de la visión..."></textarea>
-                        </div>
-                        <div>
-                            <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Script Inicial</label>
-                            <textarea id="inputScript" rows="12" class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all font-mono text-sm leading-relaxed" placeholder="[ESCENA 1]..."></textarea>
-                        </div>
-                    </div>
-
-                    <div class="bg-white p-8 rounded-xl2 shadow-sm border border-slate-100">
-                        <h3 class="text-lg font-bold mb-6 flex items-center">
-                            <span class="mr-2">🖼️</span> Storyboard
-                        </h3>
-                        <div class="grid grid-cols-2 md:grid-cols-4 gap-4" id="storyboardGrid">
-                        </div>
-                    </div>
-                </div>
-
-                <div class="space-y-6">
-                    <div class="bg-slate-900 rounded-xl2 p-4 shadow-xl overflow-hidden group">
-                        <div class="aspect-video bg-slate-800 rounded-lg flex items-center justify-center relative overflow-hidden">
-                            <div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent flex items-end p-4">
-                                <span class="text-white text-xs font-medium px-2 py-1 bg-white/20 backdrop-blur-md rounded">VISTA PREVIA</span>
-                            </div>
-                            <div class="text-white opacity-20 text-6xl group-hover:scale-110 transition-transform">▶</div>
-                        </div>
-                    </div>
-                    
-                    <div class="bg-white p-6 rounded-xl2 shadow-sm border border-slate-100">
-                        <h3 class="text-sm font-bold text-slate-400 uppercase mb-4">Estado de Producción</h3>
-                        <div class="space-y-2">
-                            <label class="flex items-center p-3 rounded-xl border border-slate-100 hover:bg-slate-50 cursor-pointer transition-colors">
-                                <input type="radio" name="status" value="Idea" class="w-4 h-4 text-primary">
-                                <span class="ml-3 text-sm font-medium">💡 Idea</span>
-                            </label>
-                            <label class="flex items-center p-3 rounded-xl border border-slate-100 hover:bg-slate-50 cursor-pointer transition-colors">
-                                <input type="radio" name="status" value="Guion" class="w-4 h-4 text-primary">
-                                <span class="ml-3 text-sm font-medium">📝 Guion</span>
-                            </label>
-                            <label class="flex items-center p-3 rounded-xl border border-slate-100 hover:bg-slate-50 cursor-pointer transition-colors">
-                                <input type="radio" name="status" value="Storyboard" class="w-4 h-4 text-primary">
-                                <span class="ml-3 text-sm font-medium">🎨 Storyboard</span>
-                            </label>
-                            <label class="flex items-center p-3 rounded-xl border border-slate-100 hover:bg-slate-50 cursor-pointer transition-colors">
-                                <input type="radio" name="status" value="Producción" class="w-4 h-4 text-primary">
-                                <span class="ml-3 text-sm font-medium">🎬 Producción</span>
-                            </label>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </template>
-
-    <script>
-        const appState = {
-            ideas: [
-                {
-                    id: 1,
-                    title: 'Campaña Summer 2026',
-                    description: 'Enfoque en vitalidad y colores saturados para RRSS.',
-                    topic: 'Moda Sostenible',
-                    script: '[ESCENA 1]\nPlano medio de modelo caminando por la playa.\nNARRADOR: El futuro es hoy.',
-                    status: 'Idea'
-                },
-                {
-                    id: 2,
-                    title: 'Documental Tech',
-                    description: 'Entrevistas con ingenieros sobre IA generativa.',
-                    topic: 'Inteligencia Artificial',
-                    script: '[INTRO]\nMontaje de racks de servidores con luces parpadeantes.',
-                    status: 'Producción'
-                },
-                {
-                    id: 3,
-                    title: 'Short Ad: Coffee Moment',
-                    description: 'Comercial de 15s para café premium.',
-                    topic: 'Lifestyle',
-                    script: '[DETALLE]\nCafé cayendo en cámara lenta sobre una taza de porcelana.',
-                    status: 'Guion'
-                }
-            ],
-            editingId: null,
-
-            getIdea(id) {
-                return this.ideas.find(i => i.id === parseInt(id));
-            },
-
-            saveCurrentIdea() {
-                const title = document.getElementById('inputTitle').value;
-                const topic = document.getElementById('inputTopic').value;
-                const description = document.getElementById('inputDesc').value;
-                const script = document.getElementById('inputScript').value;
-                const status = document.querySelector('input[name="status"]:checked')?.value || 'Idea';
-
-                if (!title) return alert('Por favor, ingresa un título');
-
-                if (this.editingId) {
-                    const idx = this.ideas.findIndex(i => i.id === this.editingId);
-                    this.ideas[idx] = { ...this.ideas[idx], title, topic, description, script, status };
-                } else {
-                    const newId = this.ideas.length > 0 ? Math.max(...this.ideas.map(i => i.id)) + 1 : 1;
-                    this.ideas.push({ id: newId, title, topic, description, script, status });
-                }
-                router.navigate('dashboard');
-            },
-
-            openNewIdeaForm() {
-                this.editingId = null;
-                router.navigate('editor');
+        const initAuth = async () => {
+            if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+                await signInWithCustomToken(auth, __initial_auth_token);
+            } else {
+                await signInAnonymously(auth);
             }
         };
 
-        const router = {
-            navigate(view, params = {}) {
-                const container = document.getElementById('content-area');
-                container.style.opacity = '0';
-                
-                setTimeout(() => {
-                    container.innerHTML = '';
-                    const template = document.getElementById(`${view}-view`);
-                    const clone = template.content.cloneNode(true);
-                    container.appendChild(clone);
+        onAuthStateChanged(auth, (user) => {
+            window.appState.user = user;
+            if (user) {
+                loadData();
+            }
+        });
 
-                    if (view === 'dashboard') {
-                        this.initDashboard();
-                    } else if (view === 'editor') {
-                        this.initEditor(params.id);
-                    }
-                    
-                    container.style.opacity = '1';
-                }, 200);
-            },
+        const loadData = () => {
+            const q = collection(db, 'artifacts', appId, 'public', 'data', 'projects');
+            onSnapshot(q, (snapshot) => {
+                window.appState.projects = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                renderApp();
+            }, (error) => {
+                console.error("Error loading data", error);
+            });
+        };
 
-            initDashboard() {
-                document.getElementById('totalIdeas').textContent = appState.ideas.length;
-                const grid = document.getElementById('projectsGrid');
-                appState.ideas.forEach(idea => {
-                    const card = document.createElement('div');
-                    card.className = 'bg-white p-6 rounded-xl2 border border-slate-100 shadow-sm bento-card cursor-pointer group';
-                    card.onclick = () => this.navigate('editor', { id: idea.id });
-                    
-                    let statusColor = 'bg-slate-100 text-slate-600';
-                    if (idea.status === 'Idea') statusColor = 'bg-blue-100 text-blue-600';
-                    if (idea.status === 'Guion') statusColor = 'bg-violet-100 text-violet-600';
-                    if (idea.status === 'Storyboard') statusColor = 'bg-pink-100 text-pink-600';
-                    if (idea.status === 'Producción') statusColor = 'bg-green-100 text-green-600';
-
-                    card.innerHTML = `
-                        <div class="flex justify-between items-start mb-4">
-                            <span class="px-3 py-1 rounded-full text-xs font-bold uppercase tracking-widest ${statusColor}">${idea.status}</span>
-                            <span class="text-xl group-hover:scale-125 transition-transform">📄</span>
-                        </div>
-                        <h4 class="text-lg font-bold text-slate-800 mb-2">${idea.title}</h4>
-                        <p class="text-sm text-slate-500 line-clamp-2 mb-4">${idea.description}</p>
-                        <div class="flex items-center text-xs text-slate-400 font-medium">
-                            <span class="mr-2">🏷️ ${idea.topic}</span>
-                        </div>
-                    `;
-                    grid.appendChild(card);
+        const saveProject = async (projectData) => {
+            if (!window.appState.user) return;
+            try {
+                await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'projects'), {
+                    ...projectData,
+                    status: 'Idea',
+                    createdAt: new Date().toISOString()
                 });
+            } catch (e) {
+                console.error("Error saving", e);
+            }
+        };
 
-                const ctx = document.getElementById('productionChart').getContext('2d');
-                const counts = { Idea: 0, Guion: 0, Storyboard: 0, Producción: 0 };
-                appState.ideas.forEach(i => counts[i.status]++);
+        const updateProjectStatus = async (projectId, newStatus) => {
+            if (!window.appState.user) return;
+            const docRef = doc(db, 'artifacts', appId, 'public', 'data', 'projects', projectId);
+            await updateDoc(docRef, { status: newStatus });
+        };
 
-                new Chart(ctx, {
-                    type: 'bar',
-                    data: {
-                        labels: Object.keys(counts),
-                        datasets: [{
-                            label: 'Proyectos',
-                            data: Object.values(counts),
-                            backgroundColor: ['#3B82F6', '#8B5CF6', '#F472B6', '#10B981'],
-                            borderRadius: 8
-                        }]
-                    },
-                    options: {
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        plugins: { legend: { display: false } },
-                        scales: {
-                            y: { beginAtZero: true, grid: { display: false }, ticks: { stepSize: 1 } },
-                            x: { grid: { display: false } }
+        const wrapLabel = (label) => {
+            if (typeof label !== 'string') return label;
+            if (label.length <= 16) return label;
+            const words = label.split(' ');
+            const lines = [];
+            let currentLine = "";
+            words.forEach(word => {
+                if ((currentLine + word).length > 16) {
+                    lines.push(currentLine.trim());
+                    currentLine = word + " ";
+                } else {
+                    currentLine += word + " ";
+                }
+            });
+            lines.push(currentLine.trim());
+            return lines;
+        };
+
+        const renderChart = () => {
+            const ctx = document.getElementById('statsChart');
+            if (!ctx) return;
+            
+            const stats = {
+                'Idea': 0,
+                'Scripting': 0,
+                'Storyboard': 0,
+                'Producción': 0,
+                'Finalizado': 0
+            };
+            
+            window.appState.projects.forEach(p => {
+                if (stats[p.status] !== undefined) stats[p.status]++;
+            });
+
+            if (window.myChart) window.myChart.destroy();
+
+            window.myChart = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: Object.keys(stats).map(wrapLabel),
+                    datasets: [{
+                        data: Object.values(stats),
+                        backgroundColor: ['#FFC300', '#FF5733', '#C70039', '#900C3F', '#581845'],
+                        borderWidth: 0
+                    }]
+                },
+                options: {
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { position: 'bottom' },
+                        tooltip: {
+                            callbacks: {
+                                title: function(tooltipItems) {
+                                    const item = tooltipItems[0];
+                                    let label = item.chart.data.labels[item.dataIndex];
+                                    return Array.isArray(label) ? label.join(' ') : label;
+                                }
+                            }
                         }
                     }
-                });
-            },
-
-            initEditor(id) {
-                const sbGrid = document.getElementById('storyboardGrid');
-                for (let i = 0; i < 4; i++) {
-                    const canvasBox = document.createElement('div');
-                    canvasBox.className = 'aspect-square bg-slate-50 rounded-xl border-2 border-dashed border-slate-200 flex flex-col items-center justify-center p-2 group hover:border-primary hover:bg-white transition-all';
-                    canvasBox.innerHTML = `
-                        <canvas width="100" height="100" class="w-full h-full opacity-10 group-hover:opacity-100 transition-opacity" id="canvas-sb-${i}"></canvas>
-                        <span class="absolute text-[10px] font-bold text-slate-300 pointer-events-none uppercase">Frame ${i+1}</span>
-                    `;
-                    sbGrid.appendChild(canvasBox);
-                    const ctx = canvasBox.querySelector('canvas').getContext('2d');
-                    ctx.strokeStyle = '#cbd5e1';
-                    ctx.setLineDash([5, 5]);
-                    ctx.strokeRect(10, 10, 80, 80);
                 }
+            });
+        };
 
-                if (id) {
-                    const idea = appState.getIdea(id);
-                    appState.editingId = idea.id;
-                    document.getElementById('editorTitle').textContent = `Editando: ${idea.title}`;
-                    document.getElementById('inputTitle').value = idea.title;
-                    document.getElementById('inputTopic').value = idea.topic;
-                    document.getElementById('inputDesc').value = idea.description;
-                    document.getElementById('inputScript').value = idea.script;
-                    const radio = document.querySelector(`input[name="status"][value="${idea.status}"]`);
-                    if (radio) radio.checked = true;
-                }
+        const renderApp = () => {
+            const root = document.getElementById('app');
+            if (window.appState.view === 'dashboard') {
+                root.innerHTML = `
+                    <div class="p-6 max-w-6xl mx-auto">
+                        <header class="flex justify-between items-center mb-8">
+                            <div>
+                                <h1 class="text-4xl font-bold text-[#581845]">AV Content Planner</h1>
+                                <p class="text-gray-500">Panel de Control de Marketing</p>
+                            </div>
+                            <button onclick="window.setView('new')" class="bg-[#C70039] text-white px-6 py-3 rounded-full font-bold shadow-lg hover:scale-105 transition-transform">
+                                + Nueva Idea
+                            </button>
+                        </header>
+
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                            <div class="bg-white p-6 rounded-3xl shadow-sm border border-gray-100 md:col-span-1">
+                                <h3 class="font-bold mb-4 text-gray-700 text-center">Estado del Pipeline</h3>
+                                <div class="relative h-64 w-full mx-auto">
+                                    <canvas id="statsChart"></canvas>
+                                </div>
+                            </div>
+                            <div class="md:col-span-2 grid grid-cols-2 gap-4">
+                                <div class="bg-[#FFC300] p-6 rounded-3xl text-[#581845]">
+                                    <span class="text-4xl block mb-2">💡</span>
+                                    <h4 class="font-bold text-xl">${window.appState.projects.length}</h4>
+                                    <p class="text-sm opacity-80">Ideas Registradas</p>
+                                </div>
+                                <div class="bg-[#581845] p-6 rounded-3xl text-white">
+                                    <span class="text-4xl block mb-2">🎬</span>
+                                    <h4 class="font-bold text-xl">${window.appState.projects.filter(p => p.status === 'Producción').length}</h4>
+                                    <p class="text-sm opacity-80">En Producción</p>
+                                </div>
+                                <div class="bg-white p-6 rounded-3xl border border-gray-100 flex items-center justify-between col-span-2">
+                                    <div>
+                                        <h4 class="font-bold text-gray-800">Próxima Grabación</h4>
+                                        <p class="text-sm text-gray-500">Video de Campaña Semanal</p>
+                                    </div>
+                                    <div class="text-right">
+                                        <span class="bg-green-100 text-green-700 px-3 py-1 rounded-full text-xs font-bold">Mañana</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <h2 class="text-2xl font-bold mb-6 text-[#581845]">Proyectos Recientes</h2>
+                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                            ${window.appState.projects.map(p => `
+                                <div onclick="window.viewDetail('${p.id}')" class="bg-white p-6 rounded-3xl shadow-sm border border-transparent hover:border-[#C70039] cursor-pointer transition-all group">
+                                    <div class="flex justify-between items-start mb-4">
+                                        <span class="px-3 py-1 rounded-full text-xs font-bold ${getStatusClass(p.status)}">${p.status}</span>
+                                        <span class="text-gray-300 group-hover:text-[#C70039]">➔</span>
+                                    </div>
+                                    <h3 class="font-bold text-lg mb-2 text-gray-800">${p.title}</h3>
+                                    <p class="text-sm text-gray-500 line-clamp-2 mb-4">${p.description}</p>
+                                    <div class="flex items-center text-xs text-gray-400">
+                                        <span class="mr-2">📁 ${p.category}</span>
+                                    </div>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                `;
+                renderChart();
+            } else if (window.appState.view === 'new') {
+                root.innerHTML = `
+                    <div class="p-6 max-w-2xl mx-auto">
+                        <button onclick="window.setView('dashboard')" class="text-gray-500 mb-6 flex items-center hover:text-[#581845]">
+                            <span class="mr-2">←</span> Volver al Dashboard
+                        </button>
+                        <div class="bg-white p-8 rounded-3xl shadow-xl">
+                            <h2 class="text-3xl font-bold mb-6 text-[#581845]">Capturar Nueva Idea</h2>
+                            <form id="ideaForm" class="space-y-4">
+                                <div>
+                                    <label class="block text-sm font-bold text-gray-700 mb-1">Título del Proyecto</label>
+                                    <input type="text" id="title" required class="w-full p-3 bg-gray-50 rounded-xl border-none focus:ring-2 focus:ring-[#FF5733]" placeholder="Ej: Tutorial de Producto X">
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-bold text-gray-700 mb-1">Categoría/Tema</label>
+                                    <select id="category" class="w-full p-3 bg-gray-50 rounded-xl border-none focus:ring-2 focus:ring-[#FF5733]">
+                                        <option>Social Media</option>
+                                        <option>Educativo</option>
+                                        <option>Institucional</option>
+                                        <option>Publicidad</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-bold text-gray-700 mb-1">Descripción Breve</label>
+                                    <textarea id="description" rows="3" required class="w-full p-3 bg-gray-50 rounded-xl border-none focus:ring-2 focus:ring-[#FF5733]" placeholder="¿De qué trata este video?"></textarea>
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-bold text-gray-700 mb-1">Script Inicial / Notas</label>
+                                    <textarea id="script" rows="4" class="w-full p-3 bg-gray-50 rounded-xl border-none focus:ring-2 focus:ring-[#FF5733]" placeholder="Escribe las primeras líneas del guion..."></textarea>
+                                </div>
+                                <button type="submit" class="w-full bg-[#581845] text-white py-4 rounded-xl font-bold text-lg hover:bg-[#900C3F] transition-colors">
+                                    Guardar y Comenzar Planificación
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                `;
+                document.getElementById('ideaForm').onsubmit = async (e) => {
+                    e.preventDefault();
+                    const data = {
+                        title: document.getElementById('title').value,
+                        category: document.getElementById('category').value,
+                        description: document.getElementById('description').value,
+                        script: document.getElementById('script').value
+                    };
+                    await saveProject(data);
+                    window.setView('dashboard');
+                };
+            } else if (window.appState.view === 'detail') {
+                const p = window.appState.currentProject;
+                root.innerHTML = `
+                    <div class="p-6 max-w-6xl mx-auto">
+                        <button onclick="window.setView('dashboard')" class="text-gray-500 mb-6 flex items-center hover:text-[#581845]">
+                            <span class="mr-2">←</span> Volver al Dashboard
+                        </button>
+                        
+                        <div class="flex flex-col md:flex-row justify-between items-start mb-8 gap-4">
+                            <div>
+                                <span class="bg-[#FFC300] text-[#581845] px-3 py-1 rounded-full text-xs font-bold mb-2 inline-block">${p.category}</span>
+                                <h1 class="text-4xl font-bold text-[#581845]">${p.title}</h1>
+                            </div>
+                            <div class="flex gap-2">
+                                <select onchange="window.updateStatus('${p.id}', this.value)" class="p-2 rounded-lg bg-white border border-gray-200 text-sm font-bold">
+                                    <option ${p.status === 'Idea' ? 'selected' : ''}>Idea</option>
+                                    <option ${p.status === 'Scripting' ? 'selected' : ''}>Scripting</option>
+                                    <option ${p.status === 'Storyboard' ? 'selected' : ''}>Storyboard</option>
+                                    <option ${p.status === 'Producción' ? 'selected' : ''}>Producción</option>
+                                    <option ${p.status === 'Finalizado' ? 'selected' : ''}>Finalizado</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                            <div class="lg:col-span-2 space-y-8">
+                                <div class="bg-white p-6 rounded-3xl shadow-sm border border-gray-100">
+                                    <h3 class="font-bold text-xl mb-4 text-[#581845] flex items-center">
+                                        <span class="mr-2">📝</span> Guion Literario
+                                    </h3>
+                                    <div class="bg-gray-50 p-6 rounded-2xl font-mono text-sm leading-relaxed min-h-[300px] outline-none" contenteditable="true">
+                                        ${p.script || 'Comienza a escribir el guion aquí...'}
+                                    </div>
+                                </div>
+
+                                <div class="bg-white p-6 rounded-3xl shadow-sm border border-gray-100">
+                                    <h3 class="font-bold text-xl mb-4 text-[#581845] flex items-center">
+                                        <span class="mr-2">🎨</span> Storyboard Visual
+                                    </h3>
+                                    <div class="grid grid-cols-2 md:grid-cols-3 gap-4">
+                                        ${[1, 2, 3, 4, 5, 6].map(i => `
+                                            <div class="aspect-video bg-gray-100 rounded-xl border-2 border-dashed border-gray-200 flex items-center justify-center text-gray-300 flex-col group cursor-pointer hover:border-[#FF5733] transition-colors">
+                                                <span class="text-2xl mb-1">🖼️</span>
+                                                <span class="text-[10px] font-bold">ESCENA ${i}</span>
+                                            </div>
+                                        `).join('')}
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="space-y-8">
+                                <div class="bg-[#581845] p-6 rounded-3xl text-white">
+                                    <h3 class="font-bold text-xl mb-4 flex items-center">
+                                        <span class="mr-2">📹</span> Previsualización
+                                    </h3>
+                                    <div class="aspect-video bg-black/20 rounded-2xl flex items-center justify-center flex-col text-white/50 border border-white/10">
+                                        <span class="text-4xl mb-2">▶️</span>
+                                        <p class="text-xs">Video no procesado aún</p>
+                                    </div>
+                                    <div class="mt-6 space-y-3">
+                                        <div class="flex justify-between text-xs">
+                                            <span>Progreso de edición</span>
+                                            <span>20%</span>
+                                        </div>
+                                        <div class="w-full bg-white/10 rounded-full h-2">
+                                            <div class="bg-[#FFC300] h-2 rounded-full w-[20%]"></div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="bg-white p-6 rounded-3xl shadow-sm border border-gray-100">
+                                    <h3 class="font-bold text-sm mb-4 text-gray-400 uppercase tracking-widest">Detalles Técnicos</h3>
+                                    <ul class="space-y-4 text-sm">
+                                        <li class="flex justify-between">
+                                            <span class="text-gray-500">Formato</span>
+                                            <span class="font-bold">9:16 (Vertical)</span>
+                                        </li>
+                                        <li class="flex justify-between">
+                                            <span class="text-gray-500">Duración Est.</span>
+                                            <span class="font-bold">60 Segundos</span>
+                                        </li>
+                                        <li class="flex justify-between">
+                                            <span class="text-gray-500">Locación</span>
+                                            <span class="font-bold">Estudio A</span>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
             }
         };
 
-        window.onload = () => router.navigate('dashboard');
+        const getStatusClass = (status) => {
+            const classes = {
+                'Idea': 'bg-yellow-100 text-yellow-700',
+                'Scripting': 'bg-orange-100 text-orange-700',
+                'Storyboard': 'bg-red-100 text-red-700',
+                'Producción': 'bg-purple-100 text-purple-700',
+                'Finalizado': 'bg-green-100 text-green-700'
+            };
+            return classes[status] || 'bg-gray-100 text-gray-700';
+        };
+
+        window.setView = (view) => {
+            window.appState.view = view;
+            renderApp();
+        };
+
+        window.viewDetail = (id) => {
+            window.appState.currentProject = window.appState.projects.find(p => p.id === id);
+            window.appState.view = 'detail';
+            renderApp();
+        };
+
+        window.updateStatus = async (id, status) => {
+            await updateProjectStatus(id, status);
+        };
+
+        window.onload = async () => {
+            await initAuth();
+            renderApp();
+        };
     </script>
+    <style>
+        body {
+            background-color: #f8fafc;
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
+        }
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 300px;
+            max-height: 400px;
+        }
+    </style>
+</head>
+<body class="antialiased text-gray-900">
+    <div id="app">
+        <div class="flex items-center justify-center min-h-screen">
+            <div class="animate-pulse flex flex-col items-center">
+                <div class="w-12 h-12 bg-[#C70039] rounded-full mb-4"></div>
+                <p class="text-[#581845] font-bold">Cargando Planificador...</p>
+            </div>
+        </div>
+    </div>
 </body>
 </html>
