@@ -2,7 +2,7 @@ import './style.css';
 import { Chart, registerables } from 'chart.js';
 import { initializeApp } from "firebase/app";
 import { getAuth, onAuthStateChanged, signInAnonymously, signInWithCustomToken } from "firebase/auth";
-import { getFirestore, collection, doc, onSnapshot, addDoc, updateDoc } from "firebase/firestore";
+import { getFirestore, collection, doc, onSnapshot, addDoc, updateDoc, deleteDoc } from "firebase/firestore";
 
 Chart.register(...registerables);
 
@@ -69,6 +69,12 @@ if (isMock) {
                 localStorage.setItem('av_planner_projects', JSON.stringify(current));
                 window.dispatchEvent(new Event('storage'));
             }
+        },
+        deleteDoc: async (docRef) => {
+            const current = JSON.parse(localStorage.getItem('av_planner_projects') || '[]');
+            const filtered = current.filter(p => p.id !== docRef.id);
+            localStorage.setItem('av_planner_projects', JSON.stringify(filtered));
+            window.dispatchEvent(new Event('storage'));
         },
         doc: (db, ...path) => ({ id: path[path.length - 1] })
     };
@@ -204,8 +210,21 @@ const updateProject = async (projectId, newData) => {
     }
 };
 
+const deleteProject = async (projectId) => {
+    if (!window.appState.user) return;
+    if (!confirm("¿Estás seguro de que quieres eliminar este proyecto?")) return;
+    try {
+        if (isMock) await db.deleteDoc({ id: projectId });
+        else await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'projects', projectId));
+        console.log("🗑️ Proyecto eliminado:", projectId);
+    } catch (error) {
+        console.error("❌ Error al eliminar en Firestore:", error.code, error.message);
+    }
+};
+
 window.saveProject = saveProject;
 window.updateProject = updateProject;
+window.deleteProject = deleteProject;
 window.renderApp = renderApp;
 window.loadData = loadData;
 window.saveScriptRealtime = async (projectId, text) => {
@@ -385,7 +404,12 @@ const renderApp = () => {
                                     <span class="text-[9px] font-bold text-gray-400 uppercase mt-1 block">${p.status}</span>
                                 </div>
                                 <div class="hidden md:block col-span-3 text-sm text-gray-400">${new Date(p.createdAt).toLocaleDateString()}</div>
-                                <div class="col-span-12 md:col-span-2 text-right text-[#C70039] font-bold text-sm">Gestionar ➔</div>
+                                <div class="col-span-12 md:col-span-2 text-right flex items-center justify-end gap-3">
+                                    <button onclick="event.stopPropagation(); window.deleteProject('${p.id}')" class="p-2 text-gray-300 hover:text-red-500 hover:bg-red-50 rounded-full transition-all" title="Eliminar">
+                                        🗑️
+                                    </button>
+                                    <span class="text-[#C70039] font-bold text-sm whitespace-nowrap">Gestionar ➔</span>
+                                </div>
                             </div>
                         `).join('')}
                     </div>
