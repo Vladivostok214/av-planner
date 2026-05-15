@@ -1,0 +1,28 @@
+{
+  "name": "av-planner-project",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "devDependencies": {
+    "autoprefixer": "^10.5.0",
+    "eslint": "^10.3.0",
+    "eslint-config-prettier": "^10.1.8",
+    "eslint-plugin-prettier": "^5.5.5",
+    "langfuse": "^3.38.20",
+    "postcss": "^8.5.14",
+    "prettier": "^3.8.3",
+    "promptfoo": "^0.121.11",
+    "tailwindcss": "^3.4.19",
+    "vite": "^8.0.12"
+  },
+  "dependencies": {
+    "chart.js": "^4.5.1",
+    "firebase": "^12.13.0",
+    "plotly.js-dist-min": "^3.5.1"
+  }
+}

@@ -1,0 +1,22 @@
+prompts:
+  - "Actúa como un experto en marketing audiovisual. Analiza el siguiente brief de proyecto y genera un guion literario de 60 segundos enfocado en engagement. Brief: {{description}}"
+
+providers:
+  - id: openai:gpt-4o-mini
+    config:
+      temperature: 0.7
+
+tests:
+  - vars:
+      description: "Un video tutorial sobre cómo usar una nueva cafetera italiana en Instagram Reels."
+    assert:
+      - type: icontains
+        value: "paso"
+      - type: javascript
+        value: "output.length > 200"
+
+  - vars:
+      description: "Anuncio publicitario para una marca de ropa deportiva enfocada en corredores nocturnos."
+    assert:
+      - type: icontains
+        value: "seguridad"
