@@ -351,81 +351,66 @@ const renderApp = () => {
         });
 
         root.innerHTML = `
-            <div class="p-6 max-w-7xl mx-auto min-h-screen">
-                <header class="flex flex-col md:flex-row justify-between items-start md:items-center mb-16 gap-8">
-                    <div class="flex items-center gap-6">
-                        <div class="relative">
-                            <div class="w-16 h-16 bg-white rounded-2xl rotate-12 absolute inset-0 opacity-20 animate-pulse"></div>
-                            <div class="w-16 h-16 bg-white rounded-2xl flex items-center justify-center relative transform transition-transform hover:rotate-0 duration-500 shadow-2xl shadow-blue-900/40">
-                                <svg class="w-10 h-10 text-[#006FB3]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
-                            </div>
+            <div class="p-4 md:p-8 max-w-[1600px] mx-auto min-h-screen">
+                <header class="flex flex-col lg:flex-row justify-between items-start lg:items-end mb-10 gap-6">
+                    <div class="flex items-center gap-5">
+                        <div class="w-12 h-12 bg-white rounded-xl flex items-center justify-center shadow-xl shadow-blue-900/20 transform -rotate-3 transition-transform hover:rotate-0">
+                            <svg class="w-7 h-7 text-[#006FB3]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
                         </div>
                         <div>
-                            <span class="text-[10px] font-black uppercase tracking-[0.4em] text-blue-100 bg-white/10 backdrop-blur-md px-3 py-1 rounded-full mb-3 inline-block border border-white/20">Marketing Digital</span>
-                            <h1 class="text-4xl md:text-5xl font-black text-white tracking-tight leading-[1.1]">
-                                Planificación Audiovisual<br>
-                                <span class="text-white relative opacity-90">
-                                    Puntaje Nacional
-                                    <span class="absolute bottom-1 left-0 w-full h-2 bg-white/20 -z-10 rounded-full"></span>
-                                </span>
-                            </h1>
+                            <span class="text-[9px] font-black uppercase tracking-[0.3em] text-blue-200/70 mb-1 inline-block">Marketing Puntaje Nacional</span>
+                            <h1 class="text-3xl font-black text-white tracking-tighter leading-none">Planificación Audiovisual</h1>
                         </div>
                     </div>
-                    <button id="btnNewIdea" class="bg-[#FE6565] text-white px-10 py-5 rounded-[2rem] font-black shadow-2xl shadow-blue-900/50 hover:bg-[#D93025] hover:scale-105 active:scale-95 transition-all flex items-center gap-3 uppercase tracking-widest text-sm border-b-4 border-black/20">
-                        <span class="text-2xl">+</span> Nueva Idea
-                    </button>
+                    
+                    <div class="flex flex-wrap items-center gap-3 bg-black/10 backdrop-blur-xl p-2 rounded-2xl border border-white/5">
+                        <div class="relative group">
+                            <span class="absolute left-3 top-1/2 -translate-y-1/2 text-white/40 text-xs transition-colors group-focus-within:text-white">🔍</span>
+                            <input type="text" id="searchInput" value="${window.appState.searchQuery}" placeholder="Filtrar..." class="pl-8 pr-3 py-2 bg-transparent border-none text-sm focus:ring-0 placeholder:text-white/20 font-bold text-white w-32 md:w-48 transition-all focus:w-64">
+                        </div>
+                        <div class="h-6 w-px bg-white/10 hidden md:block"></div>
+                        <select id="sortSelect" class="bg-transparent border-none rounded-xl text-[10px] font-black py-2 px-3 text-white/60 appearance-none cursor-pointer hover:text-white transition-colors uppercase tracking-widest outline-none">
+                            <option value="date" ${window.appState.sortBy === 'date' ? 'selected' : ''} class="text-[#0A132D]">Recientes</option>
+                            <option value="title" ${window.appState.sortBy === 'title' ? 'selected' : ''} class="text-[#0A132D]">Título</option>
+                            <option value="status" ${window.appState.sortBy === 'status' ? 'selected' : ''} class="text-[#0A132D]">Estatus</option>
+                        </select>
+                        <button id="btnNewIdea" class="bg-[#FE6565] text-white px-5 py-2 rounded-xl font-black shadow-lg hover:bg-[#D93025] hover:scale-105 active:scale-95 transition-all flex items-center gap-2 uppercase tracking-widest text-[10px]">
+                            <span>+</span> Nueva Idea
+                        </button>
+                    </div>
                 </header>
 
-                <div class="mb-12 flex flex-col md:flex-row gap-4 items-center bg-white/10 backdrop-blur-2xl p-3 rounded-[2.5rem] border border-white/20 shadow-2xl shadow-blue-900/40">
-                    <div class="relative flex-1 w-full group">
-                        <span class="absolute left-6 top-1/2 -translate-y-1/2 text-white transition-transform group-focus-within:scale-125">🔍</span>
-                        <input type="text" id="searchInput" value="${window.appState.searchQuery}" placeholder="Buscar proyectos, encargados o temas estratégicos..." class="w-full pl-16 pr-4 py-5 bg-transparent rounded-3xl border-none text-lg focus:ring-0 placeholder:text-blue-100/60 font-medium text-white">
-                    </div>
-                    <div class="flex items-center gap-4 px-6 border-l border-white/10">
-                        <label class="text-[10px] font-black text-blue-100 uppercase tracking-widest">Ordenar por</label>
-                        <select id="sortSelect" class="bg-white/10 border-none rounded-2xl text-sm font-black py-3 px-6 focus:ring-4 focus:ring-white/20 text-white appearance-none cursor-pointer backdrop-blur-md">
-                            <option value="date" ${window.appState.sortBy === 'date' ? 'selected' : ''} class="text-[#0A132D]">📅 Recientes</option>
-                            <option value="title" ${window.appState.sortBy === 'title' ? 'selected' : ''} class="text-[#0A132D]">🔤 Título</option>
-                            <option value="status" ${window.appState.sortBy === 'status' ? 'selected' : ''} class="text-[#0A132D]">⚡ Estatus</option>
-                        </select>
-                    </div>
-                </div>
-
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-5">
                     ${filteredProjects.map(p => `
-                        <div data-id="${p.id}" class="project-card group bg-white p-8 rounded-[3rem] shadow-2xl shadow-blue-900/30 hover:shadow-blue-900/50 hover:-translate-y-2 transition-all duration-500 cursor-pointer flex flex-col h-full overflow-hidden relative border border-white/10">
-                            <div class="absolute top-0 left-0 w-2 h-full bg-[#006FB3] opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                        <div data-id="${p.id}" class="project-card group bg-white/95 backdrop-blur-sm p-5 rounded-3xl shadow-xl shadow-blue-900/20 hover:shadow-blue-900/40 hover:-translate-y-1 transition-all duration-300 cursor-pointer flex flex-col h-full border border-white/20 relative overflow-hidden">
+                            <div class="absolute top-0 left-0 w-1.5 h-full bg-[#006FB3] opacity-0 group-hover:opacity-100 transition-opacity"></div>
                             
-                            <div class="flex justify-between items-start mb-8">
+                            <div class="flex justify-between items-center mb-4">
+                                <span class="text-[8px] font-black text-gray-300 uppercase tracking-widest bg-gray-50 px-2 py-1 rounded-lg border border-gray-100">${new Date(p.createdAt).toLocaleDateString()}</span>
                                 ${getStatusBadge(p.status)}
-                                <span class="text-[10px] font-black text-gray-400 uppercase tracking-widest bg-gray-50 px-3 py-1 rounded-full border border-gray-100">${new Date(p.createdAt).toLocaleDateString()}</span>
                             </div>
                             
                             <div class="flex-1">
-                                <h3 class="text-2xl font-black text-[#0A132D] leading-tight group-hover:text-[#006FB3] transition-colors mb-3">${p.title}</h3>
-                                <p class="text-gray-500 text-sm line-clamp-3 mb-6 font-medium leading-relaxed">${p.description || 'Sin descripción adicional para este proyecto.'}</p>
+                                <h3 class="text-lg font-black text-[#0A132D] leading-tight group-hover:text-[#006FB3] transition-colors mb-2">${p.title}</h3>
+                                <p class="text-gray-400 text-[11px] line-clamp-2 font-medium leading-relaxed">${p.description || 'Sin descripción adicional.'}</p>
                             </div>
 
-                            <div class="mt-auto pt-8 border-t border-gray-100 flex items-center justify-between">
-                                <div class="flex flex-col">
-                                    <span class="text-[10px] font-black text-gray-300 uppercase tracking-tighter mb-1.5">Lead del Proyecto</span>
-                                    <span class="text-xs font-black text-[#0A132D] flex items-center gap-2 bg-gray-50 pr-4 pl-1.5 py-1 rounded-full border border-gray-100">
-                                        <div class="w-6 h-6 rounded-full bg-[#FE6565] flex items-center justify-center text-[10px] text-white font-black">${(p.team || '?')[0]}</div>
-                                        ${p.team || 'Sin asignar'}
-                                    </span>
+                            <div class="mt-4 pt-4 border-t border-gray-100 flex items-center justify-between">
+                                <div class="flex items-center gap-2">
+                                    <div class="w-5 h-5 rounded-lg bg-[#D93025] flex items-center justify-center text-[9px] text-white font-black shadow-sm">${(p.team || '?')[0]}</div>
+                                    <span class="text-[10px] font-black text-[#0A132D] opacity-60">${p.team || 'Sin asignar'}</span>
                                 </div>
-                                <div class="w-14 h-14 rounded-2xl bg-[#006FB3]/5 text-[#006FB3] flex items-center justify-center group-hover:bg-[#006FB3] group-hover:text-white transition-all transform group-hover:rotate-12 group-active:scale-90 shadow-inner border border-[#006FB3]/10">
-                                    <span class="text-2xl font-black">→</span>
+                                <div class="w-8 h-8 rounded-xl bg-[#006FB3]/5 text-[#006FB3] flex items-center justify-center group-hover:bg-[#006FB3] group-hover:text-white transition-all transform group-hover:scale-110">
+                                    <span class="text-lg font-black">→</span>
                                 </div>
                             </div>
                         </div>
                     `).join('')}
                     
                     ${filteredProjects.length === 0 ? `
-                        <div class="col-span-full py-32 flex flex-col items-center justify-center text-center bg-white/5 backdrop-blur-md rounded-[4rem] border-2 border-dashed border-white/20">
-                            <div class="text-8xl mb-6 grayscale opacity-30">🏜️</div>
-                            <h3 class="text-3xl font-black text-white/50">Sin resultados</h3>
-                            <p class="text-white/40 mt-3 font-medium text-lg">Intenta ajustar los filtros o crea una nueva iniciativa.</p>
+                        <div class="col-span-full py-20 flex flex-col items-center justify-center text-center bg-black/10 backdrop-blur-md rounded-[2.5rem] border-2 border-dashed border-white/10">
+                            <div class="text-6xl mb-4 grayscale opacity-20 text-white">🏜️</div>
+                            <h3 class="text-xl font-black text-white/40 italic">Sin coincidencias estratégicas</h3>
                         </div>
                     ` : ''}
                 </div>
