@@ -122,6 +122,12 @@ const loadData = () => {
         if (unsubscribe) unsubscribe();
         unsubscribe = db.onSnapshot({}, (snapshot) => {
             window.appState.projects = snapshot.docs.map(doc => ({ ...doc.data() }));
+            
+            if (window.appState.view === 'detail' && window.appState.currentProject) {
+                const updatedProject = window.appState.projects.find(p => p.id === window.appState.currentProject.id);
+                if (updatedProject) window.appState.currentProject = updatedProject;
+            }
+            
             renderApp();
         });
         return;
@@ -168,6 +174,16 @@ const saveProject = async (projectData) => {
 const updateProject = async (projectId, newData) => {
     if (!window.appState.user) return;
     const payload = { ...newData, lastEditor: window.appState.userName || 'Anónimo' };
+    
+    // Optimistic local update
+    const index = window.appState.projects.findIndex(p => p.id === projectId);
+    if (index !== -1) {
+        window.appState.projects[index] = { ...window.appState.projects[index], ...payload };
+        if (window.appState.currentProject && window.appState.currentProject.id === projectId) {
+            window.appState.currentProject = window.appState.projects[index];
+        }
+    }
+
     if (isMock) await db.updateDoc({ id: projectId }, payload);
     else await updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'projects', projectId), payload);
 };
@@ -524,7 +540,7 @@ const renderApp = () => {
         const p = window.appState.currentProject;
         const stages = ['Idea', 'Scripting', 'Storyboard', 'Producción', 'Finalizado'];
         const currentIndex = stages.indexOf(p.status);
-        const prod = p.production || { montage: false, edicion: false, subtitulado: false, exportado: false };
+        const prod = p.production || { montaje: false, edicion: false, subtitulado: false, exportado: false };
         const images = p.storyboardImages || [];
         const activeTab = window.appState.activeTab;
 
@@ -681,17 +697,26 @@ const renderApp = () => {
         const saveBtn = document.getElementById('btnSaveDetail');
         if (saveBtn) {
             saveBtn.onclick = async () => {
+                const newStatus = document.getElementById('statusSelect').value;
+                const newTeam = document.getElementById('teamInput').value;
+                const newDueDate = document.getElementById('dueDateInput').value;
+                
+                // Get production values safely (checking if elements exist in current tab)
+                const newProd = {
+                    montaje: document.getElementById('chkMontaje') ? document.getElementById('chkMontaje').checked : prod.montaje,
+                    edicion: document.getElementById('chkEdicion') ? document.getElementById('chkEdicion').checked : prod.edicion,
+                    subtitulado: document.getElementById('chkSubtitulado') ? document.getElementById('chkSubtitulado').checked : prod.subtitulado,
+                    exportado: document.getElementById('chkExportado') ? document.getElementById('chkExportado').checked : prod.exportado
+                };
+
                 await updateProject(p.id, {
-                    status: document.getElementById('statusSelect').value,
-                    team: document.getElementById('teamInput').value,
-                    dueDate: document.getElementById('dueDateInput').value,
-                    production: {
-                        montaje: document.getElementById('chkMontaje') ? document.getElementById('chkMontaje').checked : prod.montaje,
-                        edicion: document.getElementById('chkEdicion') ? document.getElementById('chkEdicion').checked : prod.edicion,
-                        subtitulado: document.getElementById('chkSubtitulado') ? document.getElementById('chkSubtitulado').checked : prod.subtitulado,
-                        exportado: document.getElementById('chkExportado') ? document.getElementById('chkExportado').checked : prod.exportado
-                    }
+                    status: newStatus,
+                    team: newTeam,
+                    dueDate: newDueDate,
+                    production: newProd
                 });
+                
+                // Immediate navigation to dashboard
                 window.setView('dashboard');
             };
         }
