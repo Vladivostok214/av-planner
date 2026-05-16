@@ -1,5 +1,7 @@
 import './style.css';
 import { initializeApp } from "firebase/app";
+import { getAuth, onAuthStateChanged, signInAnonymously, signInWithCustomToken } from "firebase/auth";
+import { getFirestore, collection, doc, onSnapshot, addDoc, updateDoc, deleteDoc } from "firebase/firestore";
 
 // --- Firebase Mock & Initialization Logic ---
 let db, auth;
