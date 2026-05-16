@@ -348,24 +348,26 @@ const renderApp = () => {
     
     if (!window.appState.userName) {
         root.innerHTML = `
-            <div class="flex items-center justify-center min-h-screen p-10 bg-white">
-                <div class="max-w-xl w-full">
+            <div class="flex items-center justify-center min-h-screen p-10 bg-brand-primary">
+                <div class="max-w-xl w-full border-t-8 border-brand-accent pt-20">
                     <div class="mb-20">
-                        <div class="w-16 h-4 bg-brand-primary mb-4"></div>
-                        <h1 class="text-6xl font-black text-brand-dark leading-none tracking-tighter">Puntaje<br><span class="text-brand-accent">Nacional</span></h1>
-                        <p class="text-sm font-black uppercase tracking-[0.4em] mt-6 text-brand-gray">AV Content Planner / Access</p>
+                        <h1 class="text-7xl font-black text-white leading-none tracking-tighter uppercase">Puntaje<br><span class="text-brand-accent italic">Nacional</span></h1>
+                        <p class="text-sm font-black uppercase tracking-[0.4em] mt-8 text-white/40">AV Pipeline / Terminal Access</p>
                     </div>
                     
-                    <form id="loginForm" class="space-y-12">
+                    <form id="loginForm" class="space-y-16">
                         <div>
-                            <label class="block text-[10px] font-black uppercase tracking-widest text-brand-gray mb-4">Identificación del Operador</label>
-                            <input type="text" id="userNameInput" required placeholder="ESCRIBA SU NOMBRE" class="swiss-input uppercase">
+                            <label class="block text-[10px] font-black uppercase tracking-[0.3em] text-white/50 mb-6">Operador ID</label>
+                            <input type="text" id="userNameInput" required placeholder="NOMBRE DE USUARIO" class="swiss-input uppercase text-4xl">
                         </div>
-                        <button type="submit" class="btn-swiss-primary w-full py-8 text-sm">Ingresar al Sistema →</button>
+                        <button type="submit" class="btn-swiss-primary w-full py-10 text-lg flex items-center justify-between group">
+                            <span>Ingresar al Sistema</span>
+                            <span class="group-hover:translate-x-2 transition-transform">→</span>
+                        </button>
                     </form>
                     
-                    <div class="mt-20 border-t border-brand-dark pt-8">
-                        <p class="text-[9px] font-black uppercase tracking-widest text-brand-gray italic">© 2026 Puntaje Nacional. Todos los derechos reservados.</p>
+                    <div class="mt-32 opacity-20 border-t border-white pt-8">
+                        <p class="text-[9px] font-black uppercase tracking-widest text-white italic tracking-[0.5em]">MKT DEPARTAMENTO AUDIOVISUAL 2026</p>
                     </div>
                 </div>
             </div>

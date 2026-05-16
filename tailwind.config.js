@@ -8,8 +8,8 @@ export default {
     extend: {
       colors: {
         brand: {
-          primary: '#0F216D', // Azul Puntaje
-          accent: '#FEC526',  // Amarillo Nacional
+          primary: '#004A99', // Azul Puntaje Oficial
+          accent: '#F7941E',  // Naranja Puntaje (Energy)
           dark: '#0A0A0A',
           light: '#F8F9FA',
           gray: '#666666',
@@ -21,10 +21,7 @@ export default {
       },
       borderRadius: {
         'none': '0',
-      },
-      spacing: {
-        '18': '4.5rem',
-        '22': '5.5rem',
+        'lg': '0.5rem',
       }
     },
   },
