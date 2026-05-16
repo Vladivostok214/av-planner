@@ -551,19 +551,19 @@ const renderApp = () => {
                     <!-- MODERN TAB NAVIGATION -->
                     <div class="relative max-w-2xl">
                         <div class="flex gap-1 bg-black/20 backdrop-blur-3xl p-1.5 rounded-[2.2rem] border border-white/10 shadow-2xl relative overflow-hidden">
-                            <button onclick="window.setTab('guion')" class="relative flex-1 px-4 py-4 rounded-[1.8rem] font-black text-[10px] uppercase tracking-widest transition-all z-10 ${activeTab === 'guion' ? 'text-[#006FB3]' : 'text-white/40 hover:text-white'}">
+                            <button onclick="window.setTab('guion')" class="relative flex-1 px-4 py-4 rounded-[1.8rem] font-black text-[10px] uppercase tracking-widest transition-all z-10 ${activeTab === 'guion' ? 'text-[#006FB3]' : 'text-white/60 hover:text-white'}">
                                 ${activeTab === 'guion' ? '<div class="absolute inset-0 bg-white rounded-[1.6rem] -z-10 shadow-2xl animate-in fade-in duration-300"></div>' : ''}
                                 📝 Narrativo
                             </button>
-                            <button onclick="window.setTab('storyboard')" class="relative flex-1 px-4 py-4 rounded-[1.8rem] font-black text-[10px] uppercase tracking-widest transition-all z-10 ${activeTab === 'storyboard' ? 'text-[#006FB3]' : 'text-white/40 hover:text-white'}">
+                            <button onclick="window.setTab('storyboard')" class="relative flex-1 px-4 py-4 rounded-[1.8rem] font-black text-[10px] uppercase tracking-widest transition-all z-10 ${activeTab === 'storyboard' ? 'text-[#006FB3]' : 'text-white/60 hover:text-white'}">
                                 ${activeTab === 'storyboard' ? '<div class="absolute inset-0 bg-white rounded-[1.6rem] -z-10 shadow-2xl animate-in fade-in duration-300"></div>' : ''}
                                 🎨 Storyboard
                             </button>
-                            <button onclick="window.setTab('produccion')" class="relative flex-1 px-4 py-4 rounded-[1.8rem] font-black text-[10px] uppercase tracking-widest transition-all z-10 ${activeTab === 'produccion' ? 'text-[#006FB3]' : 'text-white/40 hover:text-white'}">
+                            <button onclick="window.setTab('produccion')" class="relative flex-1 px-4 py-4 rounded-[1.8rem] font-black text-[10px] uppercase tracking-widest transition-all z-10 ${activeTab === 'produccion' ? 'text-[#006FB3]' : 'text-white/60 hover:text-white'}">
                                 ${activeTab === 'produccion' ? '<div class="absolute inset-0 bg-white rounded-[1.6rem] -z-10 shadow-2xl animate-in fade-in duration-300"></div>' : ''}
                                 🎬 Prod.
                             </button>
-                            <button onclick="window.setTab('gestion')" class="relative flex-1 px-4 py-4 rounded-[1.8rem] font-black text-[10px] uppercase tracking-widest transition-all z-10 ${activeTab === 'gestion' ? 'text-[#006FB3]' : 'text-white/40 hover:text-white'}">
+                            <button onclick="window.setTab('gestion')" class="relative flex-1 px-4 py-4 rounded-[1.8rem] font-black text-[10px] uppercase tracking-widest transition-all z-10 ${activeTab === 'gestion' ? 'text-[#006FB3]' : 'text-white/60 hover:text-white'}">
                                 ${activeTab === 'gestion' ? '<div class="absolute inset-0 bg-white rounded-[1.6rem] -z-10 shadow-2xl animate-in fade-in duration-300"></div>' : ''}
                                 ⚙️ Gestión
                             </button>
@@ -577,7 +577,7 @@ const renderApp = () => {
                             <div class="flex flex-col md:flex-row items-start md:items-center justify-between mb-12 gap-6">
                                 <div>
                                     <h3 class="font-black text-3xl text-[#0A132D] tracking-tighter">Guion Narrativo<span class="text-[#006FB3]">.</span></h3>
-                                    <p class="text-[10px] font-black text-gray-400 uppercase tracking-widest mt-2 ml-1">Estilo Audiovisual Profesional</p>
+                                    <p class="text-[10px] font-black text-gray-500 uppercase tracking-widest mt-2 ml-1">Estilo Audiovisual Profesional</p>
                                 </div>
                                 <div class="flex flex-wrap items-center gap-2 bg-gray-50 p-2 rounded-3xl border border-gray-100 shadow-inner">
                                     <button onclick="window.formatScriptBold()" class="w-10 h-10 rounded-xl bg-white flex items-center justify-center font-black text-sm hover:bg-[#006FB3] hover:text-white transition-all shadow-sm border border-gray-100">B</button>
