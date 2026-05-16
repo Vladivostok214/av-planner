@@ -348,26 +348,27 @@ const renderApp = () => {
     
     if (!window.appState.userName) {
         root.innerHTML = `
-            <div class="flex items-center justify-center min-h-screen p-10 bg-brand-primary">
-                <div class="max-w-xl w-full border-t-4 border-brand-accent pt-12">
-                    <div class="mb-16">
-                        <h1 class="text-5xl font-bold text-white leading-none tracking-tight uppercase">Puntaje<br><span class="text-brand-accent italic">Nacional</span></h1>
-                        <p class="text-[11px] font-bold uppercase tracking-[0.3em] mt-6 text-brand-tint/60">AV Management / System Access</p>
+            <div class="flex items-center justify-center min-h-screen p-10 bg-brand-paper">
+                <div class="max-w-md w-full border border-brand-hairline bg-white p-12 rounded-xl shadow-soft">
+                    <div class="mb-12">
+                        <div class="w-8 h-1 bg-brand-primary mb-6"></div>
+                        <h1 class="text-3xl font-semibold text-brand-dark tracking-tight leading-tight">Puntaje<br>Nacional</h1>
+                        <p class="text-[11px] font-medium uppercase tracking-[0.2em] mt-3 text-brand-gray">AV Content Pipeline / Terminal</p>
                     </div>
                     
-                    <form id="loginForm" class="space-y-12">
+                    <form id="loginForm" class="space-y-8">
                         <div>
-                            <label class="block text-[10px] font-bold uppercase tracking-widest text-brand-tint/50 mb-4">Identificación del Operador</label>
-                            <input type="text" id="userNameInput" required placeholder="..." class="swiss-input uppercase text-2xl">
+                            <label class="block text-[10px] font-semibold uppercase tracking-widest text-brand-gray mb-3">Operator ID</label>
+                            <input type="text" id="userNameInput" required placeholder="Your name" class="swiss-input">
                         </div>
-                        <button type="submit" class="btn-swiss-primary w-full py-8 text-sm flex items-center justify-between group">
-                            <span>Ingresar al Terminal</span>
-                            <span class="group-hover:translate-x-1 transition-transform">→</span>
+                        <button type="submit" class="btn-swiss-primary w-full flex items-center justify-between group">
+                            <span>Access System</span>
+                            <span class="group-hover:translate-x-1 transition-transform opacity-40">→</span>
                         </button>
                     </form>
                     
-                    <div class="mt-24 opacity-30 border-t border-brand-tint/20 pt-6">
-                        <p class="text-[9px] font-bold uppercase tracking-widest text-brand-tint italic tracking-[0.3em]">MKT DEPARTAMENTO AUDIOVISUAL 2026</p>
+                    <div class="mt-16 pt-6 border-t border-brand-hairline">
+                        <p class="text-[9px] font-medium uppercase tracking-widest text-brand-gray/60 italic">Internal Production Tool v3.0</p>
                     </div>
                 </div>
             </div>
@@ -396,54 +397,52 @@ const renderApp = () => {
         });
 
         root.innerHTML = `
-            <div class="p-8 md:p-16 max-w-[1400px] mx-auto min-h-screen">
-                <header class="mb-20 flex flex-col md:flex-row justify-between items-end gap-8">
+            <div class="p-8 md:p-12 max-w-[1400px] mx-auto min-h-screen">
+                <header class="mb-16 flex flex-col md:flex-row justify-between items-start md:items-center gap-8 border-b border-brand-hairline pb-12">
                     <div class="flex-1">
-                        <div class="w-12 h-2 bg-brand-accent mb-6 shadow-lg shadow-brand-accent/20"></div>
-                        <h1 class="text-5xl font-bold text-white tracking-tight leading-none mb-4 uppercase">Content<br>Pipeline</h1>
-                        <div class="inline-flex items-center gap-3 bg-brand-dark/40 px-4 py-2 border border-white/10 rounded-sm">
-                            <span class="w-2 h-2 bg-emerald-400 rounded-full animate-pulse"></span>
-                            <p class="text-[10px] font-bold uppercase tracking-widest text-brand-tint">Operador: ${window.appState.userName}</p>
+                        <h1 class="text-2xl font-semibold text-brand-dark tracking-tight mb-2">Content Pipeline</h1>
+                        <div class="flex items-center gap-3">
+                            <span class="w-1.5 h-1.5 bg-brand-primary rounded-full"></span>
+                            <p class="text-[11px] font-medium text-brand-gray tracking-wide">Operator: <span class="text-brand-dark">${window.appState.userName}</span></p>
                         </div>
                     </div>
                     
-                    <div class="flex flex-col gap-6 w-full md:w-auto">
-                        <div class="flex items-center gap-4 border-b border-brand-tint/30 pb-3 group focus-within:border-brand-accent transition-colors">
-                            <span class="text-[10px] font-bold uppercase tracking-widest text-brand-tint/80">Filtrar:</span>
-                            <input type="text" id="searchInput" value="${window.appState.searchQuery}" placeholder="..." class="bg-transparent outline-none font-bold text-white uppercase text-sm placeholder:text-white/10 w-40 focus:w-56 transition-all">
+                    <div class="flex flex-wrap items-center gap-3">
+                        <div class="flex items-center gap-2 border border-brand-hairline bg-white px-4 py-2 rounded-md focus-within:border-brand-primary focus-within:ring-4 focus-within:ring-brand-primary/5 transition-all">
+                            <span class="text-[10px] text-brand-gray">🔍</span>
+                            <input type="text" id="searchInput" value="${window.appState.searchQuery}" placeholder="Filter projects..." class="bg-transparent outline-none font-medium text-brand-dark text-xs w-40">
                         </div>
-                        <div class="flex flex-wrap items-center gap-4">
-                            <select id="sortSelect" class="bg-transparent border-none text-[10px] font-bold uppercase tracking-widest outline-none cursor-pointer hover:text-brand-accent text-brand-tint transition-colors">
-                                <option value="date" ${window.appState.sortBy === 'date' ? 'selected' : ''} class="bg-brand-primary">Fecha</option>
-                                <option value="title" ${window.appState.sortBy === 'title' ? 'selected' : ''} class="bg-brand-primary">Título</option>
-                                <option value="status" ${window.appState.sortBy === 'status' ? 'selected' : ''} class="bg-brand-primary">Estado</option>
-                            </select>
-                            <button id="btnNewIdea" class="btn-swiss-primary text-[10px]">+ Nueva Iniciativa</button>
-                            <button onclick="location.reload()" class="btn-swiss-outline text-[10px]">Log Out</button>
-                        </div>
+                        <select id="sortSelect" class="bg-white border border-brand-hairline text-[11px] font-semibold px-4 py-2.5 rounded-md outline-none cursor-pointer hover:border-brand-gray transition-colors text-brand-gray">
+                            <option value="date" ${window.appState.sortBy === 'date' ? 'selected' : ''}>Recent</option>
+                            <option value="title" ${window.appState.sortBy === 'title' ? 'selected' : ''}>Alphabetical</option>
+                            <option value="status" ${window.appState.sortBy === 'status' ? 'selected' : ''}>Pipeline Stage</option>
+                        </select>
+                        <button id="btnNewIdea" class="btn-swiss-primary">+ New Project</button>
+                        <button onclick="location.reload()" class="btn-swiss-outline">Log Out</button>
                     </div>
                 </header>
 
-                <div class="space-y-2">
-                    <div class="list-header hidden md:flex opacity-60">
-                        <div class="flex-1 text-[9px] font-bold uppercase tracking-widest text-brand-tint">Proyecto / Referencia</div>
-                        <div class="w-32 text-[9px] font-bold uppercase tracking-widest text-brand-tint">Estrategia</div>
-                        <div class="w-32 text-[9px] font-bold uppercase tracking-widest text-brand-tint text-center">Pipeline</div>
-                        <div class="w-40 text-[9px] font-bold uppercase tracking-widest text-brand-tint">Responsable</div>
-                        <div class="w-48 text-[9px] font-bold uppercase tracking-widest text-brand-tint">Progreso</div>
+                <div class="space-y-3">
+                    <div class="list-header hidden md:flex">
+                        <div class="flex-1 text-[10px] font-semibold uppercase tracking-widest text-brand-gray/60">Project & Reference</div>
+                        <div class="w-32 text-[10px] font-semibold uppercase tracking-widest text-brand-gray/60">Strategy</div>
+                        <div class="w-32 text-[10px] font-semibold uppercase tracking-widest text-brand-gray/60 text-center">Status</div>
+                        <div class="w-40 text-[10px] font-semibold uppercase tracking-widest text-brand-gray/60">Lead</div>
+                        <div class="w-48 text-[10px] font-semibold uppercase tracking-widest text-brand-gray/60">Completion</div>
                     </div>
 
                     ${filteredProjects.map(p => {
                         const progress = getStatusProgress(p.status);
                         return `
                             <div data-id="${p.id}" class="project-row list-row group">
-                                <div class="flex-1 flex flex-col gap-1">
-                                    <span class="text-[8px] font-bold text-brand-accent uppercase tracking-[0.2em] mb-1">REF: ${p.id.substring(0,8)}</span>
-                                    <h3 class="text-xl font-bold text-white group-hover:text-brand-accent transition-colors">${p.title}</h3>
+                                <div class="list-row-active-accent"></div>
+                                <div class="flex-1 flex flex-col gap-0.5">
+                                    <span class="text-[9px] font-semibold text-brand-primary uppercase tracking-wider">REF-${p.id.substring(0,6)}</span>
+                                    <h3 class="text-base font-semibold text-brand-dark group-hover:text-brand-primary transition-colors">${p.title}</h3>
                                 </div>
                                 
                                 <div class="w-32 shrink-0">
-                                    <span class="text-[9px] font-bold uppercase tracking-wider text-brand-tint/60">${p.category}</span>
+                                    <span class="swiss-badge">${p.category}</span>
                                 </div>
 
                                 <div class="w-32 shrink-0 text-center">
@@ -451,18 +450,18 @@ const renderApp = () => {
                                 </div>
 
                                 <div class="w-40 shrink-0 flex flex-col">
-                                    <span class="text-[10px] font-bold text-white uppercase truncate">${p.team || '---'}</span>
-                                    <span class="text-[8px] font-medium text-brand-tint/30 uppercase mt-0.5">${new Date(p.createdAt).toLocaleDateString()}</span>
+                                    <span class="text-xs font-medium text-brand-dark truncate">${p.team || '---'}</span>
+                                    <span class="text-[10px] text-brand-gray/60 mt-0.5">${new Date(p.createdAt).toLocaleDateString()}</span>
                                 </div>
 
                                 <div class="w-48 shrink-0 flex items-center gap-4">
-                                    <div class="flex-1 h-1 bg-white/5 overflow-hidden rounded-full">
-                                        <div class="h-full bg-brand-accent transition-all duration-1000" style="width: ${progress}%"></div>
+                                    <div class="flex-1 h-1.5 bg-brand-hairline overflow-hidden rounded-full">
+                                        <div class="h-full bg-brand-primary transition-all duration-1000" style="width: ${progress}%"></div>
                                     </div>
-                                    <span class="text-[9px] font-bold text-brand-tint/80 w-8 text-right">${Math.round(progress)}%</span>
+                                    <span class="text-[10px] font-semibold text-brand-gray w-8 text-right">${Math.round(progress)}%</span>
                                 </div>
                                 
-                                <div class="w-8 h-8 flex items-center justify-center text-brand-tint/20 group-hover:text-brand-accent transition-colors text-xl font-bold">
+                                <div class="w-8 h-8 flex items-center justify-center text-brand-gray opacity-0 group-hover:opacity-100 group-hover:text-brand-primary transition-all text-xl font-bold">
                                     →
                                 </div>
                             </div>
@@ -470,8 +469,8 @@ const renderApp = () => {
                     }).join('')}
                     
                     ${filteredProjects.length === 0 ? `
-                        <div class="py-32 text-center border border-dashed border-white/10 rounded-lg">
-                            <h3 class="text-3xl font-bold text-white/5 uppercase tracking-[0.3em]">No records</h3>
+                        <div class="py-24 text-center border border-dashed border-brand-hairline bg-white rounded-lg">
+                            <p class="text-brand-gray font-medium text-sm italic">No active projects found matching your search.</p>
                         </div>
                     ` : ''}
                 </div>
