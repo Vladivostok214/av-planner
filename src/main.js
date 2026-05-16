@@ -86,6 +86,7 @@ const appId = import.meta.env.VITE_APP_ID || 'av-planner-default';
 
 window.appState = {
     user: null,
+    userName: localStorage.getItem('av_planner_username') || '',
     projects: [],
     currentProject: null,
     view: 'dashboard',
@@ -134,76 +135,53 @@ const loadData = () => {
         console.log("📥 [Firestore Sync] Recibidos:", snapshot.size, "documentos");
         window.appState.projects = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
         
-        // --- Auto-Seeding Inteligente (Añadir si faltan o actualizar textos cortos) ---
+        // --- Auto-Seeding Inteligente ---
         const originalIdeas = [
             { title: "Hack #1: El 'Frankenstein'", category: "Educativo", description: "Explicar que el DEMRE combina tus mejores puntajes de distintas rendiciones (no se promedian).", script: "¡El sistema toma tu 800 de Invierno y tu 900 de Verano! Nadie promedia nada. Es un buffet." },
-            { title: "Foco Estratégico", category: "Social Media", description: "Recomendación de prepararse para rendir al máximo en solo 1 o 2 materias específicas en esta ocasión.", script: "Por eso, la estrategia de Invierno es ir a asegurar UNA O DOS pruebas específicas. No te estreses por todas." },
-            { title: "Hack #2: Distractores", category: "Educativo", description: "Entender que las alternativas falsas no son al azar, sino trampas diseñadas a partir de errores comunes.", script: "Se llaman 'Distractores'. Si en mate te olvidas de cambiar un signo negativo, el resultado va a estar en la B esperándote..." },
-            { title: "Entrenamiento Inteligente", category: "Publicidad", description: "La importancia de armar ensayos personalizados en puntajenacional.cl para aprender a esquivar estas trampas.", script: "Entra a puntajenacional.cl y arma ensayos personalizados. No solo te dice que la 'C' está mala, te explica la trampa..." },
-            { title: "Logística del Día D", category: "Institucional", description: "Qué llevar (carnet, tarjeta, lápiz, goma), prohibiciones (celulares) y el consejo de vestirse en capas.", script: "Hará frío. Las salas son heladas. Lleva ropa en capas... Solo necesitas tu carnet, tarjeta impresa, lápiz y goma." },
-            { title: "Planificación Post-Prueba", category: "Social Media", description: "Cómo usar los puntajes obtenidos como un colchón de seguridad para enfocar el resto del año.", script: "Esos puntajes quedan congelados... Son tu colchón de seguridad. Si aseguraste Ciencias ahora, dedícate a Matemáticas." },
-            { title: "Manejo de Ansiedad", category: "Social Media", description: "Técnicas rápidas de respiración y mentalidad para el momento de entrar a la sala.", script: "Si te bloqueas, respira en 4 tiempos. Es solo una prueba, no define tu valor como persona. ¡Tú puedes!" }
+            { title: "Foco Estratégico", category: "Social Media", description: "Recomendación de prepararse para rendir al máximo en solo 1 o 2 materias específicas en esta ocasión.", script: "Por eso, la estrategia de Invierno es ir a asegurar UNA O DOS pruebas específicas. No te estreses por todas." }
         ];
 
         let hasNewSeed = false;
         originalIdeas.forEach(seed => {
             const exists = window.appState.projects.find(p => p.title === seed.title);
             if (!exists) {
-                console.log(`🌱 Sembrando idea faltante: ${seed.title}`);
-                saveProject({ ...seed, team: "Equipo AV", dueDate: "2026-06-01" });
+                saveProject({ ...seed, team: "Equipo AV", dueDate: "2026-06-01", lastEditor: "Sistema" });
                 hasNewSeed = true;
-            } else if (exists.description && exists.description.length < 40) {
-                // Actualizar textos si son las versiones resumidas de las pruebas anteriores
-                console.log(`🔄 Restaurando textos originales completos para: ${seed.title}`);
-                updateProject(exists.id, { description: seed.description, script: seed.script });
             }
         });
 
-        if (hasNewSeed) return; // Esperar a que el siguiente snapshot traiga los nuevos datos
+        if (hasNewSeed) return;
         
-        // Actualizar referencia al proyecto actual si estamos en la vista de detalle
         if (window.appState.view === 'detail' && window.appState.currentProject) {
             const updatedProject = window.appState.projects.find(p => p.id === window.appState.currentProject.id);
-            if (updatedProject) {
-                console.log("🔄 Actualizando vista de detalle con nuevos datos de la nube");
-                window.appState.currentProject = updatedProject;
-            }
+            if (updatedProject) window.appState.currentProject = updatedProject;
         }
         
         renderApp();
     }, (error) => {
         console.error("❌ Error al cargar datos de Firestore:", error.code, error.message);
-        if (error.code === 'permission-denied') {
-            alert("Error: No tienes permisos para leer la base de datos. Revisa las reglas en la consola de Firebase.");
-        }
     });
 };
 
 const saveProject = async (projectData) => {
-    if (!window.appState.user) {
-        alert("No estás autenticado. Espera a que la app conecte.");
-        return;
-    }
-    const payload = { ...projectData, status: 'Idea', createdAt: new Date().toISOString() };
+    if (!window.appState.user) return;
+    const payload = { ...projectData, status: 'Idea', createdAt: new Date().toISOString(), lastEditor: window.appState.userName || 'Anónimo' };
     try {
         if (isMock) await db.addDoc({}, payload);
-        else {
-            console.log("📤 Guardando nuevo proyecto en la nube...");
-            await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'projects'), payload);
-        }
+        else await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'projects'), payload);
     } catch (error) {
-        console.error("❌ Error al guardar en Firestore:", error.code, error.message);
-        alert("Error al guardar: " + error.message);
+        console.error("❌ Error al guardar:", error);
     }
 };
 
 const updateProject = async (projectId, newData) => {
     if (!window.appState.user) return;
+    const payload = { ...newData, lastEditor: window.appState.userName || 'Anónimo' };
     try {
-        if (isMock) await db.updateDoc({ id: projectId }, newData);
-        else await updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'projects', projectId), newData);
+        if (isMock) await db.updateDoc({ id: projectId }, payload);
+        else await updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'projects', projectId), payload);
     } catch (error) {
-        console.error("❌ Error al actualizar en Firestore:", error.code, error.message);
+        console.error("❌ Error al actualizar:", error);
     }
 };
 
@@ -335,6 +313,36 @@ const getStatusBadge = (status) => {
 
 const renderApp = () => {
     const root = document.getElementById('app');
+    
+    // --- Identity Check Flow ---
+    if (!window.appState.userName) {
+        root.innerHTML = `
+            <div class="flex items-center justify-center min-h-screen p-6 bg-[#006FB3]">
+                <div class="bg-white p-10 rounded-[3rem] shadow-2xl max-w-md w-full text-center border border-white/20 animate-in fade-in zoom-in duration-500">
+                    <div class="w-20 h-20 bg-[#006FB3] rounded-3xl mx-auto mb-8 flex items-center justify-center shadow-xl shadow-blue-100">
+                        <svg class="w-10 h-10 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+                    </div>
+                    <h2 class="text-3xl font-black text-[#0A132D] mb-4 tracking-tight">Acceso Marketing</h2>
+                    <p class="text-gray-500 mb-8 font-medium italic">Ingresa tu nombre o firma. Esto servirá de huella para rastrear cambios en las ideas.</p>
+                    <form id="loginForm" class="space-y-4">
+                        <input type="text" id="userNameInput" required placeholder="Ej: Vlado Architect" class="w-full p-5 bg-gray-50 rounded-2xl border-2 border-transparent focus:border-[#006FB3] outline-none font-bold text-center text-[#0A132D] transition-all">
+                        <button type="submit" class="w-full bg-[#006FB3] text-white py-5 rounded-2xl font-black text-lg hover:bg-[#0A132D] transition-all shadow-lg uppercase tracking-widest border-b-4 border-black/10">Entrar al Planificador</button>
+                    </form>
+                </div>
+            </div>
+        `;
+        document.getElementById('loginForm').onsubmit = (e) => {
+            e.preventDefault();
+            const name = document.getElementById('userNameInput').value.trim();
+            if (name) {
+                window.appState.userName = name;
+                localStorage.setItem('av_planner_username', name);
+                renderApp();
+            }
+        };
+        return;
+    }
+
     if (window.appState.view === 'dashboard') {
         let filteredProjects = window.appState.projects.filter(p => {
             const query = window.appState.searchQuery.toLowerCase();
@@ -377,6 +385,11 @@ const renderApp = () => {
                         <button id="btnNewIdea" class="bg-[#FE6565] text-white px-5 py-2 rounded-xl font-black shadow-lg hover:bg-[#D93025] hover:scale-105 active:scale-95 transition-all flex items-center gap-2 uppercase tracking-widest text-[10px]">
                             <span>+</span> Nueva Idea
                         </button>
+                        <div class="h-6 w-px bg-white/10 hidden md:block ml-2"></div>
+                        <div class="flex items-center gap-2 px-3 group cursor-pointer" onclick="localStorage.removeItem('av_planner_username'); location.reload();">
+                            <span class="text-[9px] font-black text-white/40 uppercase tracking-tighter group-hover:text-white transition-colors">👤 ${window.appState.userName}</span>
+                            <span class="text-[8px] text-white/20 group-hover:text-red-400">✕</span>
+                        </div>
                     </div>
                 </header>
 
@@ -396,9 +409,12 @@ const renderApp = () => {
                             </div>
 
                             <div class="mt-4 pt-4 border-t border-gray-100 flex items-center justify-between">
-                                <div class="flex items-center gap-2">
-                                    <div class="w-5 h-5 rounded-lg bg-[#D93025] flex items-center justify-center text-[9px] text-white font-black shadow-sm">${(p.team || '?')[0]}</div>
-                                    <span class="text-[10px] font-black text-[#0A132D] opacity-60">${p.team || 'Sin asignar'}</span>
+                                <div class="flex flex-col gap-1">
+                                    <div class="flex items-center gap-2">
+                                        <div class="w-4 h-4 rounded bg-[#D93025] flex items-center justify-center text-[7px] text-white font-black">${(p.team || '?')[0]}</div>
+                                        <span class="text-[9px] font-black text-[#0A132D] opacity-40 uppercase tracking-tighter">${p.team || 'Sin asignar'}</span>
+                                    </div>
+                                    <span class="text-[7px] font-black text-[#006FB3] uppercase tracking-widest opacity-60">🖊️ Edición: ${p.lastEditor || 'Sistema'}</span>
                                 </div>
                                 <div class="w-8 h-8 rounded-xl bg-[#006FB3]/5 text-[#006FB3] flex items-center justify-center group-hover:bg-[#006FB3] group-hover:text-white transition-all transform group-hover:scale-110">
                                     <span class="text-lg font-black">→</span>
@@ -479,6 +495,7 @@ const renderApp = () => {
                     <div class="flex flex-wrap items-center gap-4 mb-6">
                         ${getStatusBadge(p.status)}
                         <span class="text-[10px] font-black text-blue-100 uppercase tracking-widest bg-white/10 backdrop-blur-md px-4 py-2 rounded-full border border-white/20">ID: ${p.id.substring(0,12)}</span>
+                        <span class="text-[10px] font-black text-white/60 uppercase tracking-widest border border-white/10 px-4 py-2 rounded-full">🖊️ Última edición: ${p.lastEditor || 'Sistema'}</span>
                     </div>
                     <h1 class="text-5xl font-black text-white mb-10 tracking-tighter leading-tight max-w-4xl">${p.title}</h1>
                     
