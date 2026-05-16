@@ -239,6 +239,11 @@ const resizeImage = (file) => {
     });
 };
 
+const getStatusProgress = (status) => {
+    const stages = ['Idea', 'Scripting', 'Storyboard', 'Producción', 'Finalizado'];
+    return ((stages.indexOf(status) + 1) / stages.length) * 100;
+};
+
 const getStatusBadge = (status) => {
     const config = {
         'Idea': { bg: 'bg-amber-100', text: 'text-amber-800', icon: '💡' },
@@ -248,7 +253,7 @@ const getStatusBadge = (status) => {
         'Finalizado': { bg: 'bg-emerald-100', text: 'text-emerald-800', icon: '✅' }
     };
     const c = config[status] || { bg: 'bg-gray-100', text: 'text-gray-700', icon: '❓' };
-    return `<span class="flex items-center gap-1 px-2 py-1 rounded-full ${c.bg} ${c.text} text-[8px] font-black uppercase tracking-widest whitespace-nowrap shadow-sm">
+    return `<span class="flex items-center gap-1.5 px-3 py-1 rounded-full ${c.bg} ${c.text} text-[9px] font-black uppercase tracking-wider shadow-sm">
         <span>${c.icon}</span> ${status}
     </span>`;
 };
@@ -259,16 +264,19 @@ const renderApp = () => {
     
     if (!window.appState.userName) {
         root.innerHTML = `
-            <div class="flex items-center justify-center min-h-screen p-6 bg-[#006FB3]">
-                <div class="bg-white p-10 rounded-[3rem] shadow-2xl max-w-md w-full text-center animate-in fade-in zoom-in duration-500">
-                    <div class="w-20 h-20 bg-[#006FB3] rounded-3xl mx-auto mb-8 flex items-center justify-center shadow-xl">
+            <div class="flex items-center justify-center min-h-screen p-6 bg-[#006FB3] relative overflow-hidden">
+                <div class="absolute top-[-10%] -left-[10%] w-[50%] h-[50%] bg-blue-400/20 blur-[120px] rounded-full"></div>
+                <div class="absolute bottom-[-10%] -right-[10%] w-[40%] h-[40%] bg-[#0A132D]/40 blur-[120px] rounded-full"></div>
+                
+                <div class="bg-white/95 backdrop-blur-2xl p-10 rounded-[3rem] shadow-2xl max-w-md w-full text-center animate-in fade-in zoom-in duration-700 border border-white/20 relative z-10">
+                    <div class="w-20 h-20 bg-[#006FB3] rounded-3xl mx-auto mb-8 flex items-center justify-center shadow-2xl shadow-blue-200 transform transition-transform hover:rotate-6">
                         <svg class="w-12 h-12 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
                     </div>
-                    <h2 class="text-3xl font-black text-[#0A132D] mb-4 tracking-tight">Acceso Marketing</h2>
-                    <p class="text-gray-500 mb-8 font-medium italic text-sm text-balance">Identifícate para registrar tu huella en el planificador.</p>
+                    <h2 class="text-3xl font-black text-[#0A132D] mb-4 tracking-tighter">Acceso Marketing</h2>
+                    <p class="text-gray-500 mb-8 font-medium italic text-sm text-balance text-center">Firma tu entrada para registrar cada cambio estratégico.</p>
                     <form id="loginForm" class="space-y-4">
-                        <input type="text" id="userNameInput" required placeholder="Tu firma..." class="w-full p-5 bg-gray-50 rounded-2xl border-2 border-transparent focus:border-[#006FB3] outline-none font-bold text-center text-[#0A132D]">
-                        <button type="submit" class="w-full bg-[#006FB3] text-white py-5 rounded-2xl font-black text-lg hover:bg-[#0A132D] transition-all shadow-lg border-b-4 border-black/10 uppercase tracking-widest">Entrar</button>
+                        <input type="text" id="userNameInput" required placeholder="Tu firma..." class="w-full p-5 bg-gray-50 rounded-2xl border-2 border-transparent focus:border-[#006FB3] focus:ring-4 focus:ring-blue-500/10 outline-none font-bold text-center text-[#0A132D] transition-all">
+                        <button type="submit" class="w-full bg-[#006FB3] text-white py-5 rounded-2xl font-black text-lg hover:bg-[#0A132D] transition-all shadow-xl hover:shadow-blue-900/20 border-t border-white/20 uppercase tracking-widest active:scale-[0.98]">Entrar al Portal</button>
                     </form>
                 </div>
             </div>
@@ -297,75 +305,90 @@ const renderApp = () => {
         });
 
         root.innerHTML = `
-            <div class="p-4 md:p-8 max-w-[1400px] mx-auto min-h-screen">
-                <header class="flex flex-col lg:flex-row justify-between items-start lg:items-end mb-8 gap-6">
-                    <div class="flex items-center gap-5">
-                        <div class="w-12 h-12 bg-white rounded-xl flex items-center justify-center shadow-xl transform -rotate-3">
-                            <svg class="w-8 h-8 text-[#006FB3]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+            <div class="p-4 md:p-10 max-w-[1500px] mx-auto min-h-screen relative">
+                <!-- Background Mesh -->
+                <div class="fixed inset-0 pointer-events-none -z-10 bg-[#006FB3]">
+                    <div class="absolute top-[-20%] -left-[10%] w-[60%] h-[60%] bg-blue-400/30 blur-[150px] rounded-full opacity-60"></div>
+                    <div class="absolute bottom-[-20%] -right-[10%] w-[50%] h-[50%] bg-[#0A132D]/50 blur-[150px] rounded-full opacity-40"></div>
+                </div>
+
+                <header class="flex flex-col lg:flex-row justify-between items-start lg:items-center mb-12 gap-8 relative z-10">
+                    <div class="flex items-center gap-6">
+                        <div class="w-16 h-16 bg-white rounded-2xl flex items-center justify-center shadow-2xl shadow-blue-900/30 transform -rotate-2 hover:rotate-0 transition-all duration-500 border border-white/20">
+                            <svg class="w-10 h-10 text-[#006FB3]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
                         </div>
                         <div>
-                            <span class="text-[9px] font-black uppercase tracking-[0.3em] text-blue-200/70 mb-1 inline-block">Marketing Puntaje Nacional</span>
-                            <h1 class="text-3xl font-black text-white tracking-tighter leading-none">Planificación Audiovisual</h1>
+                            <span class="text-[10px] font-black uppercase tracking-[0.4em] text-blue-100 bg-white/10 px-4 py-1.5 rounded-full mb-2 inline-block border border-white/10 backdrop-blur-md shadow-inner">Marketing Puntaje Nacional</span>
+                            <h1 class="text-4xl font-black text-white tracking-tighter leading-tight drop-shadow-md">Planificación Audiovisual</h1>
                         </div>
                     </div>
                     
-                    <div class="flex flex-wrap items-center gap-3 bg-black/10 backdrop-blur-xl p-2 rounded-2xl border border-white/5">
+                    <div class="flex flex-wrap items-center gap-4 bg-white/5 backdrop-blur-3xl p-2.5 rounded-[2rem] border border-white/10 shadow-2xl shadow-blue-900/20">
                         <div class="relative group">
-                            <span class="absolute left-3 top-1/2 -translate-y-1/2 text-white/40 text-xs">🔍</span>
-                            <input type="text" id="searchInput" value="${window.appState.searchQuery}" placeholder="Filtrar..." class="pl-8 pr-3 py-2 bg-transparent border-none text-sm focus:ring-0 placeholder:text-white/20 font-bold text-white w-32 md:w-48 transition-all focus:w-64">
+                            <span class="absolute left-4 top-1/2 -translate-y-1/2 text-white/30 text-sm group-focus-within:text-blue-200 transition-colors">🔍</span>
+                            <input type="text" id="searchInput" value="${window.appState.searchQuery}" placeholder="Filtrar ideas..." class="pl-10 pr-4 py-2.5 bg-transparent border-none text-sm focus:ring-0 placeholder:text-white/20 font-bold text-white w-32 md:w-56 transition-all focus:w-72">
                         </div>
-                        <div class="h-6 w-px bg-white/10 hidden md:block"></div>
-                        <select id="sortSelect" class="bg-transparent border-none rounded-xl text-[10px] font-black py-2 px-3 text-white/60 appearance-none cursor-pointer outline-none uppercase tracking-widest">
-                            <option value="date" ${window.appState.sortBy === 'date' ? 'selected' : ''} class="text-[#0A132D]">Recientes</option>
-                            <option value="title" ${window.appState.sortBy === 'title' ? 'selected' : ''} class="text-[#0A132D]">Título</option>
-                            <option value="status" ${window.appState.sortBy === 'status' ? 'selected' : ''} class="text-[#0A132D]">Estatus</option>
+                        <div class="h-8 w-px bg-white/10 hidden md:block"></div>
+                        <select id="sortSelect" class="bg-transparent border-none rounded-xl text-[10px] font-black py-2.5 px-4 text-white/50 appearance-none cursor-pointer outline-none uppercase tracking-widest hover:text-white transition-colors">
+                            <option value="date" ${window.appState.sortBy === 'date' ? 'selected' : ''} class="text-[#0A132D]">📅 Recientes</option>
+                            <option value="title" ${window.appState.sortBy === 'title' ? 'selected' : ''} class="text-[#0A132D]">🔤 Título</option>
+                            <option value="status" ${window.appState.sortBy === 'status' ? 'selected' : ''} class="text-[#0A132D]">⚡ Estatus</option>
                         </select>
-                        <button id="btnNewIdea" class="bg-[#FE6565] text-white px-5 py-2 rounded-xl font-black shadow-lg hover:bg-[#D93025] hover:scale-105 active:scale-95 transition-all flex items-center gap-2 uppercase tracking-widest text-[10px]">
-                            <span>+</span> Nueva Idea
+                        <button id="btnNewIdea" class="bg-[#FE6565] text-white px-8 py-3 rounded-2xl font-black shadow-xl shadow-red-900/20 hover:bg-[#D93025] hover:scale-105 active:scale-95 transition-all flex items-center gap-2 uppercase tracking-widest text-[10px] border-t border-white/20">
+                            <span class="text-lg">+</span> Nueva Idea
                         </button>
-                        <div class="h-6 w-px bg-white/10 hidden md:block ml-2"></div>
-                        <div class="flex items-center gap-2 px-3 group cursor-pointer" onclick="localStorage.removeItem('av_planner_username'); location.reload();">
-                            <span class="text-[9px] font-black text-white/40 uppercase tracking-tighter group-hover:text-white">👤 ${window.appState.userName}</span>
-                            <span class="text-[8px] text-white/20 group-hover:text-red-400">✕</span>
+                        <div class="h-8 w-px bg-white/10 hidden md:block ml-2"></div>
+                        <div class="flex items-center gap-3 px-4 group cursor-pointer bg-white/5 rounded-2xl py-2 border border-white/5 hover:bg-white/10 transition-colors" onclick="localStorage.removeItem('av_planner_username'); location.reload();">
+                            <span class="text-[10px] font-black text-blue-100 uppercase tracking-tighter">👤 ${window.appState.userName}</span>
+                            <span class="text-[10px] text-white/20 group-hover:text-red-400">✕</span>
                         </div>
                     </div>
                 </header>
 
-                <div class="bg-white/95 backdrop-blur-sm rounded-[2rem] shadow-2xl overflow-hidden border border-white/20">
-                    <div class="hidden md:grid grid-cols-12 gap-4 p-5 bg-gray-50/50 border-b border-gray-100 text-[9px] font-black text-gray-400 uppercase tracking-widest">
-                        <div class="col-span-1 text-center">Status</div>
-                        <div class="col-span-4">Proyecto</div>
-                        <div class="col-span-2 text-center">Encargado</div>
-                        <div class="col-span-2 text-center">Fecha</div>
-                        <div class="col-span-2 text-center">Edición</div>
-                        <div class="col-span-1 text-right">Acción</div>
-                    </div>
-                    <div class="divide-y divide-gray-50">
-                        ${filteredProjects.map(p => `
-                            <div data-id="${p.id}" class="project-row grid grid-cols-12 gap-4 p-5 items-center hover:bg-blue-50/30 cursor-pointer transition-colors group">
-                                <div class="col-span-3 md:col-span-1 flex justify-center">${getStatusBadge(p.status)}</div>
-                                <div class="col-span-9 md:col-span-4">
-                                    <h3 class="text-sm font-black text-[#0A132D] group-hover:text-[#006FB3] transition-colors leading-tight">${p.title}</h3>
-                                    <span class="text-[9px] font-bold text-gray-300 uppercase mt-0.5 block tracking-tighter">${p.category}</span>
+                <div class="flex flex-col gap-4 relative z-10">
+                    ${filteredProjects.map(p => {
+                        const progress = getStatusProgress(p.status);
+                        return `
+                            <div data-id="${p.id}" class="project-row bg-white/95 backdrop-blur-md p-6 rounded-3xl shadow-xl shadow-blue-900/10 hover:shadow-blue-900/30 hover:scale-[1.01] hover:-translate-y-0.5 transition-all duration-300 cursor-pointer flex flex-col md:flex-row items-start md:items-center gap-6 relative overflow-hidden border border-white/20 group">
+                                <!-- Progress Mini-Bar -->
+                                <div class="absolute bottom-0 left-0 h-1 bg-[#006FB3]/5 w-full"></div>
+                                <div class="absolute bottom-0 left-0 h-1 bg-gradient-to-r from-[#006FB3] to-blue-400 transition-all duration-1000 shadow-[0_0_8px_rgba(0,111,179,0.5)]" style="width: ${progress}%"></div>
+                                
+                                <div class="w-full md:w-32 flex shrink-0 md:justify-center">
+                                    ${getStatusBadge(p.status)}
                                 </div>
-                                <div class="hidden md:flex col-span-2 justify-center">
-                                    <span class="text-[9px] font-black text-[#0A132D] opacity-60 bg-gray-100 px-3 py-1 rounded-full uppercase tracking-tighter">${p.team || '---'}</span>
+                                <div class="flex-1 min-w-0">
+                                    <div class="flex items-center gap-3 mb-1">
+                                        <h3 class="text-base font-black text-[#0A132D] truncate tracking-tight group-hover:text-[#006FB3] transition-colors">${p.title}</h3>
+                                        <span class="text-[8px] font-black text-[#006FB3] bg-blue-50 px-2 py-0.5 rounded-full border border-blue-100/50 uppercase tracking-widest shrink-0">${p.category}</span>
+                                    </div>
+                                    <p class="text-gray-400 text-[11px] font-medium line-clamp-1 opacity-70 italic">${p.description || 'Sin brief conceptual.'}</p>
                                 </div>
-                                <div class="hidden md:flex col-span-2 justify-center">
-                                    <span class="text-[10px] font-bold text-gray-300 uppercase">${new Date(p.createdAt).toLocaleDateString()}</span>
-                                </div>
-                                <div class="hidden md:flex col-span-2 justify-center">
-                                    <span class="text-[8px] font-black text-[#006FB3] opacity-40 uppercase tracking-widest truncate max-w-full px-2">🖊️ ${p.lastEditor || 'Sist.'}</span>
-                                </div>
-                                <div class="hidden md:flex col-span-1 text-right items-center justify-end">
-                                    <span class="text-[#006FB3] font-black text-xl transform group-hover:translate-x-1 transition-transform">→</span>
+                                <div class="flex items-center gap-8 shrink-0 w-full md:w-auto md:border-l border-gray-100 md:pl-8 mt-4 md:mt-0">
+                                    <div class="flex flex-col items-center">
+                                        <span class="text-[8px] font-black text-gray-300 uppercase tracking-widest mb-1.5">Encargado</span>
+                                        <span class="text-[10px] font-black text-[#0A132D] bg-gray-50 px-4 py-1.5 rounded-xl border border-gray-100 shadow-inner tracking-tighter">${p.team || '---'}</span>
+                                    </div>
+                                    <div class="flex flex-col items-center">
+                                        <span class="text-[8px] font-black text-gray-300 uppercase tracking-widest mb-1.5">Registro</span>
+                                        <span class="text-[10px] font-bold text-gray-400 tracking-tighter">${new Date(p.createdAt).toLocaleDateString()}</span>
+                                    </div>
+                                    <div class="flex flex-col items-end">
+                                        <span class="text-[8px] font-black text-gray-300 uppercase tracking-widest mb-1.5">Firma</span>
+                                        <span class="text-[9px] font-black text-[#006FB3] opacity-60 truncate max-w-[100px] bg-blue-50/50 px-3 py-1 rounded-lg border border-blue-50 italic">🖊️ ${p.lastEditor || 'Sist.'}</span>
+                                    </div>
+                                    <div class="w-12 h-12 rounded-2xl bg-[#006FB3]/5 text-[#006FB3] flex items-center justify-center transform group-hover:rotate-12 group-hover:scale-110 transition-all border border-blue-100/50 shadow-inner">
+                                        <span class="text-2xl font-black">→</span>
+                                    </div>
                                 </div>
                             </div>
-                        `).join('')}
-                    </div>
+                        `;
+                    }).join('')}
+                    
                     ${filteredProjects.length === 0 ? `
-                        <div class="py-20 text-center">
-                            <h3 class="text-xl font-black text-[#0A132D] opacity-20 italic uppercase tracking-[0.2em]">Sin registros estratégicos</h3>
+                        <div class="py-32 text-center bg-white/5 backdrop-blur-md rounded-[4rem] border-2 border-dashed border-white/10">
+                            <h3 class="text-3xl font-black text-white/20 italic uppercase tracking-[0.3em]">Sin registros estratégicos</h3>
+                            <p class="text-white/10 mt-4 font-bold text-sm">Prueba con otros términos de búsqueda.</p>
                         </div>
                     ` : ''}
                 </div>
@@ -387,20 +410,38 @@ const renderApp = () => {
         
     } else if (window.appState.view === 'new') {
         root.innerHTML = `
-            <div class="p-6 max-w-2xl mx-auto py-20">
-                <button id="btnBackToDashboard" class="text-white mb-10 flex items-center hover:scale-105 transition-transform font-black uppercase text-xs tracking-[0.2em]"><span class="mr-3 text-xl">←</span> Dashboard</button>
-                <div class="bg-white p-10 rounded-[3.5rem] shadow-2xl border border-white relative overflow-hidden">
-                    <h2 class="text-4xl font-black mb-8 text-[#0A132D] tracking-tight text-center">Nueva Idea<span class="text-[#006FB3]">.</span></h2>
-                    <form id="ideaForm" class="space-y-6">
-                        <div><label class="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-3">Título Conceptual</label><input type="text" id="title" required class="w-full p-5 bg-gray-50 rounded-2xl border-none outline-none font-bold text-lg text-[#0A132D]"></div>
-                        <div>
-                            <label class="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-3">Categoría</label>
-                            <select id="category" class="w-full p-5 bg-gray-50 rounded-2xl border-none outline-none font-black text-[#0A132D]">
-                                <option>Social Media</option><option>Educativo</option><option>Institucional</option><option>Publicidad</option>
-                            </select>
+            <div class="p-6 max-w-2xl mx-auto py-20 relative min-h-screen">
+                <div class="fixed inset-0 pointer-events-none -z-10 bg-[#006FB3]">
+                    <div class="absolute top-[-20%] -left-[10%] w-[60%] h-[60%] bg-blue-400/30 blur-[150px] rounded-full opacity-60"></div>
+                </div>
+                
+                <button id="btnBackToDashboard" class="text-white mb-10 flex items-center hover:scale-105 transition-transform font-black uppercase text-xs tracking-[0.3em] bg-white/10 px-6 py-3 rounded-2xl backdrop-blur-md border border-white/10 shadow-xl"><span class="mr-3 text-xl">←</span> Dashboard</button>
+                
+                <div class="bg-white p-12 rounded-[4rem] shadow-2xl border border-white relative overflow-hidden animate-in slide-in-from-bottom-8 duration-700">
+                    <div class="absolute top-0 right-0 w-48 h-48 bg-[#006FB3]/5 rounded-bl-[8rem]"></div>
+                    <h2 class="text-4xl font-black mb-10 text-[#0A132D] tracking-tighter text-center">Nueva Iniciativa<span class="text-[#006FB3]">.</span></h2>
+                    <form id="ideaForm" class="space-y-8 relative z-10">
+                        <div class="group">
+                            <label class="block text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] mb-3 ml-2 group-focus-within:text-[#006FB3] transition-colors">Título Conceptual</label>
+                            <input type="text" id="title" required class="w-full p-6 bg-gray-50 rounded-3xl border-2 border-transparent focus:border-[#006FB3] focus:bg-white focus:ring-8 focus:ring-blue-500/5 outline-none font-black text-xl text-[#0A132D] transition-all shadow-inner" placeholder="Ej: Hacks DEMRE 2026">
                         </div>
-                        <div><label class="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-3">Brief</label><textarea id="description" rows="4" required class="w-full p-5 bg-gray-50 rounded-2xl border-none outline-none font-medium leading-relaxed text-[#0A132D]"></textarea></div>
-                        <button type="submit" class="w-full bg-[#006FB3] text-white py-6 rounded-3xl font-black text-lg hover:bg-[#0A132D] transition-all shadow-lg border-b-4 border-black/10 uppercase tracking-widest">Guardar</button>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                            <div class="group">
+                                <label class="block text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] mb-3 ml-2 group-focus-within:text-[#006FB3] transition-colors">Categoría Estratégica</label>
+                                <select id="category" class="w-full p-6 bg-gray-50 rounded-3xl border-2 border-transparent focus:border-[#006FB3] focus:bg-white focus:ring-8 focus:ring-blue-500/5 outline-none font-black text-[#0A132D] appearance-none cursor-pointer shadow-inner">
+                                    <option>Social Media</option><option>Educativo</option><option>Institucional</option><option>Publicidad</option>
+                                </select>
+                            </div>
+                            <div class="group">
+                                <label class="block text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] mb-3 ml-2 group-focus-within:text-[#006FB3] transition-colors">Lead (Opcional)</label>
+                                <input type="text" id="team" class="w-full p-6 bg-gray-50 rounded-3xl border-2 border-transparent focus:border-[#006FB3] focus:bg-white focus:ring-8 focus:ring-blue-500/5 outline-none font-black text-[#0A132D] transition-all shadow-inner" placeholder="Nombre...">
+                            </div>
+                        </div>
+                        <div class="group">
+                            <label class="block text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] mb-3 ml-2 group-focus-within:text-[#006FB3] transition-colors">Brief / Objetivo</label>
+                            <textarea id="description" rows="4" required class="w-full p-6 bg-gray-50 rounded-3xl border-2 border-transparent focus:border-[#006FB3] focus:bg-white focus:ring-8 focus:ring-blue-500/5 outline-none font-medium leading-relaxed text-[#0A132D] transition-all shadow-inner" placeholder="¿Qué impacto buscamos con esta idea?"></textarea>
+                        </div>
+                        <button type="submit" class="w-full bg-[#006FB3] text-white py-8 rounded-[2.5rem] font-black text-xl hover:bg-[#0A132D] transition-all shadow-2xl hover:shadow-blue-900/30 border-t border-white/20 uppercase tracking-[0.2em] active:scale-[0.98]">Guardar Iniciativa</button>
                     </form>
                 </div>
             </div>
@@ -408,56 +449,86 @@ const renderApp = () => {
         document.getElementById('btnBackToDashboard').onclick = () => window.setView('dashboard');
         document.getElementById('ideaForm').onsubmit = async (e) => {
             e.preventDefault();
-            await saveProject({ title: document.getElementById('title').value, category: document.getElementById('category').value, description: document.getElementById('description').value });
+            await saveProject({ title: document.getElementById('title').value, category: document.getElementById('category').value, description: document.getElementById('description').value, team: document.getElementById('team').value });
             window.setView('dashboard');
         };
     } else if (window.appState.view === 'detail') {
         const p = window.appState.currentProject;
         const stages = ['Idea', 'Scripting', 'Storyboard', 'Producción', 'Finalizado'];
         const currentIndex = stages.indexOf(p.status);
-        const prod = p.production || { rawLink: '', montage: false, edicion: false, subtitulado: false, exportado: false };
+        const prod = p.production || { montage: false, edicion: false, subtitulado: false, exportado: false };
         const images = p.storyboardImages || [];
         const activeTab = window.appState.activeTab;
 
         root.innerHTML = `
-            <div class="p-4 md:p-8 max-w-[1400px] mx-auto min-h-screen pb-20">
-                <button id="btnBackToDashboardDetail" class="text-white mb-8 flex items-center hover:scale-105 transition-transform font-black uppercase text-xs tracking-[0.2em]"><span class="mr-3 text-xl">←</span> Dashboard</button>
+            <div class="p-4 md:p-10 max-w-[1400px] mx-auto min-h-screen pb-20 relative">
+                <!-- Background Mesh -->
+                <div class="fixed inset-0 pointer-events-none -z-10 bg-[#006FB3]">
+                    <div class="absolute bottom-[-10%] -left-[10%] w-[60%] h-[60%] bg-blue-400/30 blur-[150px] rounded-full opacity-60"></div>
+                </div>
+
+                <button id="btnBackToDashboardDetail" class="text-white mb-10 flex items-center hover:scale-105 transition-transform font-black uppercase text-[10px] tracking-[0.3em] bg-white/10 px-6 py-3 rounded-2xl backdrop-blur-md border border-white/10 shadow-xl"><span class="mr-3 text-xl">←</span> Dashboard</button>
                 
-                <div class="mb-10">
-                    <div class="flex flex-wrap items-center gap-4 mb-6">
+                <div class="mb-12">
+                    <div class="flex flex-wrap items-center gap-4 mb-8">
                         ${getStatusBadge(p.status)}
-                        <span class="text-[10px] font-black text-blue-100 uppercase bg-white/10 px-4 py-2 rounded-full border border-white/20 tracking-widest">🖊️ Edición: ${p.lastEditor || 'Sist.'}</span>
+                        <div class="flex items-center gap-3 bg-white/10 backdrop-blur-md px-5 py-2 rounded-full border border-white/20 shadow-xl">
+                            <span class="text-[10px] font-black text-blue-100 uppercase tracking-widest">🖊️ Última Firma:</span>
+                            <span class="text-[10px] font-black text-white italic uppercase">${p.lastEditor || 'Sist.'}</span>
+                        </div>
+                        <span class="text-[9px] font-black text-white/30 uppercase tracking-[0.3em] ml-auto">PROJECT_ID: ${p.id.substring(0,8)}</span>
                     </div>
-                    <h1 class="text-4xl md:text-5xl font-black text-white mb-10 tracking-tighter leading-tight max-w-4xl">${p.title}</h1>
+                    <h1 class="text-4xl md:text-6xl font-black text-white mb-12 tracking-tighter leading-tight max-w-5xl drop-shadow-2xl">${p.title}</h1>
                     
-                    <div class="flex gap-2 bg-black/10 backdrop-blur-xl p-2 rounded-3xl border border-white/10 overflow-x-auto no-scrollbar">
-                        <button onclick="window.setTab('guion')" class="px-8 py-4 rounded-2xl font-black text-[10px] uppercase tracking-widest transition-all ${activeTab === 'guion' ? 'bg-white text-[#006FB3] shadow-xl' : 'text-white/40 hover:text-white hover:bg-white/5'} whitespace-nowrap">1. Guion</button>
-                        <button onclick="window.setTab('storyboard')" class="px-8 py-4 rounded-2xl font-black text-[10px] uppercase tracking-widest transition-all ${activeTab === 'storyboard' ? 'bg-white text-[#006FB3] shadow-xl' : 'text-white/40 hover:text-white hover:bg-white/5'} whitespace-nowrap">2. Storyboard</button>
-                        <button onclick="window.setTab('produccion')" class="px-8 py-4 rounded-2xl font-black text-[10px] uppercase tracking-widest transition-all ${activeTab === 'produccion' ? 'bg-white text-[#006FB3] shadow-xl' : 'text-white/40 hover:text-white hover:bg-white/5'} whitespace-nowrap">3. Producción</button>
-                        <button onclick="window.setTab('gestion')" class="px-8 py-4 rounded-2xl font-black text-[10px] uppercase tracking-widest transition-all ${activeTab === 'gestion' ? 'bg-white text-[#006FB3] shadow-xl' : 'text-white/40 hover:text-white hover:bg-white/5'} whitespace-nowrap">4. Gestión</button>
+                    <!-- MODERN TAB NAVIGATION -->
+                    <div class="relative max-w-2xl">
+                        <div class="flex gap-1 bg-black/20 backdrop-blur-3xl p-1.5 rounded-[2.2rem] border border-white/10 shadow-2xl relative overflow-hidden">
+                            <button onclick="window.setTab('guion')" class="relative flex-1 px-4 py-4 rounded-[1.8rem] font-black text-[10px] uppercase tracking-widest transition-all z-10 ${activeTab === 'guion' ? 'text-[#006FB3]' : 'text-white/40 hover:text-white'}">
+                                ${activeTab === 'guion' ? '<div class="absolute inset-0 bg-white rounded-[1.6rem] -z-10 shadow-2xl animate-in fade-in duration-300"></div>' : ''}
+                                📝 Guion
+                            </button>
+                            <button onclick="window.setTab('storyboard')" class="relative flex-1 px-4 py-4 rounded-[1.8rem] font-black text-[10px] uppercase tracking-widest transition-all z-10 ${activeTab === 'storyboard' ? 'text-[#006FB3]' : 'text-white/40 hover:text-white'}">
+                                ${activeTab === 'storyboard' ? '<div class="absolute inset-0 bg-white rounded-[1.6rem] -z-10 shadow-2xl animate-in fade-in duration-300"></div>' : ''}
+                                🎨 Storyboard
+                            </button>
+                            <button onclick="window.setTab('produccion')" class="relative flex-1 px-4 py-4 rounded-[1.8rem] font-black text-[10px] uppercase tracking-widest transition-all z-10 ${activeTab === 'produccion' ? 'text-[#006FB3]' : 'text-white/40 hover:text-white'}">
+                                ${activeTab === 'produccion' ? '<div class="absolute inset-0 bg-white rounded-[1.6rem] -z-10 shadow-2xl animate-in fade-in duration-300"></div>' : ''}
+                                🎬 Prod.
+                            </button>
+                            <button onclick="window.setTab('gestion')" class="relative flex-1 px-4 py-4 rounded-[1.8rem] font-black text-[10px] uppercase tracking-widest transition-all z-10 ${activeTab === 'gestion' ? 'text-[#006FB3]' : 'text-white/40 hover:text-white'}">
+                                ${activeTab === 'gestion' ? '<div class="absolute inset-0 bg-white rounded-[1.6rem] -z-10 shadow-2xl animate-in fade-in duration-300"></div>' : ''}
+                                ⚙️ Admin
+                            </button>
+                        </div>
                     </div>
                 </div>
 
-                <div class="animate-in fade-in slide-in-from-bottom-4 duration-500">
+                <div class="animate-in fade-in slide-in-from-bottom-8 duration-700">
                     ${activeTab === 'guion' ? `
-                        <div class="bg-white p-8 md:p-12 rounded-[3.5rem] shadow-2xl border border-white max-w-4xl mx-auto">
-                            <h3 class="font-black text-2xl mb-8 text-[#0A132D] flex items-center gap-4">📝 Guion Literario</h3>
-                            <div id="scriptContent" class="bg-gray-50/50 p-8 rounded-3xl text-base text-gray-700 min-h-[400px] outline-none border-2 border-transparent focus:border-[#006FB3] focus:bg-white leading-relaxed font-medium shadow-inner" contenteditable="true">
-                                ${p.script || 'Comienza a redactar el guion aquí...'}
+                        <div class="bg-white p-10 md:p-16 rounded-[4rem] shadow-[0_30px_100px_rgba(0,0,0,0.2)] border border-white max-w-5xl">
+                            <div class="flex items-center justify-between mb-12">
+                                <h3 class="font-black text-3xl text-[#0A132D] tracking-tighter">Guion Literario<span class="text-[#006FB3]">.</span></h3>
+                                <div class="w-12 h-12 rounded-2xl bg-blue-50 flex items-center justify-center text-xl shadow-inner border border-blue-100/50">📝</div>
+                            </div>
+                            <div id="scriptContent" class="bg-gray-50/70 p-10 rounded-[2.5rem] text-lg text-gray-700 min-h-[500px] outline-none border-2 border-transparent focus:border-[#006FB3] focus:bg-white focus:ring-[15px] focus:ring-blue-500/5 leading-relaxed font-medium shadow-inner transition-all" contenteditable="true">
+                                ${p.script || 'Escribe el flujo narrativo aquí...'}
                             </div>
                         </div>
                     ` : ''}
 
                     ${activeTab === 'storyboard' ? `
-                        <div class="bg-white p-8 md:p-12 rounded-[3.5rem] shadow-2xl border border-white">
-                            <h3 class="font-black text-2xl mb-8 text-[#0A132D] flex items-center gap-4">🎨 Storyboard Visual</h3>
-                            <div class="grid grid-cols-2 md:grid-cols-4 xl:grid-cols-5 gap-6">
-                                ${images.map((img, idx) => `<div onclick="window.openLightbox(${idx})" class="aspect-square bg-gray-100 rounded-3xl overflow-hidden cursor-pointer hover:ring-4 hover:ring-blue-500/20 relative group transition-all shadow-md">
+                        <div class="bg-white p-10 md:p-14 rounded-[4rem] shadow-[0_30px_100px_rgba(0,0,0,0.2)] border border-white">
+                            <div class="flex items-center justify-between mb-12">
+                                <h3 class="font-black text-3xl text-[#0A132D] tracking-tighter">Storyboard Visual<span class="text-[#006FB3]">.</span></h3>
+                                <div class="w-12 h-12 rounded-2xl bg-purple-50 flex items-center justify-center text-xl shadow-inner border border-purple-100/50">🎨</div>
+                            </div>
+                            <div class="grid grid-cols-2 md:grid-cols-4 xl:grid-cols-5 gap-8">
+                                ${images.map((img, idx) => `<div onclick="window.openLightbox(${idx})" class="aspect-square bg-gray-100 rounded-[2rem] overflow-hidden cursor-pointer hover:ring-8 hover:ring-blue-500/10 relative group transition-all shadow-xl hover:-translate-y-2 border border-gray-100">
                                     <img src="${img}" class="w-full h-full object-cover">
-                                    <div class="absolute inset-0 bg-[#006FB3]/60 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity backdrop-blur-[2px]"><span class="text-white text-3xl font-black">🔍</span></div>
+                                    <div class="absolute inset-0 bg-[#006FB3]/40 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity backdrop-blur-[4px]"><span class="text-white text-4xl font-black">🔍</span></div>
                                 </div>`).join('')}
-                                <div onclick="document.getElementById('sbUpload').click()" class="aspect-square bg-gray-50/80 rounded-3xl flex flex-col items-center justify-center text-gray-300 border-4 border-dashed border-gray-100 hover:border-[#006FB3] hover:text-[#006FB3] cursor-pointer transition-all">
-                                    <span class="text-4xl font-black">+</span><span class="text-[10px] font-black uppercase tracking-widest mt-2">Frame</span>
+                                <div onclick="document.getElementById('sbUpload').click()" class="aspect-square bg-gray-50/80 rounded-[2rem] flex flex-col items-center justify-center text-gray-300 border-4 border-dashed border-gray-100 hover:border-[#006FB3] hover:text-[#006FB3] hover:bg-white cursor-pointer transition-all shadow-inner group">
+                                    <span class="text-5xl font-black group-hover:scale-125 transition-transform">+</span><span class="text-[10px] font-black uppercase tracking-widest mt-4">Nuevo Frame</span>
                                 </div>
                                 <input type="file" id="sbUpload" class="hidden" accept="image/jpeg, image/png" multiple onchange="window.handleImageUpload(event, '${p.id}')">
                             </div>
@@ -465,48 +536,63 @@ const renderApp = () => {
                     ` : ''}
 
                     ${activeTab === 'produccion' ? `
-                        <div class="bg-white p-8 md:p-12 rounded-[3.5rem] shadow-2xl border border-white max-w-4xl mx-auto">
-                            <h3 class="font-black text-2xl mb-10 text-[#0A132D] flex items-center gap-4">🎬 Control de Producción</h3>
-                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                <label class="flex items-center gap-5 p-8 rounded-[2.5rem] bg-gray-50 transition-all cursor-pointer border-2 border-transparent group hover:bg-white hover:shadow-xl">
-                                    <input type="checkbox" id="chkMontaje" ${prod.montaje ? 'checked' : ''} class="w-8 h-8 text-[#006FB3] rounded-xl focus:ring-[#006FB3] border-gray-200 shadow-sm"><span class="text-lg font-black text-[#0A132D]">Montaje Base</span>
+                        <div class="bg-white p-10 md:p-16 rounded-[4rem] shadow-[0_30px_100px_rgba(0,0,0,0.2)] border border-white max-w-4xl">
+                            <div class="flex items-center justify-between mb-12">
+                                <h3 class="font-black text-3xl text-[#0A132D] tracking-tighter">Control de Producción<span class="text-[#006FB3]">.</span></h3>
+                                <div class="w-12 h-12 rounded-2xl bg-red-50 flex items-center justify-center text-xl shadow-inner border border-red-100/50">🎬</div>
+                            </div>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                                <label class="flex items-center gap-6 p-10 rounded-[3rem] bg-gray-50 transition-all cursor-pointer border-2 border-transparent group hover:bg-white hover:shadow-2xl hover:shadow-blue-900/10 hover:border-blue-100">
+                                    <input type="checkbox" id="chkMontaje" ${prod.montaje ? 'checked' : ''} class="w-10 h-10 text-[#006FB3] rounded-[1rem] focus:ring-0 border-gray-200 shadow-inner group-hover:scale-110 transition-transform"><span class="text-xl font-black text-[#0A132D]">Montaje Base</span>
                                 </label>
-                                <label class="flex items-center gap-5 p-8 rounded-[2.5rem] bg-gray-50 transition-all cursor-pointer border-2 border-transparent group hover:bg-white hover:shadow-xl">
-                                    <input type="checkbox" id="chkEdicion" ${prod.edicion ? 'checked' : ''} class="w-8 h-8 text-[#006FB3] rounded-xl focus:ring-[#006FB3] border-gray-200 shadow-sm"><span class="text-lg font-black text-[#0A132D]">Color y Sonido</span>
+                                <label class="flex items-center gap-6 p-10 rounded-[3rem] bg-gray-50 transition-all cursor-pointer border-2 border-transparent group hover:bg-white hover:shadow-2xl hover:shadow-blue-900/10 hover:border-blue-100">
+                                    <input type="checkbox" id="chkEdicion" ${prod.edicion ? 'checked' : ''} class="w-10 h-10 text-[#006FB3] rounded-[1rem] focus:ring-0 border-gray-200 shadow-inner group-hover:scale-110 transition-transform"><span class="text-xl font-black text-[#0A132D]">Color y Mezcla</span>
                                 </label>
-                                <label class="flex items-center gap-5 p-8 rounded-[2.5rem] bg-gray-50 transition-all cursor-pointer border-2 border-transparent group hover:bg-white hover:shadow-xl">
-                                    <input type="checkbox" id="chkSubtitulado" ${prod.subtitulado ? 'checked' : ''} class="w-8 h-8 text-[#006FB3] rounded-xl focus:ring-[#006FB3] border-gray-200 shadow-sm"><span class="text-lg font-black text-[#0A132D]">Subtítulos / GFX</span>
+                                <label class="flex items-center gap-6 p-10 rounded-[3rem] bg-gray-50 transition-all cursor-pointer border-2 border-transparent group hover:bg-white hover:shadow-2xl hover:shadow-blue-900/10 hover:border-blue-100">
+                                    <input type="checkbox" id="chkSubtitulado" ${prod.subtitulado ? 'checked' : ''} class="w-10 h-10 text-[#006FB3] rounded-[1rem] focus:ring-0 border-gray-200 shadow-inner group-hover:scale-110 transition-transform"><span class="text-xl font-black text-[#0A132D]">GFX y Subs</span>
                                 </label>
-                                <label class="flex items-center gap-5 p-8 rounded-[2.5rem] bg-red-50/50 transition-all cursor-pointer border-2 border-transparent group hover:bg-red-50 hover:shadow-xl">
-                                    <input type="checkbox" id="chkExportado" onchange="window.toggleFinalizado(this.checked)" ${prod.exportado ? 'checked' : ''} class="w-8 h-8 text-[#D93025] rounded-xl focus:ring-[#D93025] border-red-200 shadow-sm"><span class="text-lg font-black text-[#D93025]">Exportado Final</span>
+                                <label class="flex items-center gap-6 p-10 rounded-[3rem] bg-red-50/50 transition-all cursor-pointer border-2 border-transparent group hover:bg-red-50 hover:shadow-2xl hover:shadow-red-900/10 hover:border-red-100">
+                                    <input type="checkbox" id="chkExportado" onchange="window.toggleFinalizado(this.checked)" ${prod.exportado ? 'checked' : ''} class="w-10 h-10 text-[#D93025] rounded-[1rem] focus:ring-0 border-red-200 shadow-inner group-hover:scale-110 transition-transform"><span class="text-xl font-black text-[#D93025]">Exportado Final</span>
                                 </label>
                             </div>
                         </div>
                     ` : ''}
 
                     ${activeTab === 'gestion' ? `
-                        <div class="bg-[#0A132D] p-8 md:p-12 rounded-[4rem] shadow-2xl text-white max-w-4xl mx-auto border border-white/5 relative overflow-hidden">
-                            <div class="absolute top-0 right-0 w-64 h-64 bg-[#006FB3]/10 rounded-bl-[10rem]"></div>
-                            <h3 class="font-black text-2xl mb-12 flex items-center gap-4 text-white relative">⚙️ Gestión Estratégica</h3>
-                            <div class="space-y-10 relative">
-                                <div><label class="block text-[10px] font-black text-blue-300 uppercase tracking-[0.2em] mb-4">Responsable de Proyecto</label><input type="text" id="teamInput" value="${p.team || ''}" class="w-full p-6 bg-white/5 rounded-3xl border-2 border-white/5 focus:border-[#006FB3] focus:bg-white/10 transition-all text-lg outline-none font-black text-white" placeholder="..."></div>
-                                <div><label class="block text-[10px] font-black text-blue-300 uppercase tracking-[0.2em] mb-4">Fecha Límite</label><input type="date" id="dueDateInput" value="${p.dueDate || ''}" class="w-full p-6 bg-white/5 rounded-3xl border-2 border-white/5 focus:border-[#006FB3] focus:bg-white/10 transition-all text-lg outline-none font-black text-white"></div>
-                                <div class="pt-10 border-t border-white/10">
-                                    <label class="block text-[10px] font-black text-blue-300 uppercase tracking-[0.2em] mb-5">Estado del Pipeline</label>
-                                    <select id="statusSelect" class="w-full p-6 bg-white text-[#0A132D] rounded-[2rem] text-sm font-black outline-none shadow-2xl">
+                        <div class="bg-[#0A132D] p-12 md:p-16 rounded-[5rem] shadow-[0_40px_120px_rgba(0,0,0,0.4)] text-white max-w-4xl border border-white/10 relative overflow-hidden">
+                            <div class="absolute top-0 right-0 w-80 h-80 bg-[#006FB3]/10 rounded-bl-[15rem] -z-0"></div>
+                            <div class="flex items-center justify-between mb-16 relative z-10">
+                                <h3 class="font-black text-3xl text-white tracking-tighter">Gestión Estratégica<span class="text-[#006FB3]">.</span></h3>
+                                <div class="w-14 h-14 rounded-[1.5rem] bg-white/5 flex items-center justify-center text-2xl shadow-xl border border-white/5">⚙️</div>
+                            </div>
+                            <div class="space-y-12 relative z-10">
+                                <div class="group">
+                                    <label class="block text-[10px] font-black text-blue-300 uppercase tracking-[0.3em] mb-5 ml-4 group-focus-within:text-white transition-colors">Responsable del Proyecto</label>
+                                    <input type="text" id="teamInput" value="${p.team || ''}" class="w-full p-7 bg-white/5 rounded-[2.5rem] border-2 border-white/5 focus:border-[#006FB3] focus:bg-white/10 focus:ring-[15px] focus:ring-blue-500/10 transition-all text-xl outline-none font-black text-white shadow-2xl" placeholder="...">
+                                </div>
+                                <div class="group">
+                                    <label class="block text-[10px] font-black text-blue-300 uppercase tracking-[0.3em] mb-5 ml-4 group-focus-within:text-white transition-colors">Deadline Estratégico</label>
+                                    <input type="date" id="dueDateInput" value="${p.dueDate || ''}" class="w-full p-7 bg-white/5 rounded-[2.5rem] border-2 border-white/5 focus:border-[#006FB3] focus:bg-white/10 transition-all text-lg outline-none font-black text-white shadow-2xl">
+                                </div>
+                                <div class="pt-12 border-t border-white/10 group">
+                                    <label class="block text-[10px] font-black text-blue-300 uppercase tracking-[0.3em] mb-6 ml-4">Estado del Pipeline</label>
+                                    <select id="statusSelect" class="w-full p-7 bg-white text-[#0A132D] rounded-[2.5rem] text-lg font-black outline-none shadow-[0_20px_60px_rgba(0,0,0,0.3)] border-4 border-transparent focus:border-[#006FB3]">
                                         ${stages.map(s => `<option value="${s}" ${p.status === s ? 'selected' : ''} ${(s === 'Finalizado' && !prod.exportado && p.status !== 'Finalizado') ? 'disabled' : ''}>${s.toUpperCase()}</option>`).join('')}
                                     </select>
                                 </div>
-                                <button id="btnSaveDetail" class="w-full bg-white text-[#006FB3] py-6 rounded-[2.5rem] font-black text-xl hover:scale-105 transition-all shadow-2xl uppercase tracking-[0.2em] border-b-4 border-black/10 active:scale-95 mt-4">Guardar Cambios</button>
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 pt-6">
+                                    <button id="btnSaveDetail" class="w-full bg-white text-[#006FB3] py-7 rounded-[3rem] font-black text-xl hover:scale-[1.03] transition-all shadow-[0_20px_50px_rgba(0,0,0,0.3)] uppercase tracking-[0.2em] border-b-8 border-gray-200 active:scale-95 active:border-b-0">Guardar Cambios</button>
+                                    <button onclick="window.deleteProject('${p.id}')" class="w-full bg-red-600/10 text-red-500 py-7 rounded-[3rem] font-black text-xs hover:bg-red-600 hover:text-white transition-all border border-red-500/20 uppercase tracking-[0.3em]">Eliminar Proyecto</button>
+                                </div>
                             </div>
                         </div>
                     ` : ''}
                 </div>
 
                 ${window.appState.lightbox ? `
-                    <div class="fixed inset-0 bg-black/95 z-[100] flex items-center justify-center p-4 animate-in fade-in duration-300" onclick="window.appState.lightbox = null; renderApp();">
-                        <img src="${window.appState.lightbox}" class="max-w-full max-h-full rounded-2xl shadow-2xl animate-in zoom-in duration-300">
-                        <button class="absolute top-8 right-8 text-white text-4xl font-black">&times;</button>
+                    <div class="fixed inset-0 bg-[#0A132D]/95 z-[100] flex items-center justify-center p-6 backdrop-blur-xl animate-in fade-in duration-500" onclick="window.appState.lightbox = null; renderApp();">
+                        <img src="${window.appState.lightbox}" class="max-w-full max-h-[90vh] rounded-[3rem] shadow-[0_50px_150px_rgba(0,0,0,0.6)] border border-white/10 animate-in zoom-in-95 duration-500">
+                        <button class="absolute top-10 right-10 text-white/40 hover:text-white text-5xl font-black transition-colors">&times;</button>
                     </div>
                 ` : ''}
             </div>
@@ -539,7 +625,7 @@ const renderApp = () => {
                 clearTimeout(debounceTimer);
                 debounceTimer = setTimeout(() => {
                     window.saveScriptRealtime(p.id, e.target.innerText);
-                }, 1000);
+                }, 1500);
             };
         }
     }
