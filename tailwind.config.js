@@ -8,25 +8,23 @@ export default {
     extend: {
       colors: {
         brand: {
-          primary: '#581845',
-          accent: '#C70039',
-          warning: '#FF5733',
-          highlight: '#FFC300',
-          dark: '#0A132D',
+          primary: '#0F216D', // Azul Puntaje
+          accent: '#FEC526',  // Amarillo Nacional
+          dark: '#0A0A0A',
           light: '#F8F9FA',
+          gray: '#666666',
         }
       },
       fontFamily: {
-        sans: ['Outfit', 'sans-serif'],
+        sans: ['Montserrat', 'sans-serif'],
         mono: ['JetBrains Mono', 'monospace'],
       },
       borderRadius: {
-        '4xl': '2rem',
-        '5xl': '3rem',
+        'none': '0',
       },
-      boxShadow: {
-        'glow': '0 0 15px -3px rgba(199, 0, 57, 0.3), 0 0 6px -2px rgba(199, 0, 57, 0.1)',
-        'glass': '0 8px 32px 0 rgba(0, 0, 0, 0.37)',
+      spacing: {
+        '18': '4.5rem',
+        '22': '5.5rem',
       }
     },
   },
