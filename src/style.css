@@ -1,3 +1,40 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+@layer base {
+  body {
+    @apply bg-brand-dark text-white font-sans;
+    background-image: 
+      radial-gradient(at 0% 0%, rgba(88, 24, 69, 0.15) 0px, transparent 50%),
+      radial-gradient(at 100% 100%, rgba(199, 0, 57, 0.1) 0px, transparent 50%);
+  }
+}
+
+@layer components {
+  .bento-card {
+    @apply bg-white/5 backdrop-blur-xl border border-white/10 rounded-5xl shadow-glass transition-all duration-500;
+  }
+  
+  .bento-card-light {
+    @apply bg-white p-8 rounded-5xl shadow-2xl border border-brand-light;
+  }
+
+  .btn-primary {
+    @apply bg-brand-accent text-white px-8 py-4 rounded-full font-black uppercase tracking-widest shadow-glow hover:scale-105 active:scale-95 transition-all;
+  }
+
+  .input-field {
+    @apply w-full p-5 bg-brand-light/50 rounded-3xl border-2 border-transparent focus:border-brand-accent focus:bg-white focus:ring-8 focus:ring-brand-accent/5 outline-none font-bold text-brand-dark transition-all;
+  }
+}
+
+::-webkit-scrollbar {
+  width: 8px;
+}
+::-webkit-scrollbar-track {
+  @apply bg-brand-dark;
+}
+::-webkit-scrollbar-thumb {
+  @apply bg-brand-primary/50 rounded-full hover:bg-brand-primary transition-colors;
+}
