@@ -12,17 +12,18 @@ AV Content Planner is a comprehensive Single Page Application (SPA) designed for
 - **Cloud Persistence:** Automatic synchronization via Firebase/Firestore for collaborative and remote work.
 
 ## Technical Stack
-- **Frontend:** HTML5, Tailwind CSS (via CDN) for a modern, responsive "Bento Box" / Material Design UI.
-- **Charts:** Chart.js and Plotly.js for KPI and data visualization.
+- **Frontend:** HTML5, Tailwind CSS, Vite (Build Tool).
 - **Backend/Persistence:** Firebase (Auth & Firestore) for real-time data synchronization.
-- **Design Philosophy:** Single-file architecture (SPA) with no external SVG dependencies (using Unicode and CSS-styled icons).
+- **Design Philosophy:** Bento Box / Material Design 3 aesthetic with Unicode icons.
 
 ## Key Files
-- `index.html`: The core application file. Contains the entire UI, logic, and Firebase integration.
-- `Readme.md`: Basic project introduction and setup instructions.
+- `index.html`: The entry point for the application.
+- `src/main.js`: The core application logic, routing, and Firebase integration.
+- `src/style.css`: Main Tailwind CSS entry point.
+- `package.json`: Project dependencies and scripts.
 
 ## Development Conventions
-- **Single File Architecture:** The project is intentionally kept as a single-file SPA for simplicity and ease of deployment.
+- **Modular Architecture:** The project uses a Vite-based modular structure for better maintainability and performance.
 - **Iconography:** Do not use SVG files. Use Unicode icons or CSS-based styling for interactive elements.
 - **Label Formatting:** Graph labels are automatically wrapped at 16 characters for optimal readability.
 - **Deployment:** Optimized for hosting on GitHub Pages.

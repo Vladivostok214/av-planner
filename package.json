@@ -21,8 +21,6 @@
     "vite": "^8.0.12"
   },
   "dependencies": {
-    "chart.js": "^4.5.1",
-    "firebase": "^12.13.0",
-    "plotly.js-dist-min": "^3.5.1"
+    "firebase": "^12.13.0"
   }
 }
