@@ -355,50 +355,50 @@ const renderApp = () => {
                 <header class="flex flex-col md:flex-row justify-between items-start md:items-center mb-16 gap-8">
                     <div class="flex items-center gap-6">
                         <div class="relative">
-                            <div class="w-16 h-16 bg-[#006FB3] rounded-2xl rotate-12 absolute inset-0 opacity-20 animate-pulse"></div>
-                            <div class="w-16 h-16 bg-white border-2 border-[#006FB3] rounded-2xl flex items-center justify-center relative transform transition-transform hover:rotate-0 duration-500 shadow-xl shadow-blue-100/50">
+                            <div class="w-16 h-16 bg-white rounded-2xl rotate-12 absolute inset-0 opacity-20 animate-pulse"></div>
+                            <div class="w-16 h-16 bg-white rounded-2xl flex items-center justify-center relative transform transition-transform hover:rotate-0 duration-500 shadow-2xl shadow-blue-900/40">
                                 <svg class="w-10 h-10 text-[#006FB3]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
                             </div>
                         </div>
                         <div>
-                            <span class="text-[10px] font-black uppercase tracking-[0.4em] text-[#006FB3] bg-blue-50 px-3 py-1 rounded-full mb-3 inline-block">Marketing Digital</span>
-                            <h1 class="text-4xl md:text-5xl font-black text-[#0A132D] tracking-tight leading-[1.1]">
+                            <span class="text-[10px] font-black uppercase tracking-[0.4em] text-blue-100 bg-white/10 backdrop-blur-md px-3 py-1 rounded-full mb-3 inline-block border border-white/20">Marketing Digital</span>
+                            <h1 class="text-4xl md:text-5xl font-black text-white tracking-tight leading-[1.1]">
                                 Planificación Audiovisual<br>
-                                <span class="text-[#006FB3] relative">
+                                <span class="text-white relative opacity-90">
                                     Puntaje Nacional
-                                    <span class="absolute bottom-1 left-0 w-full h-2 bg-[#006FB3]/10 -z-10 rounded-full"></span>
+                                    <span class="absolute bottom-1 left-0 w-full h-2 bg-white/20 -z-10 rounded-full"></span>
                                 </span>
                             </h1>
                         </div>
                     </div>
-                    <button id="btnNewIdea" class="bg-[#D93025] text-white px-10 py-5 rounded-[2rem] font-black shadow-2xl shadow-red-200 hover:bg-[#B71C1C] hover:scale-105 active:scale-95 transition-all flex items-center gap-3 uppercase tracking-widest text-sm border-b-4 border-black/10">
+                    <button id="btnNewIdea" class="bg-[#FE6565] text-white px-10 py-5 rounded-[2rem] font-black shadow-2xl shadow-blue-900/50 hover:bg-[#D93025] hover:scale-105 active:scale-95 transition-all flex items-center gap-3 uppercase tracking-widest text-sm border-b-4 border-black/20">
                         <span class="text-2xl">+</span> Nueva Idea
                     </button>
                 </header>
 
-                <div class="mb-12 flex flex-col md:flex-row gap-4 items-center bg-white/40 backdrop-blur-xl p-3 rounded-[2.5rem] border border-white shadow-2xl shadow-gray-200/40">
+                <div class="mb-12 flex flex-col md:flex-row gap-4 items-center bg-white/10 backdrop-blur-2xl p-3 rounded-[2.5rem] border border-white/20 shadow-2xl shadow-blue-900/40">
                     <div class="relative flex-1 w-full group">
-                        <span class="absolute left-6 top-1/2 -translate-y-1/2 text-[#006FB3] transition-transform group-focus-within:scale-125">🔍</span>
-                        <input type="text" id="searchInput" value="${window.appState.searchQuery}" placeholder="Buscar proyectos, encargados o temas estratégicos..." class="w-full pl-16 pr-4 py-5 bg-transparent rounded-3xl border-none text-lg focus:ring-0 placeholder:text-gray-400 font-medium">
+                        <span class="absolute left-6 top-1/2 -translate-y-1/2 text-white transition-transform group-focus-within:scale-125">🔍</span>
+                        <input type="text" id="searchInput" value="${window.appState.searchQuery}" placeholder="Buscar proyectos, encargados o temas estratégicos..." class="w-full pl-16 pr-4 py-5 bg-transparent rounded-3xl border-none text-lg focus:ring-0 placeholder:text-blue-100/60 font-medium text-white">
                     </div>
-                    <div class="flex items-center gap-4 px-6 border-l border-gray-100/50">
-                        <label class="text-[10px] font-black text-gray-400 uppercase tracking-widest">Ordenar por</label>
-                        <select id="sortSelect" class="bg-gray-50/50 border-none rounded-2xl text-sm font-black py-3 px-6 focus:ring-4 focus:ring-blue-100 text-[#006FB3] appearance-none cursor-pointer">
-                            <option value="date" ${window.appState.sortBy === 'date' ? 'selected' : ''}>📅 Recientes</option>
-                            <option value="title" ${window.appState.sortBy === 'title' ? 'selected' : ''}>🔤 Título</option>
-                            <option value="status" ${window.appState.sortBy === 'status' ? 'selected' : ''}>⚡ Estatus</option>
+                    <div class="flex items-center gap-4 px-6 border-l border-white/10">
+                        <label class="text-[10px] font-black text-blue-100 uppercase tracking-widest">Ordenar por</label>
+                        <select id="sortSelect" class="bg-white/10 border-none rounded-2xl text-sm font-black py-3 px-6 focus:ring-4 focus:ring-white/20 text-white appearance-none cursor-pointer backdrop-blur-md">
+                            <option value="date" ${window.appState.sortBy === 'date' ? 'selected' : ''} class="text-[#0A132D]">📅 Recientes</option>
+                            <option value="title" ${window.appState.sortBy === 'title' ? 'selected' : ''} class="text-[#0A132D]">🔤 Título</option>
+                            <option value="status" ${window.appState.sortBy === 'status' ? 'selected' : ''} class="text-[#0A132D]">⚡ Estatus</option>
                         </select>
                     </div>
                 </div>
 
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                     ${filteredProjects.map(p => `
-                        <div data-id="${p.id}" class="project-card group bg-white/70 backdrop-blur-sm p-8 rounded-[3rem] shadow-sm border border-white hover:bg-white hover:shadow-2xl hover:shadow-blue-200/30 hover:-translate-y-2 transition-all duration-500 cursor-pointer flex flex-col h-full overflow-hidden relative">
+                        <div data-id="${p.id}" class="project-card group bg-white p-8 rounded-[3rem] shadow-2xl shadow-blue-900/30 hover:shadow-blue-900/50 hover:-translate-y-2 transition-all duration-500 cursor-pointer flex flex-col h-full overflow-hidden relative border border-white/10">
                             <div class="absolute top-0 left-0 w-2 h-full bg-[#006FB3] opacity-0 group-hover:opacity-100 transition-opacity"></div>
                             
                             <div class="flex justify-between items-start mb-8">
                                 ${getStatusBadge(p.status)}
-                                <span class="text-[10px] font-black text-gray-400 uppercase tracking-widest bg-gray-50 px-3 py-1 rounded-full">${new Date(p.createdAt).toLocaleDateString()}</span>
+                                <span class="text-[10px] font-black text-gray-400 uppercase tracking-widest bg-gray-50 px-3 py-1 rounded-full border border-gray-100">${new Date(p.createdAt).toLocaleDateString()}</span>
                             </div>
                             
                             <div class="flex-1">
@@ -406,15 +406,15 @@ const renderApp = () => {
                                 <p class="text-gray-500 text-sm line-clamp-3 mb-6 font-medium leading-relaxed">${p.description || 'Sin descripción adicional para este proyecto.'}</p>
                             </div>
 
-                            <div class="mt-auto pt-8 border-t border-gray-100/50 flex items-center justify-between">
+                            <div class="mt-auto pt-8 border-t border-gray-100 flex items-center justify-between">
                                 <div class="flex flex-col">
-                                    <span class="text-[10px] font-black text-gray-400 uppercase tracking-tighter mb-1.5">Lead del Proyecto</span>
+                                    <span class="text-[10px] font-black text-gray-300 uppercase tracking-tighter mb-1.5">Lead del Proyecto</span>
                                     <span class="text-xs font-black text-[#0A132D] flex items-center gap-2 bg-gray-50 pr-4 pl-1.5 py-1 rounded-full border border-gray-100">
-                                        <div class="w-6 h-6 rounded-full bg-[#D93025] flex items-center justify-center text-[10px] text-white font-black">${(p.team || '?')[0]}</div>
+                                        <div class="w-6 h-6 rounded-full bg-[#FE6565] flex items-center justify-center text-[10px] text-white font-black">${(p.team || '?')[0]}</div>
                                         ${p.team || 'Sin asignar'}
                                     </span>
                                 </div>
-                                <div class="w-14 h-14 rounded-2xl bg-[#006FB3]/5 text-[#006FB3] flex items-center justify-center group-hover:bg-[#006FB3] group-hover:text-white transition-all transform group-hover:rotate-12 group-active:scale-90 shadow-inner">
+                                <div class="w-14 h-14 rounded-2xl bg-[#006FB3]/5 text-[#006FB3] flex items-center justify-center group-hover:bg-[#006FB3] group-hover:text-white transition-all transform group-hover:rotate-12 group-active:scale-90 shadow-inner border border-[#006FB3]/10">
                                     <span class="text-2xl font-black">→</span>
                                 </div>
                             </div>
@@ -422,10 +422,10 @@ const renderApp = () => {
                     `).join('')}
                     
                     ${filteredProjects.length === 0 ? `
-                        <div class="col-span-full py-32 flex flex-col items-center justify-center text-center bg-white/20 backdrop-blur-md rounded-[4rem] border-2 border-dashed border-gray-200">
-                            <div class="text-8xl mb-6 grayscale opacity-50">🏜️</div>
-                            <h3 class="text-3xl font-black text-gray-400">Sin resultados</h3>
-                            <p class="text-gray-400 mt-3 font-medium text-lg">Intenta ajustar los filtros o crea una nueva iniciativa.</p>
+                        <div class="col-span-full py-32 flex flex-col items-center justify-center text-center bg-white/5 backdrop-blur-md rounded-[4rem] border-2 border-dashed border-white/20">
+                            <div class="text-8xl mb-6 grayscale opacity-30">🏜️</div>
+                            <h3 class="text-3xl font-black text-white/50">Sin resultados</h3>
+                            <p class="text-white/40 mt-3 font-medium text-lg">Intenta ajustar los filtros o crea una nueva iniciativa.</p>
                         </div>
                     ` : ''}
                 </div>
@@ -448,26 +448,26 @@ const renderApp = () => {
     } else if (window.appState.view === 'new') {
         root.innerHTML = `
             <div class="p-6 max-w-2xl mx-auto py-20">
-                <button id="btnBackToDashboard" class="text-[#006FB3] mb-10 flex items-center hover:scale-105 transition-transform font-black uppercase text-xs tracking-widest"><span class="mr-3 text-xl">←</span> Dashboard</button>
+                <button id="btnBackToDashboard" class="text-white mb-10 flex items-center hover:scale-105 transition-transform font-black uppercase text-xs tracking-[0.2em]"><span class="mr-3 text-xl">←</span> Dashboard</button>
                 <div class="bg-white p-10 rounded-[3.5rem] shadow-2xl border border-white relative overflow-hidden">
                     <div class="absolute top-0 right-0 w-32 h-32 bg-[#006FB3]/5 rounded-bl-[5rem]"></div>
                     <h2 class="text-4xl font-black mb-8 text-[#0A132D] tracking-tight">Nueva Iniciativa<span class="text-[#006FB3]">.</span></h2>
                     <form id="ideaForm" class="space-y-6">
                         <div>
                             <label class="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-3">Título Conceptual</label>
-                            <input type="text" id="title" required class="w-full p-5 bg-gray-50 rounded-2xl border-2 border-transparent focus:border-[#006FB3] focus:bg-white transition-all outline-none font-bold text-lg" placeholder="Ej: Serie 'Hacks DEMRE 2026'">
+                            <input type="text" id="title" required class="w-full p-5 bg-gray-50 rounded-2xl border-2 border-transparent focus:border-[#006FB3] focus:bg-white transition-all outline-none font-bold text-lg text-[#0A132D]" placeholder="Ej: Serie 'Hacks DEMRE 2026'">
                         </div>
                         <div>
                             <label class="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-3">Categoría Estratégica</label>
-                            <select id="category" class="w-full p-5 bg-gray-50 rounded-2xl border-2 border-transparent focus:border-[#006FB3] focus:bg-white transition-all outline-none font-black appearance-none cursor-pointer">
+                            <select id="category" class="w-full p-5 bg-gray-50 rounded-2xl border-2 border-transparent focus:border-[#006FB3] focus:bg-white transition-all outline-none font-black appearance-none cursor-pointer text-[#0A132D]">
                                 <option>Social Media</option><option>Educativo</option><option>Institucional</option><option>Publicidad</option>
                             </select>
                         </div>
                         <div>
                             <label class="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-3">Brief / Objetivo</label>
-                            <textarea id="description" rows="4" required class="w-full p-5 bg-gray-50 rounded-2xl border-2 border-transparent focus:border-[#006FB3] focus:bg-white transition-all outline-none font-medium leading-relaxed" placeholder="Describe brevemente el impacto esperado..."></textarea>
+                            <textarea id="description" rows="4" required class="w-full p-5 bg-gray-50 rounded-2xl border-2 border-transparent focus:border-[#006FB3] focus:bg-white transition-all outline-none font-medium leading-relaxed text-[#0A132D]" placeholder="Describe brevemente el impacto esperado..."></textarea>
                         </div>
-                        <button type="submit" class="w-full bg-[#006FB3] text-white py-6 rounded-3xl font-black text-lg hover:bg-[#0A132D] hover:shadow-xl hover:shadow-blue-200 transition-all mt-6 uppercase tracking-[0.2em] shadow-lg">Guardar Iniciativa</button>
+                        <button type="submit" class="w-full bg-[#006FB3] text-white py-6 rounded-3xl font-black text-lg hover:bg-[#0A132D] hover:shadow-2xl transition-all mt-6 uppercase tracking-[0.2em] shadow-lg border-b-4 border-black/10">Guardar Iniciativa</button>
                     </form>
                 </div>
             </div>
@@ -488,24 +488,24 @@ const renderApp = () => {
 
         root.innerHTML = `
             <div class="p-6 max-w-7xl mx-auto min-h-screen pb-20">
-                <button id="btnBackToDashboardDetail" class="text-[#006FB3] mb-12 flex items-center hover:scale-105 transition-transform font-black uppercase text-xs tracking-widest"><span class="mr-3 text-xl">←</span> Volver</button>
+                <button id="btnBackToDashboardDetail" class="text-white mb-12 flex items-center hover:scale-105 transition-transform font-black uppercase text-xs tracking-[0.2em]"><span class="mr-3 text-xl">←</span> Dashboard</button>
                 
                 <div class="mb-16">
                     <div class="flex flex-wrap items-center gap-4 mb-6">
                         ${getStatusBadge(p.status)}
-                        <span class="text-[10px] font-black text-gray-400 uppercase tracking-widest bg-white border border-gray-100 px-4 py-2 rounded-full shadow-sm">ID: ${p.id.substring(0,12)}</span>
+                        <span class="text-[10px] font-black text-blue-100 uppercase tracking-widest bg-white/10 backdrop-blur-md px-4 py-2 rounded-full border border-white/20">ID: ${p.id.substring(0,12)}</span>
                     </div>
-                    <h1 class="text-5xl font-black text-[#0A132D] mb-10 tracking-tighter leading-tight max-w-4xl">${p.title}</h1>
+                    <h1 class="text-5xl font-black text-white mb-10 tracking-tighter leading-tight max-w-4xl">${p.title}</h1>
                     
                     <div class="relative px-2">
-                        <div class="absolute top-1/2 left-0 w-full h-2 bg-gray-100 -translate-y-1/2 rounded-full shadow-inner"></div>
-                        <div class="absolute top-1/2 left-0 h-2 bg-gradient-to-r from-[#006FB3] to-blue-400 -translate-y-1/2 transition-all duration-1000 rounded-full shadow-lg" style="width: ${(currentIndex / (stages.length - 1)) * 100}%"></div>
+                        <div class="absolute top-1/2 left-0 w-full h-2 bg-white/10 -translate-y-1/2 rounded-full shadow-inner"></div>
+                        <div class="absolute top-1/2 left-0 h-2 bg-white -translate-y-1/2 transition-all duration-1000 rounded-full shadow-2xl shadow-white/50" style="width: ${(currentIndex / (stages.length - 1)) * 100}%"></div>
                         <div class="relative flex justify-between">
                             ${stages.map((stage, i) => `<div class="flex flex-col items-center">
-                                <div class="w-12 h-12 rounded-2xl flex items-center justify-center z-10 transition-all duration-700 transform ${i <= currentIndex ? 'bg-[#006FB3] text-white shadow-xl shadow-blue-200 scale-110' : 'bg-white border-2 border-gray-100 text-gray-300'}">
+                                <div class="w-12 h-12 rounded-2xl flex items-center justify-center z-10 transition-all duration-700 transform ${i <= currentIndex ? 'bg-white text-[#006FB3] shadow-2xl shadow-white/20 scale-110' : 'bg-white/10 border border-white/20 text-white/30 backdrop-blur-md'}">
                                     ${i <= currentIndex ? '<svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="4" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"></path></svg>' : '<span class="font-black text-sm">'+(i+1)+'</span>'}
                                 </div>
-                                <span class="mt-4 text-[10px] font-black uppercase tracking-widest ${i === currentIndex ? 'text-[#006FB3]' : 'text-gray-300'}">${stage}</span>
+                                <span class="mt-4 text-[10px] font-black uppercase tracking-widest ${i === currentIndex ? 'text-white' : 'text-white/30'}">${stage}</span>
                             </div>`).join('')}
                         </div>
                     </div>
@@ -513,7 +513,7 @@ const renderApp = () => {
 
                 <div class="grid grid-cols-1 lg:grid-cols-12 gap-10">
                     <div class="lg:col-span-8 space-y-8">
-                        <div class="bg-white p-10 rounded-[3.5rem] shadow-xl shadow-gray-200/30 border border-white">
+                        <div class="bg-white p-10 rounded-[3.5rem] shadow-2xl border border-white">
                             <h3 class="font-black text-2xl mb-8 text-[#0A132D] flex items-center gap-4">
                                 <span class="w-10 h-10 rounded-2xl bg-blue-50 text-[#006FB3] flex items-center justify-center text-lg shadow-inner">📝</span> 
                                 Guion Literario
@@ -525,7 +525,7 @@ const renderApp = () => {
                             </div>
                         </div>
 
-                        <div class="bg-white p-10 rounded-[3.5rem] shadow-xl shadow-gray-200/30 border border-white ${currentIndex < 2 ? 'opacity-40 grayscale pointer-events-none' : ''}">
+                        <div class="bg-white p-10 rounded-[3.5rem] shadow-2xl border border-white ${currentIndex < 2 ? 'opacity-40 grayscale pointer-events-none' : ''}">
                             <h3 class="font-black text-2xl mb-8 text-[#0A132D] flex items-center gap-4">
                                 <span class="w-10 h-10 rounded-2xl bg-purple-50 text-purple-600 flex items-center justify-center text-lg shadow-inner">🎨</span> 
                                 Storyboard Visual
@@ -542,7 +542,7 @@ const renderApp = () => {
                             </div>
                         </div>
 
-                        <div class="bg-white p-10 rounded-[3.5rem] shadow-xl shadow-gray-200/30 border border-white ${currentIndex < 3 ? 'opacity-40 grayscale pointer-events-none' : ''}">
+                        <div class="bg-white p-10 rounded-[3.5rem] shadow-2xl border border-white ${currentIndex < 3 ? 'opacity-40 grayscale pointer-events-none' : ''}">
                             <h3 class="font-black text-2xl mb-8 text-[#0A132D] flex items-center gap-4">
                                 <span class="w-10 h-10 rounded-2xl bg-red-50 text-[#D93025] flex items-center justify-center text-lg shadow-inner">🎬</span> 
                                 Control de Producción
@@ -564,7 +564,7 @@ const renderApp = () => {
                                 <label class="flex items-center gap-5 p-6 rounded-3xl bg-gray-50 hover:bg-white hover:shadow-xl hover:shadow-blue-100/50 transition-all cursor-pointer border-2 border-transparent hover:border-blue-100 group">
                                     <input type="checkbox" id="chkSubtitulado" ${prod.subtitulado ? 'checked' : ''} class="w-7 h-7 text-[#006FB3] rounded-xl focus:ring-[#006FB3] border-gray-200 transition-all group-hover:scale-110 shadow-sm"><span class="text-base font-black text-[#0A132D]">Subtítulos / Motion</span>
                                 </label>
-                                <label class="flex items-center gap-5 p-6 rounded-3xl bg-red-50/50 hover:bg-red-50 hover:shadow-xl hover:shadow-red-100/50 transition-all cursor-pointer border-2 border-transparent hover:border-red-200 group">
+                                <label class="flex items-center gap-5 p-6 rounded-3xl bg-rose-50/50 hover:bg-rose-50 hover:shadow-xl hover:shadow-red-100/50 transition-all cursor-pointer border-2 border-transparent hover:border-red-200 group">
                                     <input type="checkbox" id="chkExportado" onchange="window.toggleFinalizado(this.checked)" ${prod.exportado ? 'checked' : ''} class="w-7 h-7 text-[#D93025] rounded-xl focus:ring-[#D93025] border-red-200 transition-all group-hover:scale-110 shadow-sm"><span class="text-base font-black text-[#D93025]">Exportado Final</span>
                                 </label>
                             </div>
@@ -572,34 +572,34 @@ const renderApp = () => {
                     </div>
 
                     <div class="lg:col-span-4 space-y-8">
-                        <div class="bg-[#0A132D] p-10 rounded-[4rem] shadow-2xl text-white sticky top-10">
+                        <div class="bg-white/10 backdrop-blur-3xl p-10 rounded-[4rem] shadow-2xl text-white sticky top-10 border border-white/20">
                             <h3 class="font-black text-2xl mb-10 flex items-center gap-4 text-white">
                                 <span class="w-10 h-10 rounded-2xl bg-white/10 flex items-center justify-center text-lg">⚙️</span> 
                                 Gestión Operativa
                             </h3>
                             <div class="space-y-8">
                                 <div>
-                                    <label class="block text-[10px] font-black text-blue-300 uppercase tracking-[0.2em] mb-4">Responsable de Proyecto</label>
-                                    <input type="text" id="teamInput" value="${p.team || ''}" class="w-full p-5 bg-white/5 rounded-2xl border-2 border-white/5 focus:border-[#006FB3] focus:bg-white/10 transition-all text-sm outline-none font-black text-white" placeholder="Nombre del encargado...">
+                                    <label class="block text-[10px] font-black text-blue-200 uppercase tracking-[0.2em] mb-4">Responsable de Proyecto</label>
+                                    <input type="text" id="teamInput" value="${p.team || ''}" class="w-full p-5 bg-white/10 rounded-2xl border-2 border-white/10 focus:border-white focus:bg-white/20 transition-all text-sm outline-none font-black text-white" placeholder="Nombre del encargado...">
                                 </div>
                                 <div>
-                                    <label class="block text-[10px] font-black text-blue-300 uppercase tracking-[0.2em] mb-4">Deadline Estratégico</label>
-                                    <input type="date" id="dueDateInput" value="${p.dueDate || ''}" class="w-full p-5 bg-white/5 rounded-2xl border-2 border-white/5 focus:border-[#006FB3] focus:bg-white/10 transition-all text-sm outline-none font-black text-white">
+                                    <label class="block text-[10px] font-black text-blue-200 uppercase tracking-[0.2em] mb-4">Deadline Estratégico</label>
+                                    <input type="date" id="dueDateInput" value="${p.dueDate || ''}" class="w-full p-5 bg-white/10 rounded-2xl border-2 border-white/10 focus:border-white focus:bg-white/20 transition-all text-sm outline-none font-black text-white">
                                 </div>
                                 <div class="pt-10 border-t border-white/10">
-                                    <label class="block text-[10px] font-black text-blue-300 uppercase tracking-[0.2em] mb-4">Estado del Ciclo</label>
+                                    <label class="block text-[10px] font-black text-blue-200 uppercase tracking-[0.2em] mb-4">Estado del Ciclo</label>
                                     <div class="relative group">
-                                        <select id="statusSelect" class="w-full p-6 bg-white text-[#0A132D] rounded-3xl text-sm font-black outline-none focus:ring-8 focus:ring-blue-500/30 appearance-none cursor-pointer">
+                                        <select id="statusSelect" class="w-full p-6 bg-white text-[#0A132D] rounded-3xl text-sm font-black outline-none focus:ring-8 focus:ring-white/20 appearance-none cursor-pointer">
                                             ${stages.map(s => `<option value="${s}" ${p.status === s ? 'selected' : ''} ${(s === 'Finalizado' && !prod.exportado && p.status !== 'Finalizado') ? 'disabled' : ''}>${s.toUpperCase()}</option>`).join('')}
                                         </select>
                                         <div class="absolute right-6 top-1/2 -translate-y-1/2 pointer-events-none text-[#006FB3] font-black text-xl italic">↓</div>
                                     </div>
-                                    <p id="statusHint" class="text-[10px] text-red-400 mt-4 font-black bg-red-500/10 p-4 rounded-2xl border border-red-500/20 text-center animate-pulse ${prod.exportado || p.status === 'Finalizado' ? 'hidden' : 'block'}">
-                                        ⚠️ ACCIÓN REQUERIDA: MARCAR 'EXPORTADO'
+                                    <p id="statusHint" class="text-[10px] text-white mt-4 font-black bg-red-500/40 p-4 rounded-2xl border border-white/20 text-center animate-pulse ${prod.exportado || p.status === 'Finalizado' ? 'hidden' : 'block'}">
+                                        ⚠️ REQUIERE EXPORTACIÓN PARA FINALIZAR
                                     </p>
                                 </div>
                             </div>
-                            <button id="btnSaveDetail" class="w-full mt-10 bg-gradient-to-br from-[#006FB3] to-blue-600 text-white py-6 rounded-[2.5rem] font-black text-lg hover:scale-105 active:scale-95 transition-all shadow-2xl shadow-blue-900/50 uppercase tracking-[0.2em] border-b-4 border-black/20">
+                            <button id="btnSaveDetail" class="w-full mt-10 bg-white text-[#006FB3] py-6 rounded-[2.5rem] font-black text-lg hover:scale-105 active:scale-95 transition-all shadow-2xl shadow-blue-900/50 uppercase tracking-[0.2em] border-b-4 border-black/10">
                                 Guardar Cambios
                             </button>
                         </div>
