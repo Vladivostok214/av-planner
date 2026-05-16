@@ -10,9 +10,10 @@ export default {
         brand: {
           primary: '#004A99', // Azul Puntaje Oficial
           accent: '#F7941E',  // Naranja Puntaje (Energy)
-          dark: '#0A0A0A',
+          dark: '#050D20',
           light: '#F8F9FA',
-          gray: '#666666',
+          tint: '#D1E1FF',    // High contrast tint for secondary text on blue
+          gray: '#94A3B8',
         }
       },
       fontFamily: {
@@ -21,7 +22,9 @@ export default {
       },
       borderRadius: {
         'none': '0',
+        'md': '0.375rem',
         'lg': '0.5rem',
+        'xl': '0.75rem',
       }
     },
   },

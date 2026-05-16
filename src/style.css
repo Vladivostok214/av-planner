@@ -5,50 +5,52 @@
 @layer base {
   body {
     @apply bg-brand-primary text-white font-sans min-h-screen;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
   }
   
   h1, h2, h3, h4, h5, h6 {
-    @apply font-black tracking-tighter uppercase leading-none;
+    @apply font-bold tracking-tight uppercase leading-snug;
   }
 }
 
 @layer components {
-  /* SWISS LIST SYSTEM */
+  /* REFINED LIST SYSTEM */
   .list-row {
-    @apply bg-white/5 border-b border-white/10 p-6 flex flex-col md:flex-row items-center gap-8 transition-all hover:bg-white/10 cursor-pointer;
+    @apply bg-brand-dark/30 border-b border-white/10 p-5 flex flex-col md:flex-row items-center gap-6 transition-all hover:bg-white/5 cursor-pointer;
   }
 
   .list-header {
-    @apply bg-brand-dark/20 p-4 flex items-center gap-8 border-b-2 border-white/20;
+    @apply p-4 flex items-center gap-6 border-b border-brand-accent/30;
   }
   
-  /* MINIMALIST BUTTONS */
+  /* BALANCED BUTTONS */
   .btn-swiss-primary {
-    @apply bg-brand-accent text-white px-10 py-5 font-black uppercase tracking-[0.2em] text-xs hover:bg-white hover:text-brand-primary transition-all;
+    @apply bg-brand-accent text-white px-8 py-4 font-bold uppercase tracking-widest text-xs hover:bg-white hover:text-brand-primary transition-all rounded-md shadow-lg;
   }
 
   .btn-swiss-outline {
-    @apply border-2 border-white text-white px-10 py-5 font-black uppercase tracking-[0.2em] text-xs hover:bg-white hover:text-brand-primary transition-all;
+    @apply border-2 border-brand-tint/30 text-brand-tint px-8 py-4 font-bold uppercase tracking-widest text-xs hover:border-white hover:text-white transition-all rounded-md;
   }
 
   /* TYPOGRAPHIC INPUTS */
   .swiss-input {
-    @apply w-full p-6 border-b-4 border-white bg-transparent font-black text-2xl outline-none placeholder:text-white/20 focus:border-brand-accent transition-colors text-white;
+    @apply w-full p-4 border-b-2 border-brand-tint/50 bg-transparent font-bold text-xl outline-none placeholder:text-white/20 focus:border-brand-accent transition-colors text-white;
   }
 
   /* STATUS MARKERS */
   .swiss-badge {
-    @apply inline-block px-4 py-1 font-black text-[10px] uppercase tracking-widest border border-white;
+    @apply inline-block px-3 py-1 font-bold text-[10px] uppercase tracking-wider border border-white/40 rounded-sm;
   }
 }
 
-/* SCROLLBAR MINIMALISM */
+/* SCROLLBAR REFINEMENT */
 ::-webkit-scrollbar {
-  width: 4px;
+  width: 6px;
 }
 ::-webkit-scrollbar-track {
   @apply bg-brand-primary;
 }
 ::-webkit-scrollbar-thumb {
-  @apply bg-white;
+  @apply bg-brand-tint/20 rounded-full hover:bg-brand-tint/40;
 }

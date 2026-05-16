@@ -349,25 +349,25 @@ const renderApp = () => {
     if (!window.appState.userName) {
         root.innerHTML = `
             <div class="flex items-center justify-center min-h-screen p-10 bg-brand-primary">
-                <div class="max-w-xl w-full border-t-8 border-brand-accent pt-20">
-                    <div class="mb-20">
-                        <h1 class="text-7xl font-black text-white leading-none tracking-tighter uppercase">Puntaje<br><span class="text-brand-accent italic">Nacional</span></h1>
-                        <p class="text-sm font-black uppercase tracking-[0.4em] mt-8 text-white/40">AV Pipeline / Terminal Access</p>
+                <div class="max-w-xl w-full border-t-4 border-brand-accent pt-12">
+                    <div class="mb-16">
+                        <h1 class="text-5xl font-bold text-white leading-none tracking-tight uppercase">Puntaje<br><span class="text-brand-accent italic">Nacional</span></h1>
+                        <p class="text-[11px] font-bold uppercase tracking-[0.3em] mt-6 text-brand-tint/60">AV Management / System Access</p>
                     </div>
                     
-                    <form id="loginForm" class="space-y-16">
+                    <form id="loginForm" class="space-y-12">
                         <div>
-                            <label class="block text-[10px] font-black uppercase tracking-[0.3em] text-white/50 mb-6">Operador ID</label>
-                            <input type="text" id="userNameInput" required placeholder="NOMBRE DE USUARIO" class="swiss-input uppercase text-4xl">
+                            <label class="block text-[10px] font-bold uppercase tracking-widest text-brand-tint/50 mb-4">Identificación del Operador</label>
+                            <input type="text" id="userNameInput" required placeholder="..." class="swiss-input uppercase text-2xl">
                         </div>
-                        <button type="submit" class="btn-swiss-primary w-full py-10 text-lg flex items-center justify-between group">
-                            <span>Ingresar al Sistema</span>
-                            <span class="group-hover:translate-x-2 transition-transform">→</span>
+                        <button type="submit" class="btn-swiss-primary w-full py-8 text-sm flex items-center justify-between group">
+                            <span>Ingresar al Terminal</span>
+                            <span class="group-hover:translate-x-1 transition-transform">→</span>
                         </button>
                     </form>
                     
-                    <div class="mt-32 opacity-20 border-t border-white pt-8">
-                        <p class="text-[9px] font-black uppercase tracking-widest text-white italic tracking-[0.5em]">MKT DEPARTAMENTO AUDIOVISUAL 2026</p>
+                    <div class="mt-24 opacity-30 border-t border-brand-tint/20 pt-6">
+                        <p class="text-[9px] font-bold uppercase tracking-widest text-brand-tint italic tracking-[0.3em]">MKT DEPARTAMENTO AUDIOVISUAL 2026</p>
                     </div>
                 </div>
             </div>
@@ -396,70 +396,73 @@ const renderApp = () => {
         });
 
         root.innerHTML = `
-            <div class="p-10 md:p-20 max-w-[1600px] mx-auto min-h-screen">
-                <header class="mb-24 flex flex-col md:flex-row justify-between items-end gap-10">
+            <div class="p-8 md:p-16 max-w-[1400px] mx-auto min-h-screen">
+                <header class="mb-20 flex flex-col md:flex-row justify-between items-end gap-8">
                     <div class="flex-1">
-                        <div class="w-20 h-3 bg-brand-accent mb-6 shadow-[0_0_15px_rgba(247,148,30,0.5)]"></div>
-                        <h1 class="text-7xl font-black text-white tracking-tighter leading-none mb-4 drop-shadow-xl">Content<br>Pipeline</h1>
-                        <p class="text-[11px] font-black uppercase tracking-[0.5em] text-white/60 bg-white/5 inline-block px-4 py-2 border border-white/10">Operador: ${window.appState.userName}</p>
+                        <div class="w-12 h-2 bg-brand-accent mb-6 shadow-lg shadow-brand-accent/20"></div>
+                        <h1 class="text-5xl font-bold text-white tracking-tight leading-none mb-4 uppercase">Content<br>Pipeline</h1>
+                        <div class="inline-flex items-center gap-3 bg-brand-dark/40 px-4 py-2 border border-white/10 rounded-sm">
+                            <span class="w-2 h-2 bg-emerald-400 rounded-full animate-pulse"></span>
+                            <p class="text-[10px] font-bold uppercase tracking-widest text-brand-tint">Operador: ${window.appState.userName}</p>
+                        </div>
                     </div>
                     
                     <div class="flex flex-col gap-6 w-full md:w-auto">
-                        <div class="flex items-center gap-4 border-b-2 border-white/30 pb-4 group focus-within:border-brand-accent transition-colors">
-                            <span class="text-[10px] font-black uppercase tracking-widest text-white/80">🔍 Buscar:</span>
-                            <input type="text" id="searchInput" value="${window.appState.searchQuery}" placeholder="..." class="bg-transparent outline-none font-black text-white uppercase text-sm placeholder:text-white/20 w-48 focus:w-64 transition-all">
+                        <div class="flex items-center gap-4 border-b border-brand-tint/30 pb-3 group focus-within:border-brand-accent transition-colors">
+                            <span class="text-[10px] font-bold uppercase tracking-widest text-brand-tint/80">Filtrar:</span>
+                            <input type="text" id="searchInput" value="${window.appState.searchQuery}" placeholder="..." class="bg-transparent outline-none font-bold text-white uppercase text-sm placeholder:text-white/10 w-40 focus:w-56 transition-all">
                         </div>
                         <div class="flex flex-wrap items-center gap-4">
-                            <select id="sortSelect" class="bg-transparent border-none text-[10px] font-black uppercase tracking-widest outline-none cursor-pointer hover:text-brand-accent text-white/80 focus:text-white transition-colors">
-                                <option value="date" ${window.appState.sortBy === 'date' ? 'selected' : ''} class="bg-brand-primary">Ordenar por Fecha</option>
-                                <option value="title" ${window.appState.sortBy === 'title' ? 'selected' : ''} class="bg-brand-primary">Ordenar por Título</option>
-                                <option value="status" ${window.appState.sortBy === 'status' ? 'selected' : ''} class="bg-brand-primary">Ordenar por Estado</option>
+                            <select id="sortSelect" class="bg-transparent border-none text-[10px] font-bold uppercase tracking-widest outline-none cursor-pointer hover:text-brand-accent text-brand-tint transition-colors">
+                                <option value="date" ${window.appState.sortBy === 'date' ? 'selected' : ''} class="bg-brand-primary">Fecha</option>
+                                <option value="title" ${window.appState.sortBy === 'title' ? 'selected' : ''} class="bg-brand-primary">Título</option>
+                                <option value="status" ${window.appState.sortBy === 'status' ? 'selected' : ''} class="bg-brand-primary">Estado</option>
                             </select>
-                            <button id="btnNewIdea" class="btn-swiss-primary text-[10px] shadow-lg shadow-brand-accent/20">+ Nueva Iniciativa</button>
-                            <button onclick="location.reload()" class="btn-swiss-outline text-[10px] border-white/40 text-white/90 hover:border-white hover:text-white backdrop-blur-sm">Cerrar Sesión</button>
+                            <button id="btnNewIdea" class="btn-swiss-primary text-[10px]">+ Nueva Iniciativa</button>
+                            <button onclick="location.reload()" class="btn-swiss-outline text-[10px]">Log Out</button>
                         </div>
                     </div>
                 </header>
 
-                <div class="space-y-4">
-                    <div class="list-header hidden md:flex">
-                        <div class="flex-1 text-[10px] font-black uppercase tracking-[0.3em] text-white/30">Identificación / Proyecto</div>
-                        <div class="w-40 text-[10px] font-black uppercase tracking-[0.3em] text-white/30">Categoría</div>
-                        <div class="w-40 text-[10px] font-black uppercase tracking-[0.3em] text-white/30 text-center">Estado</div>
-                        <div class="w-48 text-[10px] font-black uppercase tracking-[0.3em] text-white/30">Lead / Responsable</div>
-                        <div class="w-64 text-[10px] font-black uppercase tracking-[0.3em] text-white/30">Pipeline Progress</div>
+                <div class="space-y-2">
+                    <div class="list-header hidden md:flex opacity-60">
+                        <div class="flex-1 text-[9px] font-bold uppercase tracking-widest text-brand-tint">Proyecto / Referencia</div>
+                        <div class="w-32 text-[9px] font-bold uppercase tracking-widest text-brand-tint">Estrategia</div>
+                        <div class="w-32 text-[9px] font-bold uppercase tracking-widest text-brand-tint text-center">Pipeline</div>
+                        <div class="w-40 text-[9px] font-bold uppercase tracking-widest text-brand-tint">Responsable</div>
+                        <div class="w-48 text-[9px] font-bold uppercase tracking-widest text-brand-tint">Progreso</div>
                     </div>
 
                     ${filteredProjects.map(p => {
                         const progress = getStatusProgress(p.status);
                         return `
                             <div data-id="${p.id}" class="project-row list-row group">
-                                <div class="flex-1 flex flex-col gap-2">
-                                    <span class="text-[8px] font-black text-brand-accent uppercase tracking-widest">REF: ${p.id.substring(0,8)}</span>
-                                    <h3 class="text-2xl font-black text-white group-hover:text-brand-accent transition-colors">${p.title}</h3>
+                                <div class="flex-1 flex flex-col gap-1">
+                                    <span class="text-[8px] font-bold text-brand-accent uppercase tracking-[0.2em] mb-1">REF: ${p.id.substring(0,8)}</span>
+                                    <h3 class="text-xl font-bold text-white group-hover:text-brand-accent transition-colors">${p.title}</h3>
                                 </div>
                                 
-                                <div class="w-40 shrink-0">
-                                    <span class="text-[10px] font-black uppercase tracking-widest text-white/40">${p.category}</span>
+                                <div class="w-32 shrink-0">
+                                    <span class="text-[9px] font-bold uppercase tracking-wider text-brand-tint/60">${p.category}</span>
                                 </div>
 
-                                <div class="w-40 shrink-0 text-center">
+                                <div class="w-32 shrink-0 text-center">
                                     ${getStatusBadge(p.status)}
                                 </div>
 
-                                <div class="w-48 shrink-0 flex flex-col">
-                                    <span class="text-[10px] font-black text-white italic uppercase truncate">${p.team || '---'}</span>
-                                    <span class="text-[8px] font-medium text-white/20 uppercase tracking-widest mt-1">Sincronizado: ${new Date(p.createdAt).toLocaleDateString()}</span>
+                                <div class="w-40 shrink-0 flex flex-col">
+                                    <span class="text-[10px] font-bold text-white uppercase truncate">${p.team || '---'}</span>
+                                    <span class="text-[8px] font-medium text-brand-tint/30 uppercase mt-0.5">${new Date(p.createdAt).toLocaleDateString()}</span>
                                 </div>
 
-                                <div class="w-64 shrink-0 flex items-center gap-6">
-                                    <div class="flex-1 h-1 bg-white/10 overflow-hidden">
-                                        <div class="h-full bg-brand-accent transition-all duration-1000 shadow-[0_0_10px_rgba(247,148,30,0.4)]" style="width: ${progress}%"></div>
+                                <div class="w-48 shrink-0 flex items-center gap-4">
+                                    <div class="flex-1 h-1 bg-white/5 overflow-hidden rounded-full">
+                                        <div class="h-full bg-brand-accent transition-all duration-1000" style="width: ${progress}%"></div>
                                     </div>
-                                    <span class="text-[10px] font-black text-white/60 w-10 text-right">${Math.round(progress)}%</span>
+                                    <span class="text-[9px] font-bold text-brand-tint/80 w-8 text-right">${Math.round(progress)}%</span>
                                 </div>
                                 
-                                <div class="w-12 h-12 flex items-center justify-center text-white/20 group-hover:text-white transition-colors text-2xl font-black">
+                                <div class="w-8 h-8 flex items-center justify-center text-brand-tint/20 group-hover:text-brand-accent transition-colors text-xl font-bold">
                                     →
                                 </div>
                             </div>
@@ -467,9 +470,8 @@ const renderApp = () => {
                     }).join('')}
                     
                     ${filteredProjects.length === 0 ? `
-                        <div class="py-40 text-center border-2 border-dashed border-white/10">
-                            <h3 class="text-4xl font-black text-white/5 uppercase tracking-[0.4em]">Sin Registros Activos</h3>
-                            <p class="text-white/20 font-bold mt-4">No se encontraron iniciativas que coincidan con los parámetros.</p>
+                        <div class="py-32 text-center border border-dashed border-white/10 rounded-lg">
+                            <h3 class="text-3xl font-bold text-white/5 uppercase tracking-[0.3em]">No records</h3>
                         </div>
                     ` : ''}
                 </div>
