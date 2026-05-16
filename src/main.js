@@ -354,22 +354,28 @@ const renderApp = () => {
             <div class="p-6 max-w-7xl mx-auto min-h-screen">
                 <header class="flex flex-col md:flex-row justify-between items-start md:items-center mb-12 gap-6">
                     <div>
-                        <h1 class="text-5xl font-black text-[#581845] tracking-tight">AV Planner<span class="text-[#C70039]">.</span></h1>
-                        <p class="text-gray-400 font-medium mt-2">Gestión de contenido de alto impacto</p>
+                        <div class="flex items-center gap-3 mb-2">
+                            <div class="w-8 h-8 bg-[#006FB3] rounded-lg flex items-center justify-center text-white font-bold">PN</div>
+                            <span class="text-xs font-black uppercase tracking-[0.2em] text-[#006FB3]">Marketing</span>
+                        </div>
+                        <h1 class="text-4xl font-black text-[#0A132D] tracking-tight leading-none">
+                            Planificación contenido audiovisual<br>
+                            <span class="text-[#006FB3]">Puntaje Nacional</span>
+                        </h1>
                     </div>
-                    <button id="btnNewIdea" class="bg-[#C70039] text-white px-8 py-4 rounded-2xl font-black shadow-2xl shadow-red-200 hover:scale-105 active:scale-95 transition-all flex items-center gap-2 uppercase tracking-widest text-sm">
+                    <button id="btnNewIdea" class="bg-[#FE6565] text-white px-8 py-4 rounded-2xl font-black shadow-2xl shadow-red-200 hover:scale-105 active:scale-95 transition-all flex items-center gap-2 uppercase tracking-widest text-sm">
                         <span class="text-xl">+</span> Nueva Idea
                     </button>
                 </header>
 
-                <div class="mb-10 flex flex-col md:flex-row gap-4 items-center bg-white/50 backdrop-blur-md p-2 rounded-3xl border border-white shadow-sm">
+                <div class="mb-10 flex flex-col md:flex-row gap-4 items-center bg-white/80 backdrop-blur-md p-2 rounded-3xl border border-gray-100 shadow-sm">
                     <div class="relative flex-1 w-full">
                         <span class="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400">🔍</span>
                         <input type="text" id="searchInput" value="${window.appState.searchQuery}" placeholder="Buscar proyectos, equipos o temas..." class="w-full pl-12 pr-4 py-4 bg-transparent rounded-2xl border-none text-lg focus:ring-0 placeholder:text-gray-300">
                     </div>
                     <div class="flex items-center gap-3 px-4 border-l border-gray-100">
                         <label class="text-[10px] font-black text-gray-400 uppercase tracking-tighter">Ordenar</label>
-                        <select id="sortSelect" class="bg-transparent border-none rounded-xl text-sm font-bold py-2 focus:ring-0 text-[#581845]">
+                        <select id="sortSelect" class="bg-transparent border-none rounded-xl text-sm font-bold py-2 focus:ring-0 text-[#006FB3]">
                             <option value="date" ${window.appState.sortBy === 'date' ? 'selected' : ''}>Recientes</option>
                             <option value="title" ${window.appState.sortBy === 'title' ? 'selected' : ''}>Título</option>
                             <option value="status" ${window.appState.sortBy === 'status' ? 'selected' : ''}>Estatus</option>
@@ -379,33 +385,32 @@ const renderApp = () => {
 
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                     ${filteredProjects.map(p => `
-                        <div data-id="${p.id}" class="project-card group bg-white p-6 rounded-[2.5rem] shadow-sm border border-gray-100 hover:shadow-2xl hover:shadow-gray-200/50 hover:-translate-y-1 transition-all duration-500 cursor-pointer flex flex-col h-full">
+                        <div data-id="${p.id}" class="project-card group bg-white p-6 rounded-[2.5rem] shadow-sm border border-gray-100 hover:shadow-2xl hover:shadow-blue-100/50 hover:-translate-y-1 transition-all duration-500 cursor-pointer flex flex-col h-full">
                             <div class="flex justify-between items-start mb-6">
                                 ${getStatusBadge(p.status)}
                                 <span class="text-[10px] font-bold text-gray-300 uppercase tracking-widest">${new Date(p.createdAt).toLocaleDateString()}</span>
                             </div>
                             
                             <div class="flex-1">
-                                <h3 class="text-2xl font-bold text-gray-800 leading-tight group-hover:text-[#C70039] transition-colors mb-2">${p.title}</h3>
-                                <p class="text-gray-400 text-sm line-clamp-2 mb-4 font-medium">${p.description || 'Sin descripción adicional.'}</p>
+                                <h3 class="text-2xl font-bold text-[#0A132D] leading-tight group-hover:text-[#006FB3] transition-colors mb-2">${p.title}</h3>
+                                <p class="text-gray-500 text-sm line-clamp-2 mb-4 font-medium leading-relaxed">${p.description || 'Sin descripción adicional.'}</p>
                             </div>
 
                             <div class="mt-6 pt-6 border-t border-gray-50 flex items-center justify-between">
                                 <div class="flex flex-col">
                                     <span class="text-[9px] font-black text-gray-300 uppercase tracking-tighter mb-1">Encargado</span>
-                                    <span class="text-xs font-bold text-[#581845] flex items-center gap-1">
-                                        <span class="w-2 h-2 rounded-full bg-[#C70039]"></span>
+                                    <span class="text-xs font-bold text-[#0A132D] flex items-center gap-1">
+                                        <div class="w-2 h-2 rounded-full bg-[#FE6565]"></div>
                                         ${p.team || 'Sin asignar'}
                                     </span>
                                 </div>
-                                <div class="w-12 h-12 rounded-2xl bg-gray-50 flex items-center justify-center group-hover:bg-[#581845] group-hover:text-white transition-all">
+                                <div class="w-12 h-12 rounded-2xl bg-gray-50 flex items-center justify-center group-hover:bg-[#006FB3] group-hover:text-white transition-all">
                                     <span class="text-xl font-bold">→</span>
                                 </div>
                             </div>
                         </div>
                     `).join('')}
                     
-                    <!-- Empty State / Add Card -->
                     ${filteredProjects.length === 0 ? `
                         <div class="col-span-full py-20 flex flex-col items-center justify-center text-center">
                             <div class="text-6xl mb-4">🏜️</div>
@@ -433,19 +438,19 @@ const renderApp = () => {
     } else if (window.appState.view === 'new') {
         root.innerHTML = `
             <div class="p-6 max-w-2xl mx-auto">
-                <button id="btnBackToDashboard" class="text-gray-500 mb-6 flex items-center hover:text-[#581845]"><span class="mr-2">←</span> Volver</button>
-                <div class="bg-white p-8 rounded-3xl shadow-xl">
-                    <h2 class="text-3xl font-bold mb-6 text-[#581845]">Capturar Nueva Idea</h2>
+                <button id="btnBackToDashboard" class="text-gray-500 mb-6 flex items-center hover:text-[#006FB3] font-bold"><span class="mr-2">←</span> Volver</button>
+                <div class="bg-white p-8 rounded-[2.5rem] shadow-xl border border-gray-100">
+                    <h2 class="text-3xl font-black mb-6 text-[#0A132D]">Capturar Nueva Idea</h2>
                     <form id="ideaForm" class="space-y-4">
-                        <div><label class="block text-sm font-bold text-gray-700 mb-1">Título</label><input type="text" id="title" required class="w-full p-3 bg-gray-50 rounded-xl border-none"></div>
+                        <div><label class="block text-xs font-black text-gray-400 uppercase tracking-widest mb-2">Título del Proyecto</label><input type="text" id="title" required class="w-full p-4 bg-gray-50 rounded-2xl border-none focus:ring-2 focus:ring-[#006FB3]"></div>
                         <div>
-                            <label class="block text-sm font-bold text-gray-700 mb-1">Categoría</label>
-                            <select id="category" class="w-full p-3 bg-gray-50 rounded-xl border-none">
+                            <label class="block text-xs font-black text-gray-400 uppercase tracking-widest mb-2">Categoría</label>
+                            <select id="category" class="w-full p-4 bg-gray-50 rounded-2xl border-none focus:ring-2 focus:ring-[#006FB3] font-bold">
                                 <option>Social Media</option><option>Educativo</option><option>Institucional</option><option>Publicidad</option>
                             </select>
                         </div>
-                        <div><label class="block text-sm font-bold text-gray-700 mb-1">Descripción</label><textarea id="description" rows="3" required class="w-full p-3 bg-gray-50 rounded-xl border-none"></textarea></div>
-                        <button type="submit" class="w-full bg-[#581845] text-white py-4 rounded-xl font-bold text-lg hover:bg-[#900C3F]">Guardar</button>
+                        <div><label class="block text-xs font-black text-gray-400 uppercase tracking-widest mb-2">Breve Descripción / Objetivo</label><textarea id="description" rows="3" required class="w-full p-4 bg-gray-50 rounded-2xl border-none focus:ring-2 focus:ring-[#006FB3]"></textarea></div>
+                        <button type="submit" class="w-full bg-[#006FB3] text-white py-5 rounded-2xl font-black text-lg hover:bg-[#0A132D] transition-all shadow-lg mt-4 uppercase tracking-widest">Guardar Idea</button>
                     </form>
                 </div>
             </div>
@@ -466,16 +471,23 @@ const renderApp = () => {
 
         root.innerHTML = `
             <div class="p-6 max-w-6xl mx-auto">
-                <button id="btnBackToDashboardDetail" class="text-gray-500 mb-6 flex items-center hover:text-[#581845]"><span class="mr-2">←</span> Volver</button>
+                <button id="btnBackToDashboardDetail" class="text-gray-500 mb-6 flex items-center hover:text-[#006FB3] font-bold"><span class="mr-2">←</span> Volver</button>
                 <div class="mb-12">
-                    <h1 class="text-4xl font-bold text-[#581845] mb-8">${p.title}</h1>
+                    <div class="flex items-center gap-2 mb-2">
+                        ${getStatusBadge(p.status)}
+                        <span class="text-xs font-bold text-gray-300 uppercase tracking-widest">ID: ${p.id.substring(0,8)}</span>
+                    </div>
+                    <h1 class="text-4xl font-black text-[#0A132D] mb-8 leading-tight">${p.title}</h1>
+                    
                     <div class="relative px-4">
-                        <div class="absolute top-1/2 left-0 w-full h-1 bg-gray-100 -translate-y-1/2"></div>
-                        <div class="absolute top-1/2 left-0 h-1 bg-[#C70039] -translate-y-1/2 transition-all duration-500" style="width: ${(currentIndex / (stages.length - 1)) * 100}%"></div>
+                        <div class="absolute top-1/2 left-0 w-full h-1 bg-gray-100 -translate-y-1/2 rounded-full"></div>
+                        <div class="absolute top-1/2 left-0 h-1 bg-[#006FB3] -translate-y-1/2 transition-all duration-700 rounded-full" style="width: ${(currentIndex / (stages.length - 1)) * 100}%"></div>
                         <div class="relative flex justify-between">
                             ${stages.map((stage, i) => `<div class="flex flex-col items-center">
-                                <div class="w-10 h-10 rounded-full flex items-center justify-center z-10 ${i <= currentIndex ? 'bg-[#C70039] text-white' : 'bg-white border-2 border-gray-200 text-gray-300'}">${i <= currentIndex ? '✓' : i + 1}</div>
-                                <span class="mt-2 text-[10px] font-bold uppercase ${i === currentIndex ? 'text-[#C70039]' : 'text-gray-400'}">${stage}</span>
+                                <div class="w-10 h-10 rounded-xl flex items-center justify-center z-10 transition-all duration-500 ${i <= currentIndex ? 'bg-[#006FB3] text-white shadow-lg shadow-blue-200' : 'bg-white border-2 border-gray-100 text-gray-300'}">
+                                    ${i <= currentIndex ? '✓' : i + 1}
+                                </div>
+                                <span class="mt-3 text-[9px] font-black uppercase tracking-tighter ${i === currentIndex ? 'text-[#006FB3]' : 'text-gray-300'}">${stage}</span>
                             </div>`).join('')}
                         </div>
                     </div>
@@ -483,85 +495,67 @@ const renderApp = () => {
 
                 <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
                     <div class="lg:col-span-2 space-y-6">
-                        <!-- SCRIPTING (Siempre accesible) -->
-                        <div class="bg-white p-6 rounded-3xl shadow-sm border border-gray-100">
-                            <h3 class="font-bold text-xl mb-6 text-[#581845] flex items-center"><span class="mr-2">📝</span> Scripting (Guion)</h3>
+                        <div class="bg-white p-8 rounded-[2.5rem] shadow-sm border border-gray-100">
+                            <h3 class="font-black text-xl mb-6 text-[#0A132D] flex items-center gap-3"><span class="w-8 h-8 rounded-lg bg-blue-50 flex items-center justify-center text-sm">📝</span> Guion Literario</h3>
                             <div class="transition-all">
-                                <label class="text-xs font-bold text-gray-400 uppercase tracking-widest">Guion Literario</label>
-                                <div id="scriptContent" class="bg-gray-50 p-4 rounded-xl mt-2 text-sm text-gray-600 min-h-[200px] outline-none border border-transparent focus:border-[#C70039] focus:bg-white transition-all shadow-inner" contenteditable="true" oninput="window.saveScriptRealtime('${p.id}', this.innerText)">
-                                    ${p.script || 'Escribe aquí el guion literario de tu video...'}
+                                <div id="scriptContent" class="bg-gray-50 p-6 rounded-2xl mt-2 text-sm text-gray-600 min-h-[250px] outline-none border-2 border-transparent focus:border-[#006FB3] focus:bg-white transition-all leading-relaxed" contenteditable="true" oninput="window.saveScriptRealtime('${p.id}', this.innerText)">
+                                    ${p.script || 'Escribe aquí el guion literario...'}
                                 </div>
                             </div>
                         </div>
 
-                        <!-- STORYBOARD -->
-                        <div class="bg-white p-6 rounded-3xl shadow-sm border border-gray-100 ${currentIndex < 2 ? 'opacity-20 grayscale pointer-events-none' : ''}">
-                            <h3 class="font-bold text-xl mb-4 text-[#581845] flex items-center"><span class="mr-2">🎨</span> Storyboard</h3>
-                            <div class="grid grid-cols-2 md:grid-cols-4 gap-3 mt-3">
-                                ${images.map((img, idx) => `<div onclick="window.openLightbox(${idx})" class="aspect-square bg-gray-100 rounded-xl overflow-hidden cursor-pointer hover:ring-2 hover:ring-[#C70039] relative group">
+                        <div class="bg-white p-8 rounded-[2.5rem] shadow-sm border border-gray-100 ${currentIndex < 2 ? 'opacity-40 grayscale pointer-events-none' : ''}">
+                            <h3 class="font-black text-xl mb-6 text-[#0A132D] flex items-center gap-3"><span class="w-8 h-8 rounded-lg bg-purple-50 flex items-center justify-center text-sm">🎨</span> Storyboard Visual</h3>
+                            <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mt-3">
+                                ${images.map((img, idx) => `<div onclick="window.openLightbox(${idx})" class="aspect-square bg-gray-50 rounded-2xl overflow-hidden cursor-pointer hover:ring-4 hover:ring-[#006FB3]/20 relative group transition-all">
                                     <img src="${img}" class="w-full h-full object-cover">
-                                    <div class="absolute inset-0 bg-black/30 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity"><span class="text-white text-2xl">🔍</span></div>
+                                    <div class="absolute inset-0 bg-[#006FB3]/40 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity"><span class="text-white text-2xl">🔍</span></div>
                                 </div>`).join('')}
-                                <div onclick="document.getElementById('sbUpload').click()" class="aspect-square bg-gray-50 rounded-xl flex flex-col items-center justify-center text-gray-400 border-2 border-dashed border-gray-300 hover:border-[#C70039] cursor-pointer">
-                                    <span class="text-3xl">+</span><span class="text-[10px] font-bold uppercase mt-1">Imágenes</span>
+                                <div onclick="document.getElementById('sbUpload').click()" class="aspect-square bg-gray-50 rounded-2xl flex flex-col items-center justify-center text-gray-300 border-2 border-dashed border-gray-200 hover:border-[#006FB3] hover:text-[#006FB3] cursor-pointer transition-all">
+                                    <span class="text-3xl font-black">+</span><span class="text-[9px] font-black uppercase mt-1">Subir</span>
                                 </div>
                                 <input type="file" id="sbUpload" class="hidden" accept="image/jpeg, image/png" multiple onchange="window.handleImageUpload(event, '${p.id}')">
                             </div>
                         </div>
 
-                        <!-- PRODUCCION -->
-                        <div class="bg-white p-6 rounded-3xl shadow-sm border border-gray-100 ${currentIndex < 3 ? 'opacity-20 grayscale pointer-events-none' : ''}">
-                            <h3 class="font-bold text-xl mb-4 text-[#581845] flex items-center"><span class="mr-2">🎬</span> Producción</h3>
-                            <div class="mb-4">
-                                <label class="block text-xs font-bold text-gray-400 uppercase mb-1">Archivos RAW (Drive)</label>
-                                <input type="url" id="prodRawLink" value="${prod.rawLink || ''}" class="w-full p-3 bg-gray-50 rounded-xl border-none text-sm focus:ring-2 focus:ring-[#C70039]" placeholder="https://drive.google.com/...">
+                        <div class="bg-white p-8 rounded-[2.5rem] shadow-sm border border-gray-100 ${currentIndex < 3 ? 'opacity-40 grayscale pointer-events-none' : ''}">
+                            <h3 class="font-black text-xl mb-6 text-[#0A132D] flex items-center gap-3"><span class="w-8 h-8 rounded-lg bg-rose-50 flex items-center justify-center text-sm">🎬</span> Control de Producción</h3>
+                            <div class="mb-6">
+                                <label class="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2">Archivos RAW (Google Drive / One Drive)</label>
+                                <input type="url" id="prodRawLink" value="${prod.rawLink || ''}" class="w-full p-4 bg-gray-50 rounded-2xl border-none text-sm focus:ring-2 focus:ring-[#FE6565]" placeholder="Pega el link a la carpeta de crudos...">
                             </div>
-                            <div class="grid grid-cols-2 gap-3">
-                                <label class="flex items-center gap-3 p-3 rounded-xl hover:bg-gray-50 cursor-pointer">
-                                    <input type="checkbox" id="chkMontaje" ${prod.montaje ? 'checked' : ''} class="w-5 h-5 text-[#C70039] rounded focus:ring-[#C70039]"><span class="text-sm font-bold">Montaje</span>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <label class="flex items-center gap-4 p-4 rounded-2xl bg-gray-50 hover:bg-white hover:shadow-md transition-all cursor-pointer border-2 border-transparent hover:border-blue-50">
+                                    <input type="checkbox" id="chkMontaje" ${prod.montaje ? 'checked' : ''} class="w-6 h-6 text-[#006FB3] rounded-lg focus:ring-[#006FB3] border-gray-200"><span class="text-sm font-black text-[#0A132D]">Montaje Base</span>
                                 </label>
-                                <label class="flex items-center gap-3 p-3 rounded-xl hover:bg-gray-50 cursor-pointer">
-                                    <input type="checkbox" id="chkEdicion" ${prod.edicion ? 'checked' : ''} class="w-5 h-5 text-[#C70039] rounded focus:ring-[#C70039]"><span class="text-sm font-bold">Edición</span>
+                                <label class="flex items-center gap-4 p-4 rounded-2xl bg-gray-50 hover:bg-white hover:shadow-md transition-all cursor-pointer border-2 border-transparent hover:border-blue-50">
+                                    <input type="checkbox" id="chkEdicion" ${prod.edicion ? 'checked' : ''} class="w-6 h-6 text-[#006FB3] rounded-lg focus:ring-[#006FB3] border-gray-200"><span class="text-sm font-black text-[#0A132D]">Edición de Color / Audio</span>
                                 </label>
-                                <label class="flex items-center gap-3 p-3 rounded-xl hover:bg-gray-50 cursor-pointer">
-                                    <input type="checkbox" id="chkSubtitulado" ${prod.subtitulado ? 'checked' : ''} class="w-5 h-5 text-[#C70039] rounded focus:ring-[#C70039]"><span class="text-sm font-bold">Subtitulado</span>
+                                <label class="flex items-center gap-4 p-4 rounded-2xl bg-gray-50 hover:bg-white hover:shadow-md transition-all cursor-pointer border-2 border-transparent hover:border-blue-50">
+                                    <input type="checkbox" id="chkSubtitulado" ${prod.subtitulado ? 'checked' : ''} class="w-6 h-6 text-[#006FB3] rounded-lg focus:ring-[#006FB3] border-gray-200"><span class="text-sm font-black text-[#0A132D]">Subtitulado / GFX</span>
                                 </label>
-                                <label class="flex items-center gap-3 p-3 rounded-xl bg-red-50 cursor-pointer">
-                                    <input type="checkbox" id="chkExportado" onchange="window.toggleFinalizado(this.checked)" ${prod.exportado ? 'checked' : ''} class="w-5 h-5 text-[#C70039] rounded focus:ring-[#C70039]"><span class="text-sm font-bold text-[#C70039]">Exportado</span>
+                                <label class="flex items-center gap-4 p-4 rounded-2xl bg-rose-50 hover:bg-rose-100 transition-all cursor-pointer border-2 border-transparent hover:border-rose-200">
+                                    <input type="checkbox" id="chkExportado" onchange="window.toggleFinalizado(this.checked)" ${prod.exportado ? 'checked' : ''} class="w-6 h-6 text-[#FE6565] rounded-lg focus:ring-[#FE6565] border-rose-200"><span class="text-sm font-black text-[#FE6565]">Exportado Final</span>
                                 </label>
-                            </div>
-                        </div>
-
-                        <!-- FINALIZADO -->
-                        <div class="bg-gradient-to-br from-green-50 to-emerald-50 p-6 rounded-3xl border border-green-100 ${(currentIndex < 4 && !prod.exportado) ? 'opacity-20 grayscale pointer-events-none' : ''}">
-                            <h3 class="font-bold text-xl mb-4 text-green-900 flex items-center"><span class="mr-2">🚀</span> Finalizado y Publicación</h3>
-                            <div class="space-y-4">
-                                <div><label class="block text-xs font-bold text-green-800 uppercase mb-1">Video Final (Drive)</label><input type="url" id="metaFinalLink" value="${meta.finalLink || ''}" class="w-full p-3 bg-white/60 rounded-xl border-green-200"></div>
-                                <div class="grid md:grid-cols-2 gap-4">
-                                    <div><label class="block text-xs font-bold text-green-800 uppercase mb-1">Título</label><input type="text" id="metaTitle" value="${meta.title || ''}" class="w-full p-3 bg-white/60 rounded-xl border-green-200"></div>
-                                    <div><label class="block text-xs font-bold text-green-800 uppercase mb-1">Tags</label><input type="text" id="metaTags" value="${meta.tags || ''}" class="w-full p-3 bg-white/60 rounded-xl border-green-200"></div>
-                                </div>
-                                <div><label class="block text-xs font-bold text-green-800 uppercase mb-1">Descripción</label><textarea id="metaDesc" rows="3" class="w-full p-3 bg-white/60 rounded-xl border-green-200">${meta.description || ''}</textarea></div>
-                                <div><label class="block text-xs font-bold text-green-800 uppercase mb-1">URL Publicado</label><input type="url" id="metaPublishedUrl" value="${meta.publishedUrl || ''}" class="w-full p-3 bg-white font-bold text-green-700 rounded-xl border-green-300 shadow-sm" placeholder="https://tiktok.com/..."></div>
                             </div>
                         </div>
                     </div>
 
                     <div class="space-y-6">
-                        <div class="bg-white p-6 rounded-3xl shadow-sm border border-gray-100">
-                            <h3 class="font-bold text-xl mb-6 text-[#581845]">Gestión</h3>
-                            <div class="space-y-4">
-                                <div><label class="block text-xs font-bold text-gray-400 uppercase mb-1">Encargados</label><input type="text" id="teamInput" value="${p.team || ''}" class="w-full p-3 bg-gray-50 rounded-xl border-none text-sm focus:ring-2 focus:ring-[#C70039]"></div>
-                                <div><label class="block text-xs font-bold text-gray-400 uppercase mb-1">Deadline</label><input type="date" id="dueDateInput" value="${p.dueDate || ''}" class="w-full p-3 bg-gray-50 rounded-xl border-none text-sm"></div>
-                                <div class="pt-4 border-t">
-                                    <label class="block text-xs font-bold text-gray-400 uppercase mb-2">Estado</label>
-                                    <select id="statusSelect" class="w-full p-4 bg-gray-50 border-2 border-gray-200 rounded-xl text-sm font-bold text-[#581845] focus:border-[#C70039] outline-none">
+                        <div class="bg-[#0A132D] p-8 rounded-[2.5rem] shadow-xl text-white">
+                            <h3 class="font-black text-xl mb-8 flex items-center gap-3 text-white"><span class="w-8 h-8 rounded-lg bg-white/10 flex items-center justify-center text-sm">⚙️</span> Gestión</h3>
+                            <div class="space-y-6">
+                                <div><label class="block text-[10px] font-black text-blue-300 uppercase tracking-widest mb-2">Responsables</label><input type="text" id="teamInput" value="${p.team || ''}" class="w-full p-4 bg-white/5 rounded-2xl border-none text-sm focus:ring-2 focus:ring-[#006FB3] text-white"></div>
+                                <div><label class="block text-[10px] font-black text-blue-300 uppercase tracking-widest mb-2">Fecha de Entrega</label><input type="date" id="dueDateInput" value="${p.dueDate || ''}" class="w-full p-4 bg-white/5 rounded-2xl border-none text-sm text-white"></div>
+                                <div class="pt-6 border-t border-white/10">
+                                    <label class="block text-[10px] font-black text-blue-300 uppercase tracking-widest mb-3">Estado del Pipeline</label>
+                                    <select id="statusSelect" class="w-full p-5 bg-white text-[#0A132D] rounded-2xl text-sm font-black outline-none focus:ring-4 focus:ring-blue-500/50">
                                         ${stages.map(s => `<option value="${s}" ${p.status === s ? 'selected' : ''} ${(s === 'Finalizado' && !prod.exportado && p.status !== 'Finalizado') ? 'disabled' : ''}>${s}</option>`).join('')}
                                     </select>
-                                    <p id="statusHint" class="text-[10px] text-[#C70039] mt-2 font-bold ${prod.exportado || p.status === 'Finalizado' ? 'hidden' : 'block'}">⚠️ Marca 'Exportado' para Finalizar.</p>
+                                    <p id="statusHint" class="text-[10px] text-[#FE6565] mt-3 font-black bg-rose-500/10 p-3 rounded-xl ${prod.exportado || p.status === 'Finalizado' ? 'hidden' : 'block'}">⚠️ REQUIERE EXPORTACIÓN PARA FINALIZAR</p>
                                 </div>
                             </div>
-                            <button id="btnSaveDetail" class="w-full mt-6 bg-[#581845] text-white py-4 rounded-xl font-bold text-lg hover:bg-[#C70039] transition-all shadow-lg">Guardar Cambios</button>
+                            <button id="btnSaveDetail" class="w-full mt-8 bg-[#006FB3] text-white py-5 rounded-2xl font-black text-lg hover:bg-[#FE6565] transition-all shadow-lg uppercase tracking-widest">Actualizar Proyecto</button>
                         </div>
                     </div>
                 </div>
