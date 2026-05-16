@@ -184,6 +184,50 @@ window.updateProject = updateProject;
 window.deleteProject = deleteProject;
 window.renderApp = () => renderApp();
 window.loadData = loadData;
+window.formatScriptBold = () => {
+    document.execCommand('bold', false, null);
+};
+
+window.insertSceneCut = () => {
+    const selection = window.getSelection();
+    if (!selection.rangeCount) return;
+    const range = selection.getRangeAt(0);
+    const sceneCut = document.createElement('div');
+    sceneCut.className = 'my-8 border-t-2 border-dashed border-gray-200 pt-4 font-black text-[#006FB3] uppercase tracking-[0.3em] text-center text-sm';
+    sceneCut.innerHTML = '--- CORTE DE ESCENA ---';
+    range.insertNode(sceneCut);
+    range.collapse(false);
+};
+
+window.copyScript = () => {
+    const content = document.getElementById('scriptContent').innerText;
+    navigator.clipboard.writeText(content).then(() => {
+        alert('Guion copiado al portapapeles 📋');
+    });
+};
+
+window.shareScript = async () => {
+    const content = document.getElementById('scriptContent').innerText;
+    const title = window.appState.currentProject.title;
+    if (navigator.share) {
+        try {
+            await navigator.share({
+                title: `Guion: ${title}`,
+                text: content,
+                url: window.location.href
+            });
+        } catch (err) {
+            console.log('Error al compartir:', err);
+        }
+    } else {
+        window.copyScript();
+    }
+};
+
+window.printScript = () => {
+    window.print();
+};
+
 window.saveScriptRealtime = async (projectId, text) => {
     await updateProject(projectId, { script: text });
 };
@@ -261,6 +305,30 @@ const getStatusBadge = (status) => {
 // --- Core Rendering ---
 const renderApp = () => {
     const root = document.getElementById('app');
+    
+    // Add print styles dynamically
+    if (!document.getElementById('print-styles')) {
+        const style = document.createElement('style');
+        style.id = 'print-styles';
+        style.innerHTML = `
+            @media print {
+                body * { visibility: hidden; }
+                #scriptContent, #scriptContent * { visibility: visible; }
+                #scriptContent {
+                    position: absolute;
+                    left: 0;
+                    top: 0;
+                    width: 100%;
+                    padding: 0 !important;
+                    margin: 0 !important;
+                    box-shadow: none !important;
+                    border: none !important;
+                    font-size: 12pt !important;
+                }
+            }
+        `;
+        document.head.appendChild(style);
+    }
     
     if (!window.appState.userName) {
         root.innerHTML = `
@@ -485,7 +553,7 @@ const renderApp = () => {
                         <div class="flex gap-1 bg-black/20 backdrop-blur-3xl p-1.5 rounded-[2.2rem] border border-white/10 shadow-2xl relative overflow-hidden">
                             <button onclick="window.setTab('guion')" class="relative flex-1 px-4 py-4 rounded-[1.8rem] font-black text-[10px] uppercase tracking-widest transition-all z-10 ${activeTab === 'guion' ? 'text-[#006FB3]' : 'text-white/40 hover:text-white'}">
                                 ${activeTab === 'guion' ? '<div class="absolute inset-0 bg-white rounded-[1.6rem] -z-10 shadow-2xl animate-in fade-in duration-300"></div>' : ''}
-                                📝 Guion
+                                📝 Narrativo
                             </button>
                             <button onclick="window.setTab('storyboard')" class="relative flex-1 px-4 py-4 rounded-[1.8rem] font-black text-[10px] uppercase tracking-widest transition-all z-10 ${activeTab === 'storyboard' ? 'text-[#006FB3]' : 'text-white/40 hover:text-white'}">
                                 ${activeTab === 'storyboard' ? '<div class="absolute inset-0 bg-white rounded-[1.6rem] -z-10 shadow-2xl animate-in fade-in duration-300"></div>' : ''}
@@ -497,21 +565,31 @@ const renderApp = () => {
                             </button>
                             <button onclick="window.setTab('gestion')" class="relative flex-1 px-4 py-4 rounded-[1.8rem] font-black text-[10px] uppercase tracking-widest transition-all z-10 ${activeTab === 'gestion' ? 'text-[#006FB3]' : 'text-white/40 hover:text-white'}">
                                 ${activeTab === 'gestion' ? '<div class="absolute inset-0 bg-white rounded-[1.6rem] -z-10 shadow-2xl animate-in fade-in duration-300"></div>' : ''}
-                                ⚙️ Admin
+                                ⚙️ Gestión
                             </button>
-                        </div>
-                    </div>
-                </div>
+                                </div>
+                                </div>
+                                </div>
 
-                <div class="animate-in fade-in slide-in-from-bottom-8 duration-700">
-                    ${activeTab === 'guion' ? `
+                                <div class="animate-in fade-in slide-in-from-bottom-8 duration-700">
+                                ${activeTab === 'guion' ? `
                         <div class="bg-white p-10 md:p-16 rounded-[4rem] shadow-[0_30px_100px_rgba(0,0,0,0.2)] border border-white max-w-5xl">
-                            <div class="flex items-center justify-between mb-12">
-                                <h3 class="font-black text-3xl text-[#0A132D] tracking-tighter">Guion Literario<span class="text-[#006FB3]">.</span></h3>
-                                <div class="w-12 h-12 rounded-2xl bg-blue-50 flex items-center justify-center text-xl shadow-inner border border-blue-100/50">📝</div>
+                            <div class="flex flex-col md:flex-row items-start md:items-center justify-between mb-12 gap-6">
+                                <div>
+                                    <h3 class="font-black text-3xl text-[#0A132D] tracking-tighter">Guion Narrativo<span class="text-[#006FB3]">.</span></h3>
+                                    <p class="text-[10px] font-black text-gray-400 uppercase tracking-widest mt-2 ml-1">Estilo Audiovisual Profesional</p>
+                                </div>
+                                <div class="flex flex-wrap items-center gap-2 bg-gray-50 p-2 rounded-3xl border border-gray-100 shadow-inner">
+                                    <button onclick="window.formatScriptBold()" class="w-10 h-10 rounded-xl bg-white flex items-center justify-center font-black text-sm hover:bg-[#006FB3] hover:text-white transition-all shadow-sm border border-gray-100">B</button>
+                                    <button onclick="window.insertSceneCut()" class="px-4 h-10 rounded-xl bg-white flex items-center justify-center font-black text-[10px] uppercase tracking-widest hover:bg-[#006FB3] hover:text-white transition-all shadow-sm border border-gray-100 gap-2">🎬 Escena</button>
+                                    <div class="w-px h-6 bg-gray-200 mx-2"></div>
+                                    <button onclick="window.copyScript()" class="w-10 h-10 rounded-xl bg-white flex items-center justify-center text-lg hover:bg-[#006FB3] hover:text-white transition-all shadow-sm border border-gray-100">📋</button>
+                                    <button onclick="window.shareScript()" class="w-10 h-10 rounded-xl bg-white flex items-center justify-center text-lg hover:bg-[#006FB3] hover:text-white transition-all shadow-sm border border-gray-100">📤</button>
+                                    <button onclick="window.printScript()" class="w-10 h-10 rounded-xl bg-white flex items-center justify-center text-lg hover:bg-[#0A132D] hover:text-white transition-all shadow-sm border border-gray-100">🖨️</button>
+                                </div>
                             </div>
-                            <div id="scriptContent" class="bg-gray-50/70 p-10 rounded-[2.5rem] text-lg text-gray-700 min-h-[500px] outline-none border-2 border-transparent focus:border-[#006FB3] focus:bg-white focus:ring-[15px] focus:ring-blue-500/5 leading-relaxed font-medium shadow-inner transition-all" contenteditable="true">
-                                ${p.script || 'Escribe el flujo narrativo aquí...'}
+                            <div id="scriptContent" class="bg-[#F8F9FA] p-12 md:p-20 rounded-[3rem] text-sm md:text-base text-gray-800 min-h-[700px] outline-none border-2 border-transparent focus:border-[#006FB3] focus:bg-white focus:ring-[20px] focus:ring-blue-500/5 leading-loose font-mono shadow-inner transition-all print:shadow-none print:p-0 print:bg-white print:text-black" contenteditable="true" style="font-family: 'Courier New', Courier, monospace; tab-size: 4;">
+                                ${p.script || 'ESCENA 1 - INTERIOR - DÍA\n\nEscribe el flujo narrativo aquí...'}
                             </div>
                         </div>
                     ` : ''}
@@ -624,7 +702,7 @@ const renderApp = () => {
             scriptEl.oninput = (e) => {
                 clearTimeout(debounceTimer);
                 debounceTimer = setTimeout(() => {
-                    window.saveScriptRealtime(p.id, e.target.innerText);
+                    window.saveScriptRealtime(p.id, e.target.innerHTML);
                 }, 1500);
             };
         }
