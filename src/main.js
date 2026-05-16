@@ -579,13 +579,13 @@ const renderApp = () => {
                                     <h3 class="font-black text-3xl text-[#0A132D] tracking-tighter">Guion Narrativo<span class="text-[#006FB3]">.</span></h3>
                                     <p class="text-[10px] font-black text-gray-500 uppercase tracking-widest mt-2 ml-1">Estilo Audiovisual Profesional</p>
                                 </div>
-                                <div class="flex flex-wrap items-center gap-2 bg-gray-50 p-2 rounded-3xl border border-gray-100 shadow-inner">
-                                    <button onclick="window.formatScriptBold()" class="w-10 h-10 rounded-xl bg-white flex items-center justify-center font-black text-sm hover:bg-[#006FB3] hover:text-white transition-all shadow-sm border border-gray-100">B</button>
-                                    <button onclick="window.insertSceneCut()" class="px-4 h-10 rounded-xl bg-white flex items-center justify-center font-black text-[10px] uppercase tracking-widest hover:bg-[#006FB3] hover:text-white transition-all shadow-sm border border-gray-100 gap-2">🎬 Escena</button>
-                                    <div class="w-px h-6 bg-gray-200 mx-2"></div>
-                                    <button onclick="window.copyScript()" class="w-10 h-10 rounded-xl bg-white flex items-center justify-center text-lg hover:bg-[#006FB3] hover:text-white transition-all shadow-sm border border-gray-100">📋</button>
-                                    <button onclick="window.shareScript()" class="w-10 h-10 rounded-xl bg-white flex items-center justify-center text-lg hover:bg-[#006FB3] hover:text-white transition-all shadow-sm border border-gray-100">📤</button>
-                                    <button onclick="window.printScript()" class="w-10 h-10 rounded-xl bg-white flex items-center justify-center text-lg hover:bg-[#0A132D] hover:text-white transition-all shadow-sm border border-gray-100">🖨️</button>
+                                <div class="flex flex-wrap items-center gap-2 bg-gray-50 p-2 rounded-3xl border border-gray-200 shadow-inner">
+                                    <button onclick="window.formatScriptBold()" class="w-10 h-10 rounded-xl bg-white flex items-center justify-center font-black text-lg text-[#0A132D] hover:bg-[#006FB3] hover:text-white transition-all shadow-sm border border-gray-200">B</button>
+                                    <button onclick="window.insertSceneCut()" class="px-5 h-10 rounded-xl bg-white flex items-center justify-center font-black text-[11px] text-[#0A132D] uppercase tracking-wider hover:bg-[#006FB3] hover:text-white transition-all shadow-sm border border-gray-200 gap-2">🎬 ESCENA</button>
+                                    <div class="w-px h-6 bg-gray-300 mx-2"></div>
+                                    <button onclick="window.copyScript()" class="w-10 h-10 rounded-xl bg-white flex items-center justify-center text-lg hover:bg-[#006FB3] hover:text-white transition-all shadow-sm border border-gray-200">📋</button>
+                                    <button onclick="window.shareScript()" class="w-10 h-10 rounded-xl bg-white flex items-center justify-center text-lg hover:bg-[#006FB3] hover:text-white transition-all shadow-sm border border-gray-200">📤</button>
+                                    <button onclick="window.printScript()" class="w-10 h-10 rounded-xl bg-white flex items-center justify-center text-lg hover:bg-[#0A132D] hover:text-white transition-all shadow-sm border border-gray-200">🖨️</button>
                                 </div>
                             </div>
                             <div id="scriptContent" class="bg-[#F8F9FA] p-12 md:p-20 rounded-[3rem] text-sm md:text-base text-gray-800 min-h-[700px] outline-none border-2 border-transparent focus:border-[#006FB3] focus:bg-white focus:ring-[20px] focus:ring-blue-500/5 leading-loose font-mono shadow-inner transition-all print:shadow-none print:p-0 print:bg-white print:text-black" contenteditable="true" style="font-family: 'Courier New', Courier, monospace; tab-size: 4;">
