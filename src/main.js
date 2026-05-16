@@ -319,16 +319,18 @@ const renderLightbox = () => {
 };
 
 // --- Production Logic ---
-window.toggleFinalizado = (isExportado) => {
-    const select = document.getElementById('statusSelect');
-    const hint = document.getElementById('statusHint');
-    if (!select) return;
-    const finOption = Array.from(select.options).find(o => o.value === 'Finalizado');
-    if (finOption) {
-        finOption.disabled = !isExportado;
-        if (!isExportado && select.value === 'Finalizado') select.value = 'Producción';
-    }
-    if (hint) hint.classList.toggle('hidden', isExportado);
+const getStatusBadge = (status) => {
+    const config = {
+        'Idea': { bg: 'bg-amber-100', text: 'text-amber-700', icon: '💡' },
+        'Scripting': { bg: 'bg-blue-100', text: 'text-blue-700', icon: '📝' },
+        'Storyboard': { bg: 'bg-purple-100', text: 'text-purple-700', icon: '🎨' },
+        'Producción': { bg: 'bg-rose-100', text: 'text-rose-700', icon: '🎬' },
+        'Finalizado': { bg: 'bg-emerald-100', text: 'text-emerald-700', icon: '✅' }
+    };
+    const c = config[status] || { bg: 'bg-gray-100', text: 'text-gray-700', icon: '❓' };
+    return `<span class="flex items-center gap-1.5 px-3 py-1 rounded-full ${c.bg} ${c.text} text-[10px] font-black uppercase tracking-wider">
+        <span>${c.icon}</span> ${status}
+    </span>`;
 };
 
 const renderApp = () => {
@@ -349,25 +351,25 @@ const renderApp = () => {
         });
 
         root.innerHTML = `
-            <div class="p-6 max-w-6xl mx-auto">
-                <header class="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
+            <div class="p-6 max-w-7xl mx-auto min-h-screen">
+                <header class="flex flex-col md:flex-row justify-between items-start md:items-center mb-12 gap-6">
                     <div>
-                        <h1 class="text-4xl font-bold text-[#581845]">AV Content Planner</h1>
-                        <p class="text-gray-500">Pipeline de Producción</p>
+                        <h1 class="text-5xl font-black text-[#581845] tracking-tight">AV Planner<span class="text-[#C70039]">.</span></h1>
+                        <p class="text-gray-400 font-medium mt-2">Gestión de contenido de alto impacto</p>
                     </div>
-                    <button id="btnNewIdea" class="bg-[#C70039] text-white px-6 py-3 rounded-full font-bold shadow-lg hover:scale-105 transition-transform">
-                        + Nueva Idea
+                    <button id="btnNewIdea" class="bg-[#C70039] text-white px-8 py-4 rounded-2xl font-black shadow-2xl shadow-red-200 hover:scale-105 active:scale-95 transition-all flex items-center gap-2 uppercase tracking-widest text-sm">
+                        <span class="text-xl">+</span> Nueva Idea
                     </button>
                 </header>
 
-                <div class="mb-6 flex flex-col md:flex-row gap-4 items-center bg-white p-4 rounded-2xl shadow-sm border border-gray-100">
+                <div class="mb-10 flex flex-col md:flex-row gap-4 items-center bg-white/50 backdrop-blur-md p-2 rounded-3xl border border-white shadow-sm">
                     <div class="relative flex-1 w-full">
-                        <span class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">🔍</span>
-                        <input type="text" id="searchInput" value="${window.appState.searchQuery}" placeholder="Buscar por proyecto o encargado..." class="w-full pl-10 pr-4 py-2 bg-gray-50 rounded-xl border-none text-sm focus:ring-2 focus:ring-[#C70039]">
+                        <span class="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400">🔍</span>
+                        <input type="text" id="searchInput" value="${window.appState.searchQuery}" placeholder="Buscar proyectos, equipos o temas..." class="w-full pl-12 pr-4 py-4 bg-transparent rounded-2xl border-none text-lg focus:ring-0 placeholder:text-gray-300">
                     </div>
-                    <div class="flex items-center gap-2 w-full md:w-auto">
-                        <label class="text-xs font-bold text-gray-400 uppercase whitespace-nowrap">Ordenar:</label>
-                        <select id="sortSelect" class="bg-gray-50 border-none rounded-xl text-sm py-2 px-4 focus:ring-2 focus:ring-[#C70039]">
+                    <div class="flex items-center gap-3 px-4 border-l border-gray-100">
+                        <label class="text-[10px] font-black text-gray-400 uppercase tracking-tighter">Ordenar</label>
+                        <select id="sortSelect" class="bg-transparent border-none rounded-xl text-sm font-bold py-2 focus:ring-0 text-[#581845]">
                             <option value="date" ${window.appState.sortBy === 'date' ? 'selected' : ''}>Recientes</option>
                             <option value="title" ${window.appState.sortBy === 'title' ? 'selected' : ''}>Título</option>
                             <option value="status" ${window.appState.sortBy === 'status' ? 'selected' : ''}>Estatus</option>
@@ -375,41 +377,42 @@ const renderApp = () => {
                     </div>
                 </div>
 
-                <div class="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden">
-                    <div class="hidden md:grid grid-cols-12 gap-4 p-4 bg-gray-50 border-b border-gray-100 text-xs font-bold text-gray-400 uppercase tracking-widest">
-                        <div class="col-span-1 text-center">Status</div>
-                        <div class="col-span-4">Proyecto / Encargados</div>
-                        <div class="col-span-2">Progreso</div>
-                        <div class="col-span-3">Fecha</div>
-                        <div class="col-span-2 text-right">Acción</div>
-                    </div>
-                    <div class="divide-y divide-gray-50">
-                        ${filteredProjects.map(p => `
-                            <div data-id="${p.id}" class="project-row grid grid-cols-12 gap-4 p-4 items-center hover:bg-gray-50 cursor-pointer transition-colors">
-                                <div class="col-span-2 md:col-span-1 text-2xl text-center">${getStatusIcon(p.status)}</div>
-                                <div class="col-span-10 md:col-span-4">
-                                    <h3 class="font-bold text-gray-800">${p.title}</h3>
-                                    <div class="flex items-center gap-2 mt-1">
-                                        <span class="bg-gray-100 px-2 py-0.5 rounded text-[10px] font-bold text-gray-500">${p.category}</span>
-                                        ${p.team ? `<span class="text-[10px] text-[#C70039] font-medium">👥 ${p.team}</span>` : ''}
-                                    </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    ${filteredProjects.map(p => `
+                        <div data-id="${p.id}" class="project-card group bg-white p-6 rounded-[2.5rem] shadow-sm border border-gray-100 hover:shadow-2xl hover:shadow-gray-200/50 hover:-translate-y-1 transition-all duration-500 cursor-pointer flex flex-col h-full">
+                            <div class="flex justify-between items-start mb-6">
+                                ${getStatusBadge(p.status)}
+                                <span class="text-[10px] font-bold text-gray-300 uppercase tracking-widest">${new Date(p.createdAt).toLocaleDateString()}</span>
+                            </div>
+                            
+                            <div class="flex-1">
+                                <h3 class="text-2xl font-bold text-gray-800 leading-tight group-hover:text-[#C70039] transition-colors mb-2">${p.title}</h3>
+                                <p class="text-gray-400 text-sm line-clamp-2 mb-4 font-medium">${p.description || 'Sin descripción adicional.'}</p>
+                            </div>
+
+                            <div class="mt-6 pt-6 border-t border-gray-50 flex items-center justify-between">
+                                <div class="flex flex-col">
+                                    <span class="text-[9px] font-black text-gray-300 uppercase tracking-tighter mb-1">Encargado</span>
+                                    <span class="text-xs font-bold text-[#581845] flex items-center gap-1">
+                                        <span class="w-2 h-2 rounded-full bg-[#C70039]"></span>
+                                        ${p.team || 'Sin asignar'}
+                                    </span>
                                 </div>
-                                <div class="col-span-12 md:col-span-2">
-                                    <div class="w-full bg-gray-100 rounded-full h-1.5 overflow-hidden">
-                                        <div class="bg-[#C70039] h-full transition-all duration-1000" style="width: ${getStatusProgress(p.status)}%"></div>
-                                    </div>
-                                    <span class="text-[9px] font-bold text-gray-400 uppercase mt-1 block">${p.status}</span>
-                                </div>
-                                <div class="hidden md:block col-span-3 text-sm text-gray-400">${new Date(p.createdAt).toLocaleDateString()}</div>
-                                <div class="col-span-12 md:col-span-2 text-right flex items-center justify-end gap-3">
-                                    <button onclick="event.stopPropagation(); window.deleteProject('${p.id}')" class="p-2 text-gray-300 hover:text-red-500 hover:bg-red-50 rounded-full transition-all" title="Eliminar">
-                                        🗑️
-                                    </button>
-                                    <span class="text-[#C70039] font-bold text-sm whitespace-nowrap">Gestionar ➔</span>
+                                <div class="w-12 h-12 rounded-2xl bg-gray-50 flex items-center justify-center group-hover:bg-[#581845] group-hover:text-white transition-all">
+                                    <span class="text-xl font-bold">→</span>
                                 </div>
                             </div>
-                        `).join('')}
-                    </div>
+                        </div>
+                    `).join('')}
+                    
+                    <!-- Empty State / Add Card -->
+                    ${filteredProjects.length === 0 ? `
+                        <div class="col-span-full py-20 flex flex-col items-center justify-center text-center">
+                            <div class="text-6xl mb-4">🏜️</div>
+                            <h3 class="text-2xl font-bold text-gray-400">No encontramos lo que buscas</h3>
+                            <p class="text-gray-300 mt-2">Prueba con otros términos o crea una nueva idea.</p>
+                        </div>
+                    ` : ''}
                 </div>
             </div>
         `;
@@ -425,7 +428,7 @@ const renderApp = () => {
             };
         }
         document.getElementById('sortSelect').onchange = (e) => { window.appState.sortBy = e.target.value; renderApp(); };
-        document.querySelectorAll('.project-row').forEach(row => row.onclick = () => window.viewDetail(row.dataset.id));
+        document.querySelectorAll('.project-card').forEach(card => card.onclick = () => window.viewDetail(card.dataset.id));
         
     } else if (window.appState.view === 'new') {
         root.innerHTML = `
