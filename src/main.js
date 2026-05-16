@@ -396,55 +396,82 @@ const renderApp = () => {
         });
 
         root.innerHTML = `
-            <div class="p-10 md:p-20 max-w-[1800px] mx-auto min-h-screen">
+            <div class="p-10 md:p-20 max-w-[1600px] mx-auto min-h-screen">
                 <header class="mb-24 flex flex-col md:flex-row justify-between items-end gap-10">
                     <div class="flex-1">
-                        <div class="w-20 h-3 bg-brand-primary mb-6"></div>
-                        <h1 class="text-7xl font-black text-brand-dark tracking-tighter leading-none mb-4">Content<br>Pipeline</h1>
-                        <p class="text-xs font-black uppercase tracking-[0.5em] text-brand-gray">Operador: ${window.appState.userName}</p>
+                        <div class="w-20 h-3 bg-brand-accent mb-6 shadow-[0_0_15px_rgba(247,148,30,0.5)]"></div>
+                        <h1 class="text-7xl font-black text-white tracking-tighter leading-none mb-4 drop-shadow-xl">Content<br>Pipeline</h1>
+                        <p class="text-[11px] font-black uppercase tracking-[0.5em] text-white/60 bg-white/5 inline-block px-4 py-2 border border-white/10">Operador: ${window.appState.userName}</p>
                     </div>
                     
                     <div class="flex flex-col gap-6 w-full md:w-auto">
-                        <div class="flex items-center gap-4 border-b-2 border-brand-dark pb-4">
-                            <span class="text-xs font-black uppercase tracking-widest text-brand-gray">Buscar:</span>
-                            <input type="text" id="searchInput" value="${window.appState.searchQuery}" placeholder="..." class="bg-transparent outline-none font-black text-brand-dark uppercase text-sm">
+                        <div class="flex items-center gap-4 border-b-2 border-white/30 pb-4 group focus-within:border-brand-accent transition-colors">
+                            <span class="text-[10px] font-black uppercase tracking-widest text-white/80">🔍 Buscar:</span>
+                            <input type="text" id="searchInput" value="${window.appState.searchQuery}" placeholder="..." class="bg-transparent outline-none font-black text-white uppercase text-sm placeholder:text-white/20 w-48 focus:w-64 transition-all">
                         </div>
                         <div class="flex flex-wrap items-center gap-4">
-                            <select id="sortSelect" class="bg-transparent border-none text-[10px] font-black uppercase tracking-widest outline-none cursor-pointer hover:text-brand-accent">
-                                <option value="date" ${window.appState.sortBy === 'date' ? 'selected' : ''}>Fecha</option>
-                                <option value="title" ${window.appState.sortBy === 'title' ? 'selected' : ''}>Título</option>
-                                <option value="status" ${window.appState.sortBy === 'status' ? 'selected' : ''}>Estado</option>
+                            <select id="sortSelect" class="bg-transparent border-none text-[10px] font-black uppercase tracking-widest outline-none cursor-pointer hover:text-brand-accent text-white/80 focus:text-white transition-colors">
+                                <option value="date" ${window.appState.sortBy === 'date' ? 'selected' : ''} class="bg-brand-primary">Ordenar por Fecha</option>
+                                <option value="title" ${window.appState.sortBy === 'title' ? 'selected' : ''} class="bg-brand-primary">Ordenar por Título</option>
+                                <option value="status" ${window.appState.sortBy === 'status' ? 'selected' : ''} class="bg-brand-primary">Ordenar por Estado</option>
                             </select>
-                            <button id="btnNewIdea" class="btn-swiss-primary text-[10px]">+ Nueva Iniciativa</button>
-                            <button onclick="location.reload()" class="btn-swiss-outline text-[10px]">Cerrar Sesión</button>
+                            <button id="btnNewIdea" class="btn-swiss-primary text-[10px] shadow-lg shadow-brand-accent/20">+ Nueva Iniciativa</button>
+                            <button onclick="location.reload()" class="btn-swiss-outline text-[10px] border-white/40 text-white/90 hover:border-white hover:text-white backdrop-blur-sm">Cerrar Sesión</button>
                         </div>
                     </div>
                 </header>
 
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-x-12 gap-y-24">
+                <div class="space-y-4">
+                    <div class="list-header hidden md:flex">
+                        <div class="flex-1 text-[10px] font-black uppercase tracking-[0.3em] text-white/30">Identificación / Proyecto</div>
+                        <div class="w-40 text-[10px] font-black uppercase tracking-[0.3em] text-white/30">Categoría</div>
+                        <div class="w-40 text-[10px] font-black uppercase tracking-[0.3em] text-white/30 text-center">Estado</div>
+                        <div class="w-48 text-[10px] font-black uppercase tracking-[0.3em] text-white/30">Lead / Responsable</div>
+                        <div class="w-64 text-[10px] font-black uppercase tracking-[0.3em] text-white/30">Pipeline Progress</div>
+                    </div>
+
                     ${filteredProjects.map(p => {
                         const progress = getStatusProgress(p.status);
                         return `
-                            <div data-id="${p.id}" class="project-row group cursor-pointer border-t-4 border-brand-dark pt-8 transition-all hover:translate-y-[-8px]">
-                                <div class="mb-8 flex justify-between items-start">
-                                    <span class="text-[9px] font-black uppercase tracking-[0.3em] text-brand-gray">${p.category}</span>
+                            <div data-id="${p.id}" class="project-row list-row group">
+                                <div class="flex-1 flex flex-col gap-2">
+                                    <span class="text-[8px] font-black text-brand-accent uppercase tracking-widest">REF: ${p.id.substring(0,8)}</span>
+                                    <h3 class="text-2xl font-black text-white group-hover:text-brand-accent transition-colors">${p.title}</h3>
+                                </div>
+                                
+                                <div class="w-40 shrink-0">
+                                    <span class="text-[10px] font-black uppercase tracking-widest text-white/40">${p.category}</span>
+                                </div>
+
+                                <div class="w-40 shrink-0 text-center">
                                     ${getStatusBadge(p.status)}
                                 </div>
-                                <h3 class="text-3xl font-black text-brand-dark mb-6 group-hover:text-brand-primary transition-colors">${p.title}</h3>
-                                <p class="text-xs font-medium text-brand-gray mb-10 line-clamp-3 leading-relaxed">${p.description || 'SIN ESPECIFICACIÓN ESTRATÉGICA.'}</p>
+
+                                <div class="w-48 shrink-0 flex flex-col">
+                                    <span class="text-[10px] font-black text-white italic uppercase truncate">${p.team || '---'}</span>
+                                    <span class="text-[8px] font-medium text-white/20 uppercase tracking-widest mt-1">Sincronizado: ${new Date(p.createdAt).toLocaleDateString()}</span>
+                                </div>
+
+                                <div class="w-64 shrink-0 flex items-center gap-6">
+                                    <div class="flex-1 h-1 bg-white/10 overflow-hidden">
+                                        <div class="h-full bg-brand-accent transition-all duration-1000 shadow-[0_0_10px_rgba(247,148,30,0.4)]" style="width: ${progress}%"></div>
+                                    </div>
+                                    <span class="text-[10px] font-black text-white/60 w-10 text-right">${Math.round(progress)}%</span>
+                                </div>
                                 
-                                <div class="flex flex-col gap-4 border-t border-brand-light pt-6">
-                                    <div class="flex justify-between items-center">
-                                        <span class="text-[8px] font-black uppercase tracking-widest text-brand-gray">Responsable</span>
-                                        <span class="text-[10px] font-black text-brand-dark uppercase italic">${p.team || '---'}</span>
-                                    </div>
-                                    <div class="h-1 w-full bg-brand-light">
-                                        <div class="h-full bg-brand-primary" style="width: ${progress}%"></div>
-                                    </div>
+                                <div class="w-12 h-12 flex items-center justify-center text-white/20 group-hover:text-white transition-colors text-2xl font-black">
+                                    →
                                 </div>
                             </div>
                         `;
                     }).join('')}
+                    
+                    ${filteredProjects.length === 0 ? `
+                        <div class="py-40 text-center border-2 border-dashed border-white/10">
+                            <h3 class="text-4xl font-black text-white/5 uppercase tracking-[0.4em]">Sin Registros Activos</h3>
+                            <p class="text-white/20 font-bold mt-4">No se encontraron iniciativas que coincidan con los parámetros.</p>
+                        </div>
+                    ` : ''}
                 </div>
             </div>
         `;
