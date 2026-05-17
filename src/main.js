@@ -16,7 +16,8 @@ const loadData = async () => {
         window.appState.projects = data.map(p => ({
             ...p,
             status: p.status || p.estado || 'Idea',
-            createdAt: p.createdat || p.createdAt || new Date().toISOString()
+            createdAt: p.createdat || p.createdAt || new Date().toISOString(),
+            updatedAt: p.updatedat || p.updatedAt || p.createdat || p.createdAt || new Date().toISOString()
         }));
         if (window.appState.view === 'detail' && window.appState.currentProject) {
             const updated = window.appState.projects.find(p => p.id === window.appState.currentProject.id);
