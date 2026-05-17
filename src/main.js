@@ -96,6 +96,18 @@ window.downloadPDF = async (event) => {
         content.innerHTML = el.innerHTML;
         content.style.cssText = 'font-family: Courier, monospace; font-size: 14px; line-height: 1.6; color: black; white-space: pre-wrap; word-wrap: break-word;';
         
+        // Fix: html2canvas inline background shift bug
+        const spans = content.querySelectorAll('span');
+        spans.forEach(span => {
+            if (span.style.backgroundColor === 'black' || span.style.backgroundColor === 'rgb(0, 0, 0)') {
+                span.style.lineHeight = '1.2';
+                span.style.paddingTop = '0px';
+                span.style.paddingBottom = '0px';
+                span.style.boxDecorationBreak = 'clone';
+                span.style.WebkitBoxDecorationBreak = 'clone';
+            }
+        });
+
         container.appendChild(header);
         container.appendChild(content);
         document.body.appendChild(container);
