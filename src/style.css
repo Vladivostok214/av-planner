@@ -109,34 +109,7 @@
   .detail-nav-btn.active {
     @apply border-brand-primary bg-gradient-to-br from-brand-primary to-blue-600 text-white shadow-[0_15px_40px_rgba(0,0,0,0.15)] dark:shadow-[0_15px_40px_rgba(59,130,246,0.2)] transform scale-105;
   }
-  
-  .work-header {
-    @apply sticky top-0 z-20 backdrop-blur-xl bg-brand-light/70 shadow-lg border-b border-brand-hairline;
-  }
 
-  .loading-overlay {
-    @apply fixed inset-0 z-[200] bg-brand-paper/40 backdrop-blur-xl flex items-center justify-center pointer-events-none opacity-0 transition-opacity duration-500;
-  }
-
-  .loading-overlay.active {
-    @apply pointer-events-auto opacity-100;
-  }
-
-  /* Accessibility fix for delete button in dark mode */
-  .dark .btn-delete-contrast {
-    @apply border-rose-500/50 text-rose-400 hover:bg-rose-500 hover:text-white hover:shadow-[0_0_20px_rgba(244,63,94,0.3)];
-  }
-}
-
-/* LOADING SPINNER */
-.spinner {
-  @apply w-14 h-14 border-[5px] border-brand-hairline border-t-brand-primary rounded-full animate-spin shadow-2xl;
-}
-
-  /* LOADING SPINNER */
-  .spinner {
-  @apply w-12 h-12 border-4 border-brand-hairline border-t-brand-primary rounded-full animate-spin;
-  }
   .detail-nav-btn .num {
     @apply text-[10px] font-black opacity-30 uppercase tracking-widest;
   }
@@ -155,6 +128,28 @@
   
   .detail-nav-btn.active .icon {
     @apply grayscale-0 opacity-100 scale-110;
+  }
+  
+  .work-header {
+    @apply sticky top-0 z-20 backdrop-blur-xl bg-brand-light/70 shadow-lg border-b border-brand-hairline;
+  }
+
+  .loading-overlay {
+    @apply fixed inset-0 z-[200] bg-brand-paper/40 backdrop-blur-xl flex items-center justify-center pointer-events-none opacity-0 transition-opacity duration-500;
+  }
+
+  .loading-overlay.active {
+    @apply pointer-events-auto opacity-100;
+  }
+
+  /* Accessibility fix for delete button in dark mode */
+  .dark .btn-delete-contrast {
+    @apply border-rose-500/50 text-rose-400 hover:bg-rose-500 hover:text-white hover:shadow-[0_0_20px_rgba(244,63,94,0.3)];
+  }
+
+  /* LOADING SPINNER */
+  .spinner {
+    @apply w-14 h-14 border-[5px] border-brand-hairline border-t-brand-primary rounded-full animate-spin shadow-2xl;
   }
 }
 
