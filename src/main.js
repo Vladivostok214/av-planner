@@ -94,7 +94,7 @@ window.downloadPDF = async (event) => {
         
         const content = document.createElement('div');
         content.innerHTML = el.innerHTML;
-        content.style.cssText = 'font-family: Courier, monospace; font-size: 14px; line-height: 1.6; color: black;';
+        content.style.cssText = 'font-family: Courier, monospace; font-size: 14px; line-height: 1.6; color: black; white-space: pre-wrap; word-wrap: break-word;';
         
         container.appendChild(header);
         container.appendChild(content);
@@ -110,10 +110,23 @@ window.downloadPDF = async (event) => {
         const imgData = canvas.toDataURL('image/png');
         const pdf = new jsPDF('p', 'mm', 'a4');
         const pdfW = pdf.internal.pageSize.getWidth();
+        const pdfH = pdf.internal.pageSize.getHeight();
         const imgW = pdfW - 20; // 10mm margins
         const imgH = (canvas.height * imgW) / canvas.width;
 
-        pdf.addImage(imgData, 'PNG', 10, 10, imgW, imgH);
+        let heightLeft = imgH;
+        let position = 10; // Top margin
+
+        pdf.addImage(imgData, 'PNG', 10, position, imgW, imgH);
+        heightLeft -= (pdfH - 20);
+
+        while (heightLeft > 0) {
+            position = position - pdfH + 20; // Move up to draw the next segment
+            pdf.addPage();
+            pdf.addImage(imgData, 'PNG', 10, position, imgW, imgH);
+            heightLeft -= (pdfH - 20);
+        }
+
         pdf.save("GUION_" + p.title.replace(/\s+/g, '_') + ".pdf");
         
         document.body.removeChild(container);

@@ -1,51 +1,43 @@
 # AV Content Planner - Project Context
 
 ## Project Overview
-AV Content Planner is a comprehensive Single Page Application (SPA) designed for the internal management and planning of audiovisual content for marketing teams. It centralizes the workflow from the initial idea/brief to final production tracking.
+AV Content Planner is a professional Single Page Application (SPA) designed for the internal management of audiovisual content for marketing teams. It follows a **Sovereign-Tech** philosophy, ensuring all data and assets are locally or self-hosted.
 
 ### Core Features
-- **Real-time Dashboard:** Visualizes production metrics using dynamic charts.
-- **Idea Management:** Advanced forms for capturing briefs, core themes, and initial scripts, now with **instant deletion** support.
-- **Multi-device Sync:** Seamless real-time synchronization between PC and mobile via Firestore.
-- **Self-Healing Data:** Automated seeding mechanism to restore core ideas if missing.
-- **360° Detail View:** Includes an integrated script editor, interactive visual storyboard (CSS Grid-based), and video progress preview.
-- **Cloud Persistence:** Automatic synchronization via Firebase/Firestore for collaborative and remote work.
+- **Sovereign Backend:** Fully integrated with Google Sheets via custom Apps Script API. Zero dependence on Firebase.
+- **Manual Persistence:** Data is pulled on load and only pushed to the cloud when manually saved, preventing data loss during active editing.
+- **Professional Script Editor:** Specialized tools for Scene Cuts, high-contrast highlighting, and standard script formatting. Support for Ctrl+Z.
+- **Visual Register:** Integrated storyboard engine with image compression and lightbox.
+- **High-Fidelity Export:** Pixel-perfect PDF generation (PNG-based) and native system sharing.
 
 ## Technical Stack
 - **Frontend:** HTML5, Tailwind CSS, Vite (Build Tool).
-- **Backend/Persistence:** Firebase (Auth & Firestore) for real-time data synchronization.
-- **Design Philosophy:** Bento Box / Material Design 3 aesthetic with Unicode icons.
+- **Backend/Persistence:** Google Sheets (via Google Apps Script Web App API).
+- **Assets:** Localized fonts (`Montserrat`, `JetBrains Mono`) - 0% external CDN dependency.
+- **Libraries:** `jspdf`, `html2canvas` for document export.
 
 ## Key Files
-- `index.html`: The entry point for the application.
-- `src/main.js`: The core application logic, routing, and Firebase integration.
-- `src/style.css`: Main Tailwind CSS entry point.
-- `package.json`: Project dependencies and scripts.
+- `index.html`: Application entry point.
+- `src/main.js`: Core sovereign logic, routing, and manual persistence adapter.
+- `src/style.css`: UI/UX design tokens and component styling.
+- `public/fonts/`: Localized brand typography assets.
 
 ## Development Conventions
-- **Modular Architecture:** The project uses a Vite-based modular structure for better maintainability and performance.
-- **Iconography:** Do not use SVG files. Use Unicode icons or CSS-based styling for interactive elements.
-- **Label Formatting:** Graph labels are automatically wrapped at 16 characters for optimal readability.
-- **Deployment:** Optimized for hosting on GitHub Pages.
+- **Sovereign-First:** Never add external cloud dependencies (CDNs, SaaS APIs) without a local fallback or bridge.
+- **Design Philosophy:** Professional SaaS aesthetic with high contrast, 2px borders, and Montserrat-based hierarchy.
+- **Deployment:** Optimized for Vercel/GitHub Pages with environment variable support for the Sheets API URL.
 
 ## Agent Persona & Specialized Standards
-### Persona: Senior Full-Stack Architect (AV Content Specialist)
-As the specialized agent for this project, you operate as a Senior Architect with a focus on high-performance marketing tools. Your goals are:
-1. **Performance First:** Every change must maintain or improve Lighthouse scores.
-2. **Aesthetic Rigor:** Adhere strictly to the "Bento Box" / Material Design 3 aesthetic. Use consistent rounding (`rounded-3xl`), subtle shadows, and vibrant accent colors (`#C70039`).
-3. **Data Integrity:** Protect the Firebase/Firestore structure. Never modify schemas without a migration plan.
+### Persona: Sovereign Full-Stack Architect
+1. **IP Protection:** All data must reside in the user's controlled infrastructure (Drive/Sheets).
+2. **Performance:** Bundle size must be kept minimal (Firebase removal reduced bundle from ~400KB to ~35KB).
+3. **UX Integrity:** UI must be localized to Spanish. Use "Actualización Optimista" for all local edits.
 
 ### Specialized Workflows
-- **Optimization:** Use the `web-optimizer` skill for any UI/UX or performance task.
-- **Review:** Use the `code-review` extension before confirming any complex logic change.
-- **Security:** Run `/security:analyze` whenever adding new dependencies or modifying authentication logic.
-
-### Design Tokens (Tailwind)
-- **Primary:** `#581845` (Deep Purple)
-- **Accent:** `#C70039` (Crimson)
-- **Warning:** `#FF5733` (Orange)
-- **Highlight:** `#FFC300` (Yellow)
-- **Radius:** `rounded-2xl` for cards, `rounded-full` for buttons.
+- **PDF Logic:** Always use the `html2canvas` snapshot method in `src/main.js` to ensure visual parity.
+- **Manual Sync:** Ensure every editable section has a dedicated "GUARDAR" button that triggers the Sheets POST action.
 
 ## Contextual Note
-This project was initially explored and organized from a subdirectory into a dedicated "AV Planner Project" folder within the user's Documents. It is linked to the repository: `https://github.com/Vladivostok214/av-planner`.
+This project achieved full technological sovereignty in May 2026 by removing Firebase and migrating to a Google Sheets-backed architecture, ensuring complete control over production intellectual property.
+---
+Repository: `https://github.com/Vladivostok214/av-planner`
