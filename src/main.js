@@ -1,6 +1,4 @@
 import './style.css';
-import { jsPDF } from "jspdf";
-import html2canvas from "html2canvas";
 
 const sheetsUrl = import.meta.env.VITE_SHEETS_API_URL;
 const isSheets = !!sheetsUrl;
