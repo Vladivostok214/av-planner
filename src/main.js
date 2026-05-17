@@ -35,6 +35,7 @@ const loadData = async () => {
 
 const updateProject = async (projectId, newData) => {
     const payload = { ...newData, lastEditor: window.appState.userName || 'Anonimo', updatedAt: new Date().toISOString() };
+    console.log("SENDING TO SHEETS:", payload); // Debugging
     const index = window.appState.projects.findIndex(p => p.id === projectId);
     if (index !== -1) {
         window.appState.projects[index] = { ...window.appState.projects[index], ...payload };
@@ -43,8 +44,10 @@ const updateProject = async (projectId, newData) => {
         }
     }
     if (isSheets) {
-        fetch(sheetsUrl, { method: 'POST', mode: 'no-cors', body: JSON.stringify({ action: 'update', id: projectId, ...payload }) });
-        window.isEditing = false;
+        try {
+            await fetch(sheetsUrl, { method: 'POST', mode: 'no-cors', body: JSON.stringify({ action: 'update', id: projectId, ...payload }) });
+            window.isEditing = false;
+        } catch (e) { console.error("Sheets Error:", e); }
     } else {
         const current = JSON.parse(localStorage.getItem('av_planner_projects') || '[]');
         const idx = current.findIndex(p => p.id === projectId);
