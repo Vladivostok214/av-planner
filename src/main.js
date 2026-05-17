@@ -96,15 +96,38 @@ window.downloadPDF = async (event) => {
         content.innerHTML = el.innerHTML;
         content.style.cssText = 'font-family: Courier, monospace; font-size: 14px; line-height: 1.6; color: black; white-space: pre-wrap; word-wrap: break-word;';
         
-        // Fix: html2canvas inline background shift bug
+        // Fix: html2canvas inline background wrapping bug
         const spans = content.querySelectorAll('span');
         spans.forEach(span => {
             if (span.style.backgroundColor === 'black' || span.style.backgroundColor === 'rgb(0, 0, 0)') {
-                span.style.lineHeight = '1.2';
-                span.style.paddingTop = '0px';
-                span.style.paddingBottom = '0px';
-                span.style.boxDecorationBreak = 'clone';
-                span.style.WebkitBoxDecorationBreak = 'clone';
+                span.style.backgroundColor = 'transparent';
+                
+                const walker = document.createTreeWalker(span, NodeFilter.SHOW_TEXT, null, false);
+                const nodes = [];
+                while (walker.nextNode()) nodes.push(walker.currentNode);
+                
+                nodes.forEach(node => {
+                    if (node.nodeValue.trim() === '') return;
+                    const fragment = document.createDocumentFragment();
+                    const parts = node.nodeValue.split(/(\s+)/);
+                    parts.forEach(part => {
+                        if (part === '') return;
+                        if (part.trim() === '') {
+                            fragment.appendChild(document.createTextNode(part));
+                        } else {
+                            const s = document.createElement('span');
+                            s.style.backgroundColor = 'black';
+                            s.style.color = 'white';
+                            s.style.display = 'inline-block';
+                            s.style.padding = '0.1em 0.2em';
+                            s.style.margin = '0 -0.1em'; // visually connect the black boxes slightly
+                            s.style.borderRadius = '2px';
+                            s.textContent = part;
+                            fragment.appendChild(s);
+                        }
+                    });
+                    node.parentNode.replaceChild(fragment, node);
+                });
             }
         });
 
