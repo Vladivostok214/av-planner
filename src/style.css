@@ -126,7 +126,6 @@
   .dark .btn-delete-contrast {
     @apply border-rose-400 text-rose-400 hover:bg-rose-400 hover:text-white;
   }
-  }
 
   /* LOADING SPINNER */
   .spinner {
