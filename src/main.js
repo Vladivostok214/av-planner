@@ -205,6 +205,39 @@ const getStatusBadge = (status) => {
     return '<span class="swiss-badge ' + c.bg + ' ' + c.text + ' border-2 border-brand-hairline px-3 py-1 text-[9px] font-bold"><span>' + c.icon + '</span> ' + status + '</span>';
 };
 
+window.addStoryboardLink = async (projectId) => {
+    const input = document.getElementById('sbLinkInput');
+    const url = input.value.trim();
+    if (!url) return;
+
+    let finalUrl = url;
+    // Auto-convert Google Drive links to direct viewing links
+    if (url.includes('drive.google.com')) {
+        const match = url.match(/\/d\/(.+?)\//) || url.match(/id=(.+?)(&|$)/);
+        if (match && match[1]) {
+            finalUrl = `https://lh3.googleusercontent.com/u/0/d/${match[1]}`;
+        }
+    }
+
+    const p = window.appState.currentProject;
+    if (!p.storyboardImages) p.storyboardImages = [];
+    
+    // Add to local state
+    if (Array.isArray(p.storyboardImages)) p.storyboardImages.push(finalUrl);
+    else {
+        const existing = p.storyboardImages ? p.storyboardImages.split(',').filter(x => x) : [];
+        existing.push(finalUrl);
+        p.storyboardImages = existing;
+    }
+    
+    input.value = '';
+    renderApp();
+    
+    // Optimistic save
+    const imgString = Array.isArray(p.storyboardImages) ? p.storyboardImages.join(',') : p.storyboardImages;
+    await updateProject(projectId, { storyboardImages: imgString });
+};
+
 const renderApp = () => {
     const root = document.getElementById('app');
     if (!document.getElementById('loadingOverlay')) {
