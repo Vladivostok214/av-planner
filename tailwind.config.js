@@ -8,14 +8,14 @@ export default {
     extend: {
       colors: {
         brand: {
-          primary: '#004A99', // Azul Puntaje Oficial
-          accent: '#F7941E',  // Naranja Puntaje (Energy)
+          primary: '#003A7A', // Azul más profundo para contraste
+          accent: '#F7941E',  
           dark: '#050D20',
-          paper: '#FBFBFA',   // Sunsama-inspired calm background
-          hairline: '#EAEAEA', // Subtle 1px border color
+          paper: '#FBFBFA',   
+          hairline: '#D1D5DB', // Gris más oscuro para bordes visibles
           light: '#F8F9FA',
-          tint: '#D1E1FF',    // High contrast tint for secondary text on blue
-          gray: '#94A3B8',
+          tint: '#D1E1FF',    
+          gray: '#475569', // Texto secundario más legible
         }
       },
       fontFamily: {

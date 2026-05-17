@@ -28,10 +28,10 @@ const loadData = async () => {
     try {
         const resp = await fetch(sheetsUrl);
         const data = await resp.json();
-                    const projects = data.map(p => ({
-                        ...p,
-                        status: p.status || p.estado // Maps 'estado' from Sheets to 'status' for UI
-                    }));
+        const projects = data.map(p => ({
+            ...p,
+            status: p.status || p.estado
+        }));
         
         window.appState.projects = projects;
         
@@ -86,7 +86,7 @@ const updateProject = async (projectId, newData) => {
 };
 
 const deleteProject = async (projectId) => {
-    if (!confirm("¿Estás seguro?")) return;
+    if (!confirm("¿Estás seguro de que deseas eliminar este proyecto?")) return;
     
     if (isSheets) {
         await fetch(sheetsUrl, { method: 'POST', mode: 'no-cors', body: JSON.stringify({ action: 'delete', id: projectId }) });
@@ -218,20 +218,21 @@ const resizeImage = (file) => {
 };
 
 const getStatusProgress = (status) => {
-    const stages = ['Idea', 'Scripting', 'Storyboard', 'Producción', 'Finalizado'];
-    return ((stages.indexOf(status) + 1) / stages.length) * 100;
+    const stages = ['Idea', 'Guionizado', 'Storyboard', 'Producción', 'Finalizado'];
+    const idx = stages.indexOf(status);
+    return idx === -1 ? 20 : ((idx + 1) / stages.length) * 100;
 };
 
 const getStatusBadge = (status) => {
     const config = {
         'Idea': { bg: 'bg-white', text: 'text-brand-dark', icon: '💡' },
-        'Scripting': { bg: 'bg-white', text: 'text-brand-dark', icon: '📝' },
+        'Guionizado': { bg: 'bg-white', text: 'text-brand-dark', icon: '📝' },
         'Storyboard': { bg: 'bg-white', text: 'text-brand-dark', icon: '🎨' },
         'Producción': { bg: 'bg-brand-primary', text: 'text-white', icon: '🎬' },
         'Finalizado': { bg: 'bg-brand-accent', text: 'text-brand-dark', icon: '✅' }
     };
     const c = config[status] || { bg: 'bg-white', text: 'text-brand-dark', icon: '❓' };
-    return `<span class="swiss-badge ${c.bg} ${c.text}">
+    return `<span class="swiss-badge ${c.bg} ${c.text} border border-brand-hairline shadow-sm">
         ${c.icon} ${status}
     </span>`;
 };
@@ -263,32 +264,32 @@ const renderApp = () => {
     }
     
     if (!window.appState.userName) {
-        root.innerHTML = `
-            <div class="flex items-center justify-center min-h-screen p-10 bg-brand-paper">
-                <div class="max-w-md w-full border border-brand-hairline bg-white p-12 rounded-xl shadow-soft">
+        root.innerHTML = \`
+            <div class="flex items-center justify-center min-h-screen p-10 bg-brand-paper text-brand-dark">
+                <div class="max-w-md w-full border-2 border-brand-hairline bg-white p-12 rounded-2xl shadow-soft">
                     <div class="mb-12">
-                        <div class="w-8 h-1 bg-brand-primary mb-6"></div>
-                        <h1 class="text-3xl font-semibold text-brand-dark tracking-tight leading-tight">Puntaje<br>Nacional</h1>
-                        <p class="text-[11px] font-medium uppercase tracking-[0.2em] mt-3 text-brand-gray">AV Content Pipeline / Terminal</p>
+                        <div class="w-12 h-1.5 bg-brand-primary mb-6"></div>
+                        <h1 class="text-4xl font-bold tracking-tight leading-tight">Puntaje<br>Nacional</h1>
+                        <p class="text-[12px] font-semibold uppercase tracking-[0.2em] mt-3 text-brand-gray">Terminal de Producción AV</p>
                     </div>
                     
                     <form id="loginForm" class="space-y-8">
                         <div>
-                            <label class="block text-[10px] font-semibold uppercase tracking-widest text-brand-gray mb-3">Operator ID</label>
-                            <input type="text" id="userNameInput" required placeholder="Your name" class="swiss-input">
+                            <label class="block text-[11px] font-bold uppercase tracking-widest text-brand-dark mb-3">ID de Operador</label>
+                            <input type="text" id="userNameInput" required placeholder="Tu nombre..." class="swiss-input border-brand-hairline focus:border-brand-primary">
                         </div>
-                        <button type="submit" class="btn-swiss-primary w-full flex items-center justify-between group">
-                            <span>Access System</span>
-                            <span class="group-hover:translate-x-1 transition-transform opacity-40">→</span>
+                        <button type="submit" class="btn-swiss-primary w-full flex items-center justify-between group py-5 px-8">
+                            <span class="font-bold">Acceder al Sistema</span>
+                            <span class="group-hover:translate-x-1 transition-transform opacity-70">→</span>
                         </button>
                     </form>
                     
-                    <div class="mt-16 pt-6 border-t border-brand-hairline">
-                        <p class="text-[9px] font-medium uppercase tracking-widest text-brand-gray/60 italic">Internal Production Tool v3.0</p>
+                    <div class="mt-16 pt-6 border-t border-brand-hairline text-center">
+                        <p class="text-[10px] font-bold uppercase tracking-widest text-brand-gray/60 italic">Herramienta Interna v3.5 SOBERANA</p>
                     </div>
                 </div>
             </div>
-        `;
+        \`;
         document.getElementById('loginForm').onsubmit = (e) => {
             e.preventDefault();
             const name = document.getElementById('userNameInput').value.trim();
@@ -306,92 +307,92 @@ const renderApp = () => {
         filteredProjects.sort((a, b) => {
             if (window.appState.sortBy === 'title') return a.title.localeCompare(b.title);
             if (window.appState.sortBy === 'status') {
-                const stages = ['Idea', 'Scripting', 'Storyboard', 'Producción', 'Finalizado'];
+                const stages = ['Idea', 'Guionizado', 'Storyboard', 'Producción', 'Finalizado'];
                 return stages.indexOf(b.status) - stages.indexOf(a.status);
             }
             return new Date(b.createdAt) - new Date(a.createdAt);
         });
 
-        root.innerHTML = `
+        root.innerHTML = \`
             <div class="p-8 md:p-12 max-w-[1400px] mx-auto min-h-screen">
-                <header class="mb-16 flex flex-col md:flex-row justify-between items-start md:items-center gap-8 border-b border-brand-hairline pb-12">
+                <header class="mb-16 flex flex-col md:flex-row justify-between items-start md:items-center gap-8 border-b-2 border-brand-hairline pb-12">
                     <div class="flex-1">
-                        <h1 class="text-2xl font-semibold text-brand-dark tracking-tight mb-2">Content Pipeline</h1>
+                        <h1 class="text-3xl font-bold text-brand-dark tracking-tight mb-2 uppercase">Panel de Producción</h1>
                         <div class="flex items-center gap-3">
-                            <span class="w-1.5 h-1.5 bg-brand-primary rounded-full"></span>
-                            <p class="text-[11px] font-medium text-brand-gray tracking-wide">Operator: <span class="text-brand-dark">${window.appState.userName}</span></p>
+                            <span class="w-2 h-2 bg-brand-primary rounded-full animate-pulse"></span>
+                            <p class="text-[12px] font-bold text-brand-gray tracking-wide">Operador: <span class="text-brand-dark underline">\${window.appState.userName}</span></p>
                         </div>
                     </div>
                     
-                    <div class="flex flex-wrap items-center gap-3">
-                        <div class="flex items-center gap-2 border border-brand-hairline bg-white px-4 py-2 rounded-md focus-within:border-brand-primary focus-within:ring-4 focus-within:ring-brand-primary/5 transition-all">
-                            <span class="text-[10px] text-brand-gray">🔍</span>
-                            <input type="text" id="searchInput" value="${window.appState.searchQuery}" placeholder="Filter projects..." class="bg-transparent outline-none font-medium text-brand-dark text-xs w-40">
+                    <div class="flex flex-wrap items-center gap-4">
+                        <div class="flex items-center gap-2 border-2 border-brand-hairline bg-white px-5 py-2.5 rounded-lg focus-within:border-brand-primary focus-within:ring-4 focus-within:ring-brand-primary/5 transition-all shadow-sm">
+                            <span class="text-sm">🔍</span>
+                            <input type="text" id="searchInput" value="\${window.appState.searchQuery}" placeholder="Filtrar proyectos..." class="bg-transparent outline-none font-semibold text-brand-dark text-sm w-48">
                         </div>
-                        <select id="sortSelect" class="bg-white border border-brand-hairline text-[11px] font-semibold px-4 py-2.5 rounded-md outline-none cursor-pointer hover:border-brand-gray transition-colors text-brand-gray">
-                            <option value="date" ${window.appState.sortBy === 'date' ? 'selected' : ''}>Recent</option>
-                            <option value="title" ${window.appState.sortBy === 'title' ? 'selected' : ''}>Alphabetical</option>
-                            <option value="status" ${window.appState.sortBy === 'status' ? 'selected' : ''}>Pipeline Stage</option>
+                        <select id="sortSelect" class="bg-white border-2 border-brand-hairline text-[12px] font-bold px-5 py-3 rounded-lg outline-none cursor-pointer hover:border-brand-primary transition-colors text-brand-dark shadow-sm">
+                            <option value="date" \${window.appState.sortBy === 'date' ? 'selected' : ''}>MÁS RECIENTE</option>
+                            <option value="title" \${window.appState.sortBy === 'title' ? 'selected' : ''}>ALFABÉTICO</option>
+                            <option value="status" \${window.appState.sortBy === 'status' ? 'selected' : ''}>ETAPA PIPELINE</option>
                         </select>
-                        <button id="btnNewIdea" class="btn-swiss-primary">+ New Project</button>
-                        <button onclick="location.reload()" class="btn-swiss-outline">Log Out</button>
+                        <button id="btnNewIdea" class="btn-swiss-primary shadow-lg">+ NUEVO PROYECTO</button>
+                        <button onclick="location.reload()" class="btn-swiss-outline border-2 font-bold px-6">SALIR</button>
                     </div>
                 </header>
 
-                <div class="space-y-3">
-                    <div class="list-header hidden md:flex">
-                        <div class="flex-1 text-[10px] font-semibold uppercase tracking-widest text-brand-gray/60">Project & Reference</div>
-                        <div class="w-32 text-[10px] font-semibold uppercase tracking-widest text-brand-gray/60">Strategy</div>
-                        <div class="w-32 text-[10px] font-semibold uppercase tracking-widest text-brand-gray/60 text-center">Status</div>
-                        <div class="w-40 text-[10px] font-semibold uppercase tracking-widest text-brand-gray/60">Lead</div>
-                        <div class="w-48 text-[10px] font-semibold uppercase tracking-widest text-brand-gray/60">Completion</div>
+                <div class="space-y-4">
+                    <div class="list-header hidden md:flex px-6 mb-2">
+                        <div class="flex-1 text-[11px] font-bold uppercase tracking-[0.2em] text-brand-gray">PROYECTO Y REFERENCIA</div>
+                        <div class="w-32 text-[11px] font-bold uppercase tracking-[0.2em] text-brand-gray">ESTRATEGIA</div>
+                        <div class="w-40 text-[11px] font-bold uppercase tracking-[0.2em] text-brand-gray text-center">ESTADO</div>
+                        <div class="w-40 text-[11px] font-bold uppercase tracking-[0.2em] text-brand-gray">RESPONSABLE</div>
+                        <div class="w-48 text-[11px] font-bold uppercase tracking-[0.2em] text-brand-gray">AVANCE</div>
                     </div>
 
-                    ${filteredProjects.map(p => {
+                    \${filteredProjects.map(p => {
                         const progress = getStatusProgress(p.status);
-                        return `
-                            <div data-id="${p.id}" class="project-row list-row group">
-                                <div class="list-row-active-accent"></div>
+                        return \`
+                            <div data-id="\${p.id}" class="project-row list-row group border-2 hover:border-brand-primary shadow-sm hover:shadow-md bg-white">
+                                <div class="list-row-active-accent w-2"></div>
                                 <div class="flex-1 flex flex-col gap-0.5">
-                                    <span class="text-[9px] font-semibold text-brand-primary uppercase tracking-wider">REF-${p.id.substring(0,6)}</span>
-                                    <h3 class="text-base font-semibold text-brand-dark group-hover:text-brand-primary transition-colors">${p.title}</h3>
+                                    <span class="text-[10px] font-bold text-brand-primary uppercase tracking-wider">\${p.id.startsWith('id-') ? 'NUEVO' : 'REF-' + p.id.substring(0,6)}</span>
+                                    <h3 class="text-lg font-bold text-brand-dark group-hover:text-brand-primary transition-colors">\${p.title}</h3>
                                 </div>
                                 
                                 <div class="w-32 shrink-0">
-                                    <span class="swiss-badge">${p.category}</span>
+                                    <span class="swiss-badge bg-brand-light text-brand-dark border-brand-hairline font-bold text-[10px]">\${p.category}</span>
                                 </div>
 
-                                <div class="w-32 shrink-0 text-center">
-                                    ${getStatusBadge(p.status)}
+                                <div class="w-40 shrink-0 text-center">
+                                    \${getStatusBadge(p.status)}
                                 </div>
 
-                                <div class="w-40 shrink-0 flex flex-col">
-                                    <span class="text-xs font-medium text-brand-dark truncate">${p.team || '---'}</span>
-                                    <span class="text-[10px] text-brand-gray/60 mt-0.5">${new Date(p.createdAt).toLocaleDateString()}</span>
+                                <div class="w-40 shrink-0 flex flex-col justify-center">
+                                    <span class="text-xs font-bold text-brand-dark truncate">\${p.team || '---'}</span>
+                                    <span class="text-[10px] font-medium text-brand-gray mt-0.5">\${new Date(p.createdAt).toLocaleDateString()}</span>
                                 </div>
 
                                 <div class="w-48 shrink-0 flex items-center gap-4">
-                                    <div class="flex-1 h-1.5 bg-brand-hairline overflow-hidden rounded-full">
-                                        <div class="h-full bg-brand-primary transition-all duration-1000" style="width: ${progress}%"></div>
+                                    <div class="flex-1 h-2 bg-brand-hairline overflow-hidden rounded-full border border-brand-hairline">
+                                        <div class="h-full bg-brand-primary transition-all duration-1000 shadow-inner" style="width: \${progress}%"></div>
                                     </div>
-                                    <span class="text-[10px] font-semibold text-brand-gray w-8 text-right">${Math.round(progress)}%</span>
+                                    <span class="text-[11px] font-bold text-brand-dark w-10 text-right">\${Math.round(progress)}%</span>
                                 </div>
                                 
-                                <div class="w-8 h-8 flex items-center justify-center text-brand-gray opacity-0 group-hover:opacity-100 group-hover:text-brand-primary transition-all text-xl font-bold">
+                                <div class="w-8 h-8 flex items-center justify-center text-brand-primary opacity-30 group-hover:opacity-100 transition-all text-2xl font-bold">
                                     →
                                 </div>
                             </div>
-                        `;
+                        \`;
                     }).join('')}
                     
-                    ${filteredProjects.length === 0 ? `
-                        <div class="py-24 text-center border border-dashed border-brand-hairline bg-white rounded-lg">
-                            <p class="text-brand-gray font-medium text-sm italic">No active projects found matching your search.</p>
+                    \${filteredProjects.length === 0 ? \`
+                        <div class="py-32 text-center border-2 border-dashed border-brand-hairline bg-white rounded-2xl">
+                            <p class="text-brand-gray font-bold text-lg italic uppercase tracking-widest">No se encontraron proyectos activos</p>
                         </div>
-                    ` : ''}
+                    \` : ''}
                 </div>
             </div>
-        `;
+        \`;
         document.getElementById('btnNewIdea').onclick = () => window.setView('new');
         const searchInput = document.getElementById('searchInput');
         if (searchInput) {
@@ -407,44 +408,44 @@ const renderApp = () => {
         document.querySelectorAll('.project-row').forEach(row => row.onclick = () => window.viewDetail(row.dataset.id));
         
     } else if (window.appState.view === 'new') {
-        root.innerHTML = `
-            <div class="p-10 md:p-20 max-w-4xl mx-auto min-h-screen">
-                <button id="btnBackToDashboard" class="btn-swiss-outline text-[10px] mb-20">← Dashboard</button>
+        root.innerHTML = \`
+            <div class="p-10 md:p-20 max-w-4xl mx-auto min-h-screen bg-brand-paper text-brand-dark">
+                <button id="btnBackToDashboard" class="btn-swiss-outline border-2 font-bold text-xs mb-16 shadow-sm">← VOLVER AL PANEL</button>
                 
-                <div class="mb-20">
-                    <div class="w-16 h-3 bg-brand-accent mb-6"></div>
-                    <h2 class="text-6xl font-black text-brand-dark tracking-tighter leading-none mb-4">Nueva<br>Iniciativa</h2>
-                    <p class="text-xs font-black uppercase tracking-[0.4em] text-brand-gray">Pipeline / Entry Form</p>
+                <div class="mb-16">
+                    <div class="w-20 h-4 bg-brand-accent mb-6 shadow-sm"></div>
+                    <h2 class="text-7xl font-bold tracking-tighter leading-none mb-4 uppercase">NUEVA<br>INICIATIVA</h2>
+                    <p class="text-sm font-bold uppercase tracking-[0.5em] text-brand-gray underline underline-offset-8">Registro de Producción</p>
                 </div>
 
-                <form id="ideaForm" class="space-y-20">
+                <form id="ideaForm" class="space-y-16 bg-white p-12 rounded-3xl border-2 border-brand-hairline shadow-soft">
                     <div>
-                        <label class="block text-[10px] font-black uppercase tracking-widest text-brand-gray mb-4">Título del Concepto</label>
-                        <input type="text" id="title" required class="swiss-input uppercase" placeholder="EJ: CAMP. INVIERNO">
+                        <label class="block text-[11px] font-bold uppercase tracking-[0.3em] text-brand-primary mb-4">Título del Concepto</label>
+                        <input type="text" id="title" required class="swiss-input uppercase text-2xl border-b-4 focus:border-brand-primary" placeholder="EJ: CAMPAÑA INVIERNO">
                     </div>
                     
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-20">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-12">
                         <div>
-                            <label class="block text-[10px] font-black uppercase tracking-widest text-brand-gray mb-4">Estrategia / Categoría</label>
-                            <select id="category" class="swiss-input uppercase cursor-pointer">
+                            <label class="block text-[11px] font-bold uppercase tracking-[0.3em] text-brand-primary mb-4">Estrategia / Categoría</label>
+                            <select id="category" class="swiss-input uppercase cursor-pointer border-b-4">
                                 <option>Social Media</option><option>Educativo</option><option>Institucional</option><option>Publicidad</option>
                             </select>
                         </div>
                         <div>
-                            <label class="block text-[10px] font-black uppercase tracking-widest text-brand-gray mb-4">Lead de Producción</label>
-                            <input type="text" id="team" class="swiss-input uppercase" placeholder="NOMBRE...">
+                            <label class="block text-[11px] font-bold uppercase tracking-[0.3em] text-brand-primary mb-4">Lead de Producción</label>
+                            <input type="text" id="team" class="swiss-input uppercase border-b-4" placeholder="NOMBRE DEL LÍDER...">
                         </div>
                     </div>
                     
                     <div>
-                        <label class="block text-[10px] font-black uppercase tracking-widest text-brand-gray mb-4">Brief Estratégico</label>
-                        <textarea id="description" rows="3" required class="swiss-input font-medium text-lg leading-relaxed" placeholder="DESCRIBA LOS OBJETIVOS..."></textarea>
+                        <label class="block text-[11px] font-bold uppercase tracking-[0.3em] text-brand-primary mb-4">Brief Estratégico</label>
+                        <textarea id="description" rows="4" required class="swiss-input font-medium text-xl leading-relaxed border-2 rounded-xl p-6" placeholder="DESCRIBA LOS OBJETIVOS Y EL CORE DEL CONTENIDO..."></textarea>
                     </div>
                     
-                    <button type="submit" class="btn-swiss-primary w-full py-10 text-lg">Ejecutar Lanzamiento ⚡</button>
+                    <button type="submit" class="btn-swiss-primary w-full py-10 text-2xl font-bold uppercase tracking-widest shadow-xl transform hover:-translate-y-1 active:scale-95 transition-all">Lanzar Iniciativa 🚀</button>
                 </form>
             </div>
-        `;
+        \`;
         document.getElementById('btnBackToDashboard').onclick = () => window.setView('dashboard');
         document.getElementById('ideaForm').onsubmit = async (e) => {
             e.preventDefault();
@@ -457,154 +458,208 @@ const renderApp = () => {
         const images = p.storyboardImages || [];
         const activeTab = window.appState.activeTab;
 
-        root.innerHTML = `
-            <div class="p-10 md:p-20 max-w-[1600px] mx-auto min-h-screen">
-                <button id="btnBackToDashboardDetail" class="btn-swiss-outline text-[10px] mb-20">← Volver</button>
+        root.innerHTML = \`
+            <div class="p-8 md:p-12 max-w-[1600px] mx-auto min-h-screen bg-brand-paper text-brand-dark">
+                <div class="flex justify-between items-center mb-12">
+                    <button id="btnBackToDashboardDetail" class="btn-swiss-outline border-2 font-bold text-xs shadow-sm">← PANEL GENERAL</button>
+                    <div class="flex items-center gap-4">
+                         <span class="text-[11px] font-bold uppercase tracking-widest text-brand-gray">Última Edición:</span>
+                         <span class="text-[11px] font-bold bg-brand-dark text-white px-3 py-1 rounded uppercase">\${p.lastEditor || 'Sistema'}</span>
+                    </div>
+                </div>
                 
-                <div class="mb-24 flex flex-col md:flex-row justify-between items-start gap-12">
-                    <div class="flex-1">
-                        <div class="flex items-center gap-4 mb-8">
-                            ${getStatusBadge(p.status)}
-                            <span class="text-[9px] font-black uppercase tracking-[0.4em] text-brand-gray">REF: ${p.id.substring(0,8)}</span>
+                <div class="grid grid-cols-1 xl:grid-cols-5 gap-12 items-start">
+                    <!-- Sidebar Informativo -->
+                    <div class="xl:col-span-2 space-y-8 sticky top-12">
+                        <div class="bg-white p-10 rounded-3xl border-2 border-brand-hairline shadow-soft space-y-8">
+                            <div class="flex items-center gap-4">
+                                \${getStatusBadge(p.status)}
+                                <span class="text-[10px] font-bold uppercase tracking-[0.4em] text-brand-gray">REF: \${p.id.substring(0,8)}</span>
+                            </div>
+                            
+                            <h1 class="text-5xl md:text-7xl font-bold tracking-tighter leading-[0.95] uppercase break-words">\${p.title}</h1>
+                            
+                            <p class="text-lg font-medium text-brand-gray leading-relaxed">\${p.description}</p>
+                            
+                            <div class="grid grid-cols-2 gap-4 border-t-2 border-brand-hairline pt-8">
+                                <div>
+                                    <p class="text-[9px] font-bold text-brand-gray uppercase tracking-widest mb-1">Categoría</p>
+                                    <p class="font-bold text-sm uppercase">\${p.category}</p>
+                                </div>
+                                <div>
+                                    <p class="text-[9px] font-bold text-brand-gray uppercase tracking-widest mb-1">Líder</p>
+                                    <p class="font-bold text-sm uppercase">\${p.team || 'Sin asignar'}</p>
+                                </div>
+                            </div>
                         </div>
-                        <h1 class="text-6xl md:text-8xl font-black text-brand-dark tracking-tighter leading-none mb-10 uppercase">${p.title}</h1>
-                        <div class="flex items-center gap-4 border-t-2 border-brand-dark pt-8">
-                            <span class="text-[10px] font-black uppercase tracking-widest text-brand-gray">Última Edición:</span>
-                            <span class="text-[10px] font-black text-brand-dark uppercase italic">${p.lastEditor || 'Sistema'}</span>
+
+                        <!-- Navegación de Pestañas Mejorada -->
+                        <div class="flex flex-col gap-3">
+                            <button onclick="window.setTab('guion')" class="detail-nav-btn \${activeTab === 'guion' ? 'active' : ''}">
+                                <span class="num">01</span>
+                                <span class="label">GUION NARRATIVO</span>
+                                <span class="icon">📝</span>
+                            </button>
+                            <button onclick="window.setTab('storyboard')" class="detail-nav-btn \${activeTab === 'storyboard' ? 'active' : ''}">
+                                <span class="num">02</span>
+                                <span class="label">REGISTRO VISUAL</span>
+                                <span class="icon">🎨</span>
+                            </button>
+                            <button onclick="window.setTab('produccion')" class="detail-nav-btn \${activeTab === 'produccion' ? 'active' : ''}">
+                                <span class="num">03</span>
+                                <span class="label">POST-PRODUCCIÓN</span>
+                                <span class="icon">🎬</span>
+                            </button>
+                            <button onclick="window.setTab('gestion')" class="detail-nav-btn \${activeTab === 'gestion' ? 'active' : ''}">
+                                <span class="num">04</span>
+                                <span class="label">AJUSTES Y CIERRE</span>
+                                <span class="icon">⚙️</span>
+                            </button>
                         </div>
                     </div>
-                    
-                    <div class="w-full md:w-auto flex flex-col gap-2">
-                        <button onclick="window.setTab('guion')" class="w-full text-left px-8 py-4 font-black uppercase tracking-widest text-xs border-l-8 ${activeTab === 'guion' ? 'border-brand-primary bg-brand-light text-brand-primary' : 'border-brand-light text-brand-gray hover:bg-brand-light transition-all'}">01. Guion Narrativo</button>
-                        <button onclick="window.setTab('storyboard')" class="w-full text-left px-8 py-4 font-black uppercase tracking-widest text-xs border-l-8 ${activeTab === 'storyboard' ? 'border-brand-primary bg-brand-light text-brand-primary' : 'border-brand-light text-brand-gray hover:bg-brand-light transition-all'}">02. Registro Visual</button>
-                        <button onclick="window.setTab('produccion')" class="w-full text-left px-8 py-4 font-black uppercase tracking-widest text-xs border-l-8 ${activeTab === 'produccion' ? 'border-brand-primary bg-brand-light text-brand-primary' : 'border-brand-light text-brand-gray hover:bg-brand-light transition-all'}">03. Post-Producción</button>
-                        <button onclick="window.setTab('gestion')" class="w-full text-left px-8 py-4 font-black uppercase tracking-widest text-xs border-l-8 ${activeTab === 'gestion' ? 'border-brand-primary bg-brand-light text-brand-primary' : 'border-brand-light text-brand-gray hover:bg-brand-light transition-all'}">04. Administración</button>
+
+                    <!-- Área de Trabajo -->
+                    <div class="xl:col-span-3 min-h-[800px]">
+                        <div class="bg-white rounded-3xl border-2 border-brand-hairline shadow-focus overflow-hidden">
+                            \${activeTab === 'guion' ? \`
+                                <div class="p-8 border-b-2 border-brand-hairline bg-brand-light flex justify-between items-center">
+                                    <h3 class="text-xl font-bold uppercase tracking-widest">Editor de Texto Técnico</h3>
+                                    <div class="flex gap-2">
+                                        <button onclick="window.formatScriptBold()" class="btn-swiss-outline py-2 px-4 text-[10px] font-bold bg-white">NEGRITA</button>
+                                        <button onclick="window.insertSceneCut()" class="btn-swiss-outline py-2 px-4 text-[10px] font-bold bg-white underline">CORTE</button>
+                                        <button onclick="window.printScript()" class="btn-swiss-primary py-2 px-6 text-[10px] font-bold">IMPRIMIR</button>
+                                    </div>
+                                </div>
+                                <div id="scriptContent" class="p-12 text-xl text-brand-dark min-h-[900px] outline-none font-mono leading-relaxed bg-brand-paper/50" contenteditable="true">
+                                    \${p.script || 'ESCENA 01 - ...'}
+                                </div>
+                            \` : ''}
+
+                            \${activeTab === 'storyboard' ? \`
+                                <div class="p-12">
+                                    <h3 class="text-3xl font-bold uppercase tracking-tighter mb-8">Storyboard / Referencias</h3>
+                                    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                                        \${images.map((img, idx) => \`<div onclick="window.openLightbox(\{idx})" class="aspect-video bg-brand-light border-2 border-brand-dark group relative cursor-pointer overflow-hidden rounded-xl shadow-sm">
+                                            <img src="\${img}" class="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-500 scale-105 group-hover:scale-100">
+                                            <div class="absolute bottom-0 left-0 bg-brand-dark text-white text-[9px] font-bold px-4 py-2 uppercase tracking-widest">Frame \${idx+1}</div>
+                                        </div>\`).join('')}
+                                        <div onclick="document.getElementById('sbUpload').click()" class="aspect-video border-4 border-dashed border-brand-hairline flex flex-col items-center justify-center cursor-pointer hover:bg-brand-primary hover:text-white transition-all group rounded-xl">
+                                            <span class="text-6xl font-bold mb-4 group-hover:rotate-90 transition-transform">+</span>
+                                            <span class="text-xs font-bold uppercase tracking-[0.3em]">Añadir Frame</span>
+                                        </div>
+                                        <input type="file" id="sbUpload" class="hidden" accept="image/jpeg, image/png" multiple onchange="window.handleImageUpload(event, '\${p.id}')">
+                                    </div>
+                                </div>
+                            \` : ''}
+
+                            \${activeTab === 'produccion' ? \`
+                                <div class="p-12 space-y-12">
+                                    <h3 class="text-4xl font-bold tracking-tighter uppercase">Calidad y Entrega</h3>
+                                    <div class="grid grid-cols-1 gap-6">
+                                        <label class="flex items-center gap-8 p-12 border-2 border-brand-hairline rounded-2xl cursor-pointer hover:bg-brand-light transition-all shadow-sm">
+                                            <input type="checkbox" id="chkMontaje" \${prod.montaje ? 'checked' : ''} class="w-10 h-10 accent-brand-primary">
+                                            <div class="flex flex-col">
+                                                <span class="text-2xl font-bold uppercase tracking-tighter">Montaje Base</span>
+                                                <span class="text-xs font-medium text-brand-gray uppercase">Sincronización inicial y estructura narrativa</span>
+                                            </div>
+                                        </label>
+                                        <label class="flex items-center gap-8 p-12 border-2 border-brand-hairline rounded-2xl cursor-pointer hover:bg-brand-light transition-all shadow-sm">
+                                            <input type="checkbox" id="chkEdicion" \${prod.edicion ? 'checked' : ''} class="w-10 h-10 accent-brand-primary">
+                                            <div class="flex flex-col">
+                                                <span class="text-2xl font-bold uppercase tracking-tighter">Color & Mix</span>
+                                                <span class="text-xs font-medium text-brand-gray uppercase">Corrección cromática y post de audio</span>
+                                            </div>
+                                        </label>
+                                        <label class="flex items-center gap-8 p-12 border-2 border-brand-hairline rounded-2xl cursor-pointer hover:bg-brand-light transition-all shadow-sm">
+                                            <input type="checkbox" id="chkSubtitulado" \${prod.subtitulado ? 'checked' : ''} class="w-10 h-10 accent-brand-primary">
+                                            <div class="flex flex-col">
+                                                <span class="text-2xl font-bold uppercase tracking-tighter">Gráficas & Subs</span>
+                                                <span class="text-xs font-medium text-brand-gray uppercase">Motion graphics, títulos y subtítulos</span>
+                                            </div>
+                                        </label>
+                                        <label class="flex items-center gap-8 p-12 border-4 border-brand-accent rounded-2xl cursor-pointer hover:bg-brand-accent/5 transition-all shadow-md bg-brand-accent/5">
+                                            <input type="checkbox" id="chkExportado" onchange="window.toggleFinalizado(this.checked)" \${prod.exportado ? 'checked' : ''} class="w-10 h-10 accent-brand-primary">
+                                            <div class="flex flex-col">
+                                                <span class="text-2xl font-bold uppercase tracking-tighter text-brand-primary">Exportación Final</span>
+                                                <span class="text-xs font-bold text-brand-accent uppercase italic">Habilita el estado "Finalizado" para entrega</span>
+                                            </div>
+                                        </label>
+                                    </div>
+                                    <div class="pt-8 text-center">
+                                        <button id="btnSyncProd" class="btn-swiss-primary px-12 py-5 text-lg font-bold">GUARDAR PROGRESO</button>
+                                    </div>
+                                </div>
+                            \` : ''}
+
+                            \${activeTab === 'gestion' ? \`
+                                <div class="p-12 space-y-16">
+                                    <h3 class="text-4xl font-bold tracking-tighter uppercase">Administración de Pipeline</h3>
+                                    <div class="grid grid-cols-1 md:grid-cols-2 gap-12">
+                                        <div>
+                                            <label class="block text-[11px] font-bold uppercase tracking-[0.2em] text-brand-gray mb-4">Asignar Líder</label>
+                                            <input type="text" id="teamInput" value="\${p.team || ''}" class="swiss-input uppercase border-b-2 font-bold">
+                                        </div>
+                                        <div>
+                                            <label class="block text-[11px] font-bold uppercase tracking-[0.2em] text-brand-gray mb-4">Fecha Límite</label>
+                                            <input type="date" id="dueDateInput" value="\${p.dueDate || ''}" class="swiss-input border-b-2 font-bold">
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <label class="block text-[11px] font-bold uppercase tracking-[0.2em] text-brand-gray mb-4">Estado del Proceso</label>
+                                        <select id="statusSelect" class="swiss-input uppercase border-b-2 font-bold text-xl">
+                                            <option value="Idea" \${p.status === 'Idea' ? 'selected' : ''}>Idea</option>
+                                            <option value="Guionizado" \${p.status === 'Guionizado' ? 'selected' : ''}>Guionizado</option>
+                                            <option value="Storyboard" \${p.status === 'Storyboard' ? 'selected' : ''}>Storyboard</option>
+                                            <option value="Producción" \${p.status === 'Producción' ? 'selected' : ''}>Producción</option>
+                                            <option value="Finalizado" \${p.status === 'Finalizado' ? 'selected' : ''} \${!prod.exportado && p.status !== 'Finalizado' ? 'disabled' : ''}>✅ Finalizado</option>
+                                        </select>
+                                    </div>
+                                    <div class="flex flex-col md:flex-row gap-6 pt-12">
+                                        <button id="btnSaveDetail" class="btn-swiss-primary flex-1 py-10 text-2xl font-bold uppercase tracking-widest shadow-xl">Sincronizar Datos ⚡</button>
+                                        <button onclick="window.deleteProject('\${p.id}')" class="btn-swiss-outline px-12 py-10 text-brand-accent border-brand-accent border-2 font-bold hover:bg-brand-accent hover:text-white transition-all uppercase tracking-widest">Eliminar</button>
+                                    </div>
+                                </div>
+                            \` : ''}
+                        </div>
                     </div>
                 </div>
 
-                <div class="swiss-container">
-                    ${activeTab === 'guion' ? `
-                        <div class="grid grid-cols-1 lg:grid-cols-4 gap-20">
-                            <div class="lg:col-span-1">
-                                <h3 class="text-xl mb-6">Editor v2</h3>
-                                <p class="text-[10px] font-medium text-brand-gray leading-relaxed uppercase tracking-widest italic">Utilice el panel para formatear el texto técnico. El autoguardado está activo.</p>
-                                <div class="flex flex-col gap-4 mt-12">
-                                    <button onclick="window.formatScriptBold()" class="btn-swiss-outline text-left">Resaltar (B)</button>
-                                    <button onclick="window.insertSceneCut()" class="btn-swiss-outline text-left">Corte Escena</button>
-                                    <button onclick="window.printScript()" class="btn-swiss-primary text-left">Imprimir</button>
-                                </div>
-                            </div>
-                            <div class="lg:col-span-3">
-                                <div id="scriptContent" class="bg-brand-light p-16 text-lg text-brand-dark min-h-[800px] outline-none border-l-4 border-brand-dark font-mono leading-relaxed print:bg-white print:p-0" contenteditable="true">
-                                    ${p.script || 'ESCENA 01 - ...'}
-                                </div>
-                            </div>
-                        </div>
-                    ` : ''}
-
-                    ${activeTab === 'storyboard' ? `
-                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                            ${images.map((img, idx) => `<div onclick="window.openLightbox(${idx})" class="aspect-video bg-brand-light border border-brand-dark group relative cursor-pointer overflow-hidden">
-                                <img src="${img}" class="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all">
-                                <div class="absolute bottom-0 left-0 bg-brand-dark text-white text-[8px] font-black px-4 py-2 uppercase tracking-widest">Frame ${idx+1}</div>
-                            </div>`).join('')}
-                            <div onclick="document.getElementById('sbUpload').click()" class="aspect-video border-2 border-dashed border-brand-dark flex flex-col items-center justify-center cursor-pointer hover:bg-brand-accent transition-all group">
-                                <span class="text-4xl font-black mb-4 group-hover:scale-125 transition-transform">+</span>
-                                <span class="text-[10px] font-black uppercase tracking-widest">Añadir Frame</span>
-                            </div>
-                            <input type="file" id="sbUpload" class="hidden" accept="image/jpeg, image/png" multiple onchange="window.handleImageUpload(event, '${p.id}')">
-                        </div>
-                    ` : ''}
-
-                    ${activeTab === 'produccion' ? `
-                        <div class="max-w-4xl space-y-12">
-                            <h3 class="text-4xl">Checklist de Calidad</h3>
-                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                <label class="flex items-center gap-6 p-10 border border-brand-dark cursor-pointer hover:bg-brand-light transition-all">
-                                    <input type="checkbox" id="chkMontaje" ${prod.montaje ? 'checked' : ''} class="w-8 h-8 accent-brand-primary">
-                                    <span class="text-xl font-black uppercase tracking-tighter">Montaje Base</span>
-                                </label>
-                                <label class="flex items-center gap-6 p-10 border border-brand-dark cursor-pointer hover:bg-brand-light transition-all">
-                                    <input type="checkbox" id="chkEdicion" ${prod.edicion ? 'checked' : ''} class="w-8 h-8 accent-brand-primary">
-                                    <span class="text-xl font-black uppercase tracking-tighter">Color & Mix</span>
-                                </label>
-                                <label class="flex items-center gap-6 p-10 border border-brand-dark cursor-pointer hover:bg-brand-light transition-all">
-                                    <input type="checkbox" id="chkSubtitulado" ${prod.subtitulado ? 'checked' : ''} class="w-8 h-8 accent-brand-primary">
-                                    <span class="text-xl font-black uppercase tracking-tighter">GFX & Subs</span>
-                                </label>
-                                <label class="flex items-center gap-6 p-10 border-4 border-brand-accent cursor-pointer hover:bg-brand-accent/10 transition-all">
-                                    <input type="checkbox" id="chkExportado" onchange="window.toggleFinalizado(this.checked)" ${prod.exportado ? 'checked' : ''} class="w-8 h-8 accent-brand-primary">
-                                    <span class="text-xl font-black uppercase tracking-tighter text-brand-primary">Master Final</span>
-                                </label>
-                            </div>
-                        </div>
-                    ` : ''}
-
-                    ${activeTab === 'gestion' ? `
-                        <div class="max-w-3xl space-y-20">
-                            <div class="grid grid-cols-1 md:grid-cols-2 gap-20">
-                                <div>
-                                    <label class="block text-[10px] font-black uppercase tracking-widest text-brand-gray mb-4">Líder del Proyecto</label>
-                                    <input type="text" id="teamInput" value="${p.team || ''}" class="swiss-input uppercase">
-                                </div>
-                                <div>
-                                    <label class="block text-[10px] font-black uppercase tracking-widest text-brand-gray mb-4">Fecha Límite</label>
-                                    <input type="date" id="dueDateInput" value="${p.dueDate || ''}" class="swiss-input">
-                                </div>
-                            </div>
-                            <div>
-                                <label class="block text-[10px] font-black uppercase tracking-widest text-brand-gray mb-4">Estado del Proceso</label>
-                                <select id="statusSelect" class="swiss-input uppercase">
-                                    <option value="Idea" ${p.status === 'Idea' ? 'selected' : ''}>Idea</option>
-                                    <option value="Scripting" ${p.status === 'Scripting' ? 'selected' : ''}>Scripting</option>
-                                    <option value="Storyboard" ${p.status === 'Storyboard' ? 'selected' : ''}>Storyboard</option>
-                                    <option value="Producción" ${p.status === 'Producción' ? 'selected' : ''}>Producción</option>
-                                    <option value="Finalizado" ${p.status === 'Finalizado' ? 'selected' : ''} ${!prod.exportado && p.status !== 'Finalizado' ? 'disabled' : ''}>Finalizado</option>
-                                </select>
-                            </div>
-                            <div class="flex gap-4">
-                                <button id="btnSaveDetail" class="btn-swiss-primary flex-1 py-8 text-lg">Sincronizar Datos</button>
-                                <button onclick="window.deleteProject('${p.id}')" class="btn-swiss-outline px-12 py-8 text-brand-accent border-brand-accent">Eliminar</button>
-                            </div>
-                        </div>
-                    ` : ''}
-                </div>
-
-                ${window.appState.lightbox ? `
-                    <div class="fixed inset-0 bg-brand-dark z-[100] flex items-center justify-center p-20" onclick="window.appState.lightbox = null; renderApp();">
-                        <img src="${window.appState.lightbox}" class="max-w-full max-h-full border-4 border-white shadow-2xl">
-                        <button class="absolute top-10 right-10 text-white text-4xl font-black">&times;</button>
+                \${window.appState.lightbox ? \`
+                    <div class="fixed inset-0 bg-brand-dark/95 z-[100] flex items-center justify-center p-20 backdrop-blur-md" onclick="window.appState.lightbox = null; renderApp();">
+                        <img src="\${window.appState.lightbox}" class="max-w-full max-h-full border-8 border-white shadow-2xl rounded-lg">
+                        <button class="absolute top-10 right-10 text-white text-6xl font-bold hover:scale-110 transition-transform">&times;</button>
                     </div>
-                ` : ''}
+                \` : ''}
             </div>
-        `;
+        \`;
 
         document.getElementById('btnBackToDashboardDetail').onclick = () => window.setView('dashboard');
         
-        const saveBtn = document.getElementById('btnSaveDetail');
-        if (saveBtn) {
-            saveBtn.onclick = async () => {
-                const newStatus = document.getElementById('statusSelect').value;
-                const newTeam = document.getElementById('teamInput').value;
-                const newDueDate = document.getElementById('dueDateInput').value;
-                
-                const newProd = {
-                    montaje: document.getElementById('chkMontaje') ? document.getElementById('chkMontaje').checked : prod.montaje,
-                    edicion: document.getElementById('chkEdicion') ? document.getElementById('chkEdicion').checked : prod.edicion,
-                    subtitulado: document.getElementById('chkSubtitulado') ? document.getElementById('chkSubtitulado').checked : prod.subtitulado,
-                    exportado: document.getElementById('chkExportado') ? document.getElementById('chkExportado').checked : prod.exportado
-                };
-
-                await updateProject(p.id, {
-                    status: newStatus,
-                    team: newTeam,
-                    dueDate: newDueDate,
-                    production: newProd
-                });
-                
-                window.setView('dashboard');
+        const syncAction = async () => {
+            const newStatus = document.getElementById('statusSelect') ? document.getElementById('statusSelect').value : p.status;
+            const newTeam = document.getElementById('teamInput') ? document.getElementById('teamInput').value : p.team;
+            const newDueDate = document.getElementById('dueDateInput') ? document.getElementById('dueDateInput').value : p.dueDate;
+            
+            const newProd = {
+                montaje: document.getElementById('chkMontaje') ? document.getElementById('chkMontaje').checked : prod.montaje,
+                edicion: document.getElementById('chkEdicion') ? document.getElementById('chkEdicion').checked : prod.edicion,
+                subtitulado: document.getElementById('chkSubtitulado') ? document.getElementById('chkSubtitulado').checked : prod.subtitulado,
+                exportado: document.getElementById('chkExportado') ? document.getElementById('chkExportado').checked : prod.exportado
             };
-        }
+
+            await updateProject(p.id, {
+                status: newStatus,
+                team: newTeam,
+                dueDate: newDueDate,
+                production: newProd
+            });
+            
+            if (activeTab === 'gestion') window.setView('dashboard');
+            else renderApp();
+        };
+
+        if (document.getElementById('btnSaveDetail')) document.getElementById('btnSaveDetail').onclick = syncAction;
+        if (document.getElementById('btnSyncProd')) document.getElementById('btnSyncProd').onclick = syncAction;
 
         const scriptEl = document.getElementById('scriptContent');
         if (scriptEl) {
@@ -622,7 +677,7 @@ const renderApp = () => {
 window.setView = (view) => { 
     window.appState.view = view; 
     window.appState.activeTab = 'guion';
-    history.pushState({ view }, '', `#${view}`);
+    history.pushState({ view }, '', \`#\${view}\`);
     renderApp(); 
 };
 
@@ -630,7 +685,7 @@ window.viewDetail = (id) => {
     window.appState.currentProject = window.appState.projects.find(p => p.id === id); 
     window.appState.view = 'detail'; 
     window.appState.activeTab = 'guion';
-    history.pushState({ view: 'detail', projectId: id }, '', `#detail-${id}`);
+    history.pushState({ view: 'detail', projectId: id }, '', \`#detail-\${id}\`);
     renderApp(); 
 };
 

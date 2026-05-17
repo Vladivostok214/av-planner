@@ -42,56 +42,80 @@
   }
   
   h1, h2, h3, h4, h5, h6 {
-    @apply font-semibold tracking-tight text-brand-dark leading-snug;
+    @apply font-bold tracking-tight text-brand-dark leading-snug;
   }
 }
 
 @layer components {
   /* SUNSAMA-INSPIRED LIST SYSTEM */
   .list-row {
-    @apply bg-white border border-brand-hairline p-4 flex flex-col md:flex-row items-center gap-6 transition-all hover:shadow-soft hover:border-brand-primary/20 cursor-pointer relative overflow-hidden;
+    @apply bg-white border-2 border-brand-hairline p-5 flex flex-col md:flex-row items-center gap-6 transition-all duration-300 hover:shadow-lg hover:border-brand-primary cursor-pointer relative overflow-hidden rounded-xl;
   }
 
   .list-row-active-accent {
-    @apply absolute left-0 top-0 bottom-0 w-1 bg-brand-primary opacity-0 group-hover:opacity-100 transition-opacity;
+    @apply absolute left-0 top-0 bottom-0 w-1.5 bg-brand-primary opacity-0 group-hover:opacity-100 transition-opacity;
   }
 
   .list-header {
-    @apply p-4 flex items-center gap-6 border-b border-brand-hairline bg-transparent;
+    @apply p-4 flex items-center gap-6 border-b-2 border-brand-hairline bg-transparent;
   }
   
   /* REFINED SaaS BUTTONS */
   .btn-swiss-primary {
-    @apply bg-brand-primary text-white px-6 py-2.5 font-semibold text-xs tracking-wide hover:bg-brand-primary/90 transition-all rounded-md shadow-sm;
+    @apply bg-brand-primary text-white px-8 py-3.5 font-bold text-xs tracking-[0.1em] uppercase hover:bg-brand-primary/90 transition-all rounded-lg shadow-lg active:scale-95;
   }
 
   .btn-swiss-outline {
-    @apply border border-brand-hairline text-brand-gray px-6 py-2.5 font-semibold text-xs tracking-wide hover:bg-brand-paper hover:text-brand-dark transition-all rounded-md;
+    @apply border-2 border-brand-hairline text-brand-dark px-8 py-3.5 font-bold text-xs tracking-[0.1em] uppercase hover:border-brand-primary hover:text-brand-primary transition-all rounded-lg active:scale-95;
   }
 
   /* CALM INPUTS */
   .swiss-input {
-    @apply w-full p-3 border border-brand-hairline bg-white font-medium text-base outline-none placeholder:text-brand-gray/40 focus:border-brand-primary focus:ring-4 focus:ring-brand-primary/5 transition-all rounded-md text-brand-dark;
+    @apply w-full p-4 border-2 border-brand-hairline bg-white font-bold text-base outline-none placeholder:text-brand-gray/40 focus:border-brand-primary focus:ring-8 focus:ring-brand-primary/5 transition-all rounded-xl text-brand-dark shadow-sm;
   }
 
   /* UTILITY BADGES */
   .swiss-badge {
-    @apply inline-block px-2 py-0.5 font-semibold text-[10px] uppercase tracking-wider border border-brand-hairline bg-brand-paper text-brand-gray rounded-md;
+    @apply inline-block px-4 py-1.5 font-bold text-[10px] uppercase tracking-[0.1em] border-2 border-brand-hairline bg-brand-light text-brand-dark rounded-full shadow-sm;
   }
 
-  /* HOVER DISCLOSURE */
-  .hover-action {
-    @apply opacity-0 group-hover:opacity-100 transition-opacity duration-200;
+  /* NEW DETAIL NAV BUTTONS */
+  .detail-nav-btn {
+    @apply flex items-center gap-5 px-8 py-6 bg-white border-2 border-brand-hairline rounded-2xl transition-all duration-300 hover:border-brand-primary hover:shadow-md text-brand-gray text-left w-full;
+  }
+  
+  .detail-nav-btn.active {
+    @apply border-brand-primary bg-brand-primary text-white shadow-xl transform translate-x-2;
+  }
+  
+  .detail-nav-btn .num {
+    @apply text-[10px] font-black opacity-30 uppercase tracking-widest;
+  }
+  
+  .detail-nav-btn.active .num {
+    @apply opacity-100;
+  }
+  
+  .detail-nav-btn .label {
+    @apply flex-1 font-bold text-xs uppercase tracking-[0.15em];
+  }
+  
+  .detail-nav-btn .icon {
+    @apply text-2xl grayscale opacity-30 transition-all;
+  }
+  
+  .detail-nav-btn.active .icon {
+    @apply grayscale-0 opacity-100 scale-110;
   }
 }
 
 /* SCROLLBAR REFINEMENT */
 ::-webkit-scrollbar {
-  width: 6px;
+  width: 8px;
 }
 ::-webkit-scrollbar-track {
   @apply bg-brand-paper;
 }
 ::-webkit-scrollbar-thumb {
-  @apply bg-brand-hairline rounded-full hover:bg-brand-gray/30;
+  @apply bg-brand-hairline rounded-full border-4 border-brand-paper hover:bg-brand-gray/50;
 }
