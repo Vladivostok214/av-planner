@@ -3,6 +3,28 @@
 @tailwind utilities;
 
 @layer base {
+  :root {
+    --color-primary: #003A7A;
+    --color-accent: #F7941E;
+    --color-dark: #050D20;
+    --color-paper: #FBFBFA;
+    --color-hairline: #D1D5DB;
+    --color-light: #FFFFFF;
+    --color-tint: #D1E1FF;
+    --color-gray: #475569;
+  }
+
+  .dark {
+    --color-primary: #3b82f6; /* Lighter blue for dark mode contrast */
+    --color-accent: #F7941E;
+    --color-dark: #FFFFFF; /* Text becomes white */
+    --color-paper: #0a1128; /* Deep dark blue background */
+    --color-hairline: #1e293b; /* Dark slate borders */
+    --color-light: #111c40; /* Cards and elements background */
+    --color-tint: #1e3a8a;
+    --color-gray: #94a3b8; /* Lighter secondary text */
+  }
+
   @font-face {
     font-family: 'Montserrat';
     font-style: normal;
@@ -71,7 +93,7 @@
 
   /* CALM INPUTS */
   .swiss-input {
-    @apply w-full p-4 border-2 border-brand-hairline bg-white font-bold text-base outline-none placeholder:text-brand-gray/40 focus:border-brand-primary focus:ring-8 focus:ring-brand-primary/5 transition-all rounded-xl text-brand-dark shadow-sm;
+    @apply w-full p-4 border-2 border-brand-hairline bg-brand-light font-bold text-base outline-none placeholder:text-brand-gray/40 focus:border-brand-primary focus:ring-8 focus:ring-brand-primary/5 transition-all rounded-xl text-brand-dark shadow-sm;
   }
 
   /* UTILITY BADGES */
@@ -81,7 +103,7 @@
 
   /* NEW DETAIL NAV BUTTONS */
   .detail-nav-btn {
-    @apply flex items-center gap-5 px-8 py-6 bg-white border-2 border-brand-hairline rounded-2xl transition-all duration-300 hover:border-brand-primary hover:shadow-md text-brand-gray text-left w-full;
+    @apply flex items-center gap-5 px-8 py-6 bg-brand-light border-2 border-brand-hairline rounded-2xl transition-all duration-300 hover:border-brand-primary hover:shadow-md text-brand-gray text-left w-full;
   }
   
   .detail-nav-btn.active {

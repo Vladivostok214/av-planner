@@ -1,5 +1,6 @@
 /** @type {import('tailwindcss').Config} */
 export default {
+  darkMode: 'class',
   content: [
     "./index.html",
     "./src/**/*.{js,ts,jsx,tsx}",
@@ -8,14 +9,14 @@ export default {
     extend: {
       colors: {
         brand: {
-          primary: '#003A7A', // Azul más profundo para contraste
-          accent: '#F7941E',  
-          dark: '#050D20',
-          paper: '#FBFBFA',   
-          hairline: '#D1D5DB', // Gris más oscuro para bordes visibles
-          light: '#F8F9FA',
-          tint: '#D1E1FF',    
-          gray: '#475569', // Texto secundario más legible
+          primary: 'var(--color-primary)', 
+          accent: 'var(--color-accent)',  
+          dark: 'var(--color-dark)',
+          paper: 'var(--color-paper)',   
+          hairline: 'var(--color-hairline)', 
+          light: 'var(--color-light)',
+          tint: 'var(--color-tint)',    
+          gray: 'var(--color-gray)', 
         }
       },
       fontFamily: {
