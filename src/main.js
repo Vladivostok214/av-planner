@@ -340,9 +340,11 @@ const renderApp = () => {
             btn.innerText = "GUARDANDO...";
             
             const sH = document.getElementById('scriptContent') ? document.getElementById('scriptContent').innerHTML : p.script;
+            const imgData = Array.isArray(p.storyboardImages) ? p.storyboardImages.join(',') : (p.storyboardImages || '');
             let payload = { 
                 script: sH,
-                storyboardImages: Array.isArray(p.storyboardImages) ? p.storyboardImages.join(',') : (p.storyboardImages || '')
+                storyboardImages: imgData,
+                storyboardimages: imgData // Duplicate in lowercase for backend compatibility
             };
             
             const statusSel = document.getElementById('statusSelect');
