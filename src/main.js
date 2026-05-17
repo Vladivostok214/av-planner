@@ -27,7 +27,7 @@ const loadData = async () => {
 };
 
 const updateProject = async (projectId, newData) => {
-    const payload = { ...newData, lastEditor: window.appState.userName || 'Anonimo' };
+    const payload = { ...newData, lastEditor: window.appState.userName || 'Anonimo', updatedAt: new Date().toISOString() };
     const index = window.appState.projects.findIndex(p => p.id === projectId);
     if (index !== -1) {
         window.appState.projects[index] = { ...window.appState.projects[index], ...payload };
@@ -44,6 +44,24 @@ const updateProject = async (projectId, newData) => {
         if (idx !== -1) { current[idx] = { ...current[idx], ...payload }; localStorage.setItem('av_planner_projects', JSON.stringify(current)); }
         window.isEditing = false; loadData();
     }
+};
+
+window.deleteProject = async (projectId) => {
+    if (!confirm('¿Estás seguro de que deseas eliminar este proyecto? Esta acción no se puede deshacer.')) return;
+    
+    window.appState.projects = window.appState.projects.filter(p => p.id !== projectId);
+    
+    if (isSheets) {
+        await fetch(sheetsUrl, { method: 'POST', mode: 'no-cors', body: JSON.stringify({ action: 'delete', id: projectId }) });
+        setTimeout(loadData, 1000);
+    } else {
+        const current = JSON.parse(localStorage.getItem('av_planner_projects') || '[]');
+        const updated = current.filter(p => p.id !== projectId);
+        localStorage.setItem('av_planner_projects', JSON.stringify(updated));
+        loadData();
+    }
+    if (window.appState.view === 'detail') window.setView('dashboard');
+    else renderApp();
 };
 
 window.appState = { user: { uid: 'sov' }, userName: '', projects: [], currentProject: null, view: 'dashboard', searchQuery: '', sortBy: 'date', lightbox: null, activeTab: 'guion' };
@@ -194,11 +212,11 @@ const renderApp = () => {
     }
     if (window.appState.view === 'dashboard') {
         let filtered = window.appState.projects.filter(p => { const q = window.appState.searchQuery.toLowerCase(); return p.title.toLowerCase().includes(q) || (p.team && p.team.toLowerCase().includes(q)); });
-        filtered.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
-        root.innerHTML = '<div class="p-6 md:p-10 max-w-[1300px] mx-auto min-h-screen"><header class="mb-10 flex flex-col md:flex-row justify-between items-start md:items-end gap-6 border-b-2 border-brand-hairline pb-8"><div><h1 class="text-2xl font-bold text-brand-dark mb-1">PANEL DE PRODUCCION</h1><p class="text-[10px] font-bold text-brand-gray tracking-widest uppercase">Operador: <span class="text-brand-dark underline font-bold">' + window.appState.userName + '</span></p></div><div class="flex flex-wrap items-center gap-3 w-full md:w-auto"><div class="flex-1 md:flex-none flex items-center gap-2 border-2 border-brand-hairline bg-white px-4 py-2 rounded-lg shadow-sm"><input type="text" id="searchInput" value="' + window.appState.searchQuery + '" placeholder="Buscar..." class="bg-transparent outline-none font-bold text-xs w-full md:w-32"></div><button id="btnNewIdea" class="btn-swiss-primary shadow-md flex-1 md:flex-none">+ NUEVO</button><button onclick="location.reload()" class="btn-swiss-outline py-2 px-4 text-[10px] border-2">SALIR</button></div></header><div class="space-y-3">' + filtered.map(p => { const pr = ((['Idea','Guionizado','Storyboard','Produccion','Finalizado'].indexOf(p.status)+1)/5)*100; let dS = '---'; try { const d = new Date(p.createdAt); if(!isNaN(d)) dS = d.toLocaleDateString(); } catch(e) {} return '<div data-id="' + p.id + '" class="project-row list-row group border-2 bg-white hover:border-brand-primary shadow-sm"><div class="w-full md:flex-1 text-center md:text-left"><span class="text-[8px] font-bold text-brand-primary uppercase tracking-widest">' + (p.id.startsWith('id-') ? 'NUEVO' : 'REF-'+p.id.substring(0,6)) + '</span><h3 class="text-base font-bold text-brand-dark group-hover:text-brand-primary">' + p.title + '</h3></div><div class="w-full md:w-32 flex justify-center md:justify-start shrink-0">' + getStatusBadge(p.status) + '</div><div class="w-full md:w-32 flex flex-row md:flex-col justify-center gap-4 md:gap-0 shrink-0"><span class="text-[10px] font-bold text-brand-dark truncate">' + (p.team || '---') + '</span><span class="text-[8px] font-bold text-brand-gray uppercase">' + dS + '</span></div><div class="w-full md:w-40 flex items-center justify-center gap-3 shrink-0"><div class="flex-1 h-1.5 bg-brand-hairline rounded-full overflow-hidden border"><div class="h-full bg-brand-primary" style="width: ' + pr + '%"></div></div><span class="text-[9px] font-bold text-brand-dark w-8 text-left">' + Math.round(pr) + '%</span></div><div class="hidden md:block w-6 text-right font-bold text-brand-primary opacity-30 group-hover:opacity-100">-></div></div>'; }).join('') + '</div></div>';
+        filtered.sort((a, b) => new Date(b.updatedAt || b.createdAt || 0) - new Date(a.updatedAt || a.createdAt || 0));
+        root.innerHTML = '<div class="p-6 md:p-10 max-w-[1300px] mx-auto min-h-screen"><header class="mb-10 flex flex-col md:flex-row justify-between items-start md:items-end gap-6 border-b-2 border-brand-hairline pb-8"><div><h1 class="text-2xl font-bold text-brand-dark mb-1">PANEL DE PRODUCCION</h1><p class="text-[10px] font-bold text-brand-gray tracking-widest uppercase">Operador: <span class="text-brand-dark underline font-bold">' + window.appState.userName + '</span></p></div><div class="flex flex-wrap items-center gap-3 w-full md:w-auto"><div class="flex-1 md:flex-none flex items-center gap-2 border-2 border-brand-hairline bg-white px-4 py-2 rounded-lg shadow-sm"><input type="text" id="searchInput" value="' + window.appState.searchQuery + '" placeholder="Buscar..." class="bg-transparent outline-none font-bold text-xs w-full md:w-32"></div><button id="btnNewIdea" class="btn-swiss-primary shadow-md flex-1 md:flex-none">+ NUEVO</button><button onclick="location.reload()" class="btn-swiss-outline py-2 px-4 text-[10px] border-2">SALIR</button></div></header><div class="space-y-4">' + filtered.map(p => { const pr = ((['Idea','Guionizado','Storyboard','Produccion','Finalizado'].indexOf(p.status)+1)/5)*100; let dS = '---'; try { const d = new Date(p.updatedAt || p.createdAt); if(!isNaN(d)) dS = d.toLocaleDateString(); } catch(e) {} return '<div class="project-row list-row group flex flex-col md:flex-row items-center gap-6"><div data-id="' + p.id + '" class="flex-1 flex flex-col md:flex-row items-center gap-6 w-full cursor-pointer"><div class="w-full md:flex-1 text-center md:text-left"><h3 class="text-lg font-bold text-brand-dark group-hover:text-brand-primary transition-colors">' + p.title + '</h3></div><div class="w-full md:w-32 flex justify-center md:justify-start shrink-0">' + getStatusBadge(p.status) + '</div><div class="w-full md:w-32 flex flex-row md:flex-col justify-center gap-4 md:gap-0 shrink-0"><span class="text-[10px] font-bold text-brand-dark truncate">' + (p.team || '---') + '</span><span class="text-[8px] font-bold text-brand-gray uppercase">' + dS + '</span></div><div class="w-full md:w-40 flex items-center justify-center gap-3 shrink-0"><div class="flex-1 h-2 bg-brand-hairline rounded-full overflow-hidden border"><div class="h-full bg-brand-primary" style="width: ' + pr + '%"></div></div><span class="text-[9px] font-bold text-brand-dark w-8 text-left">' + Math.round(pr) + '%</span></div></div><button onclick="window.deleteProject(\'' + p.id + '\')" class="w-full md:w-auto mt-2 md:mt-0 btn-swiss-outline py-2 px-4 border-red-500 text-red-500 hover:bg-red-500 hover:text-white text-[10px] opacity-100 md:opacity-0 group-hover:opacity-100 transition-opacity flex justify-center items-center gap-2 shadow-sm shrink-0"><span>BORRAR</span></button></div>'; }).join('') + '</div></div>';
         document.getElementById('btnNewIdea').onclick = () => window.setView('new');
         const si = document.getElementById('searchInput'); if (si) si.oninput = (e) => { window.appState.searchQuery = e.target.value; renderApp(); document.getElementById('searchInput').focus(); };
-        document.querySelectorAll('.project-row').forEach(row => row.onclick = () => window.viewDetail(row.dataset.id));
+        document.querySelectorAll('.project-row > div:first-child').forEach(row => row.onclick = () => window.viewDetail(row.dataset.id));
     } else if (window.appState.view === 'new') {
         root.innerHTML = '<div class="p-6 md:p-10 max-w-2xl mx-auto min-h-screen"><button id="btnBack" class="btn-swiss-outline text-[10px] mb-8 border-2"><- VOLVER</button><h2 class="text-3xl font-bold tracking-tight uppercase mb-10">NUEVA INICIATIVA</h2><form id="ideaForm" class="space-y-6 bg-white p-8 rounded-2xl border-2 border-brand-hairline shadow-soft"><div><label class="block text-[9px] font-bold uppercase mb-2">Titulo</label><input type="text" id="title" required class="swiss-input uppercase text-lg border-b-4"></div><div><label class="block text-[9px] font-bold uppercase mb-2">Brief</label><textarea id="description" rows="3" required class="swiss-input border-2 rounded-xl p-4"></textarea></div><button type="submit" class="btn-swiss-primary w-full py-5 text-base font-bold shadow-xl">LANZAR PROYECTO</button></form></div>';
         document.getElementById('btnBack').onclick = () => window.setView('dashboard');
