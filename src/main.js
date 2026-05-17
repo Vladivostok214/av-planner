@@ -52,9 +52,9 @@ const loadData = async () => {
     }
 };
 
+// La carga de datos ahora es manual/inicial para evitar sobreescritura accidental
 if (isSheets) {
-    console.log("📊 Modo SOBERANO Activo");
-    setInterval(loadData, 30000); 
+    console.log("📊 Modo SOBERANO Activo (Carga inicial completada)");
 }
 
 const saveProject = async (projectData) => {
