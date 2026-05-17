@@ -22,7 +22,8 @@ const loadData = async () => {
             status: p.status || p.estado || 'Idea',
             dueDate: p.duedate || p.dueDate || '',
             createdAt: p.createdat || p.createdAt || new Date().toISOString(),
-            updatedAt: p.updatedat || p.updatedAt || p.createdat || p.createdAt || new Date().toISOString()
+            updatedAt: p.updatedat || p.updatedAt || p.createdat || p.createdAt || new Date().toISOString(),
+            storyboardImages: p.storyboardimages || p.storyboardImages || ''
         }));
         if (window.appState.view === 'detail' && window.appState.currentProject) {
             const updated = window.appState.projects.find(p => p.id === window.appState.currentProject.id);
