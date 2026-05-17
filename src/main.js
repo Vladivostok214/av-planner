@@ -28,13 +28,10 @@ const loadData = async () => {
     try {
         const resp = await fetch(sheetsUrl);
         const data = await resp.json();
-        const projects = Array.isArray(data) && Array.isArray(data[0]) 
-            ? data.slice(1).map(row => ({
-                id: row[0], title: row[1], category: row[2], 
-                status: row[3], team: row[4], description: row[5],
-                script: row[6], createdAt: row[7], lastEditor: row[8]
-              }))
-            : data;
+                    const projects = data.map(p => ({
+                        ...p,
+                        status: p.status || p.estado // Maps 'estado' from Sheets to 'status' for UI
+                    }));
         
         window.appState.projects = projects;
         
