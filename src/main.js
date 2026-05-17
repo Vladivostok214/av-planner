@@ -1,92 +1,111 @@
 import './style.css';
-import { initializeApp } from "firebase/app";
-import { getAuth, onAuthStateChanged, signInAnonymously, signInWithCustomToken } from "firebase/auth";
-import { getFirestore, collection, doc, onSnapshot, addDoc, updateDoc, deleteDoc } from "firebase/firestore";
 
-// --- Firebase Mock & Initialization Logic ---
-let db, auth;
-const firebaseConfig = {
-    apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
-    authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
-    projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID,
-    storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET,
-    messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID,
-    appId: import.meta.env.VITE_FIREBASE_APP_ID
+// --- Backend Configuration (Google Sheets) ---
+const sheetsUrl = import.meta.env.VITE_SHEETS_API_URL;
+const isSheets = !!sheetsUrl;
+
+const loadData = async () => {
+    if (!isSheets) {
+        console.warn("🏠 Modo LOCAL (localStorage): No se detectó URL de Google Sheets.");
+        let data = JSON.parse(localStorage.getItem('av_planner_projects') || '[]');
+        const seedData = [
+            { title: "Hack #1: El 'Frankenstein'", category: "Educativo", description: "Mejores puntajes de distintas rendiciones.", script: "¡El sistema toma tus mejores resultados!", status: "Idea", id: "local-seed-1", createdAt: new Date().toISOString(), team: "MKT", location: "Estudio A", dueDate: "2026-06-01" },
+            { title: "Foco Estratégico", category: "Social Media", description: "Prepararse para rendir al máximo.", script: "Asegura una o dos pruebas.", status: "Idea", id: "local-seed-2", createdAt: new Date().toISOString(), team: "MKT", location: "Remoto", dueDate: "2026-06-05" },
+        ];
+        let needsSync = false;
+        seedData.forEach(seed => {
+            if (!data.find(p => p.title === seed.title)) {
+                data.push(seed);
+                needsSync = true;
+            }
+        });
+        if (needsSync) localStorage.setItem('av_planner_projects', JSON.stringify(data));
+        window.appState.projects = data;
+        renderApp();
+        return;
+    }
+
+    try {
+        const resp = await fetch(sheetsUrl);
+        const data = await resp.json();
+        const projects = Array.isArray(data) && Array.isArray(data[0]) 
+            ? data.slice(1).map(row => ({
+                id: row[0], title: row[1], category: row[2], 
+                status: row[3], team: row[4], description: row[5],
+                script: row[6], createdAt: row[7], lastEditor: row[8]
+              }))
+            : data;
+        
+        window.appState.projects = projects;
+        
+        if (window.appState.view === 'detail' && window.appState.currentProject) {
+            const updated = projects.find(p => p.id === window.appState.currentProject.id);
+            if (updated) window.appState.currentProject = updated;
+        }
+        renderApp();
+    } catch (e) { 
+        console.error("Sheets Load Error:", e); 
+    }
 };
 
-const isMock = !firebaseConfig.apiKey || firebaseConfig.apiKey === "tu_api_key_aqui" || firebaseConfig.apiKey === "dummy-key";
-
-if (isMock) {
-    console.warn("🏠 Modo LOCAL (localStorage): No se detectaron credenciales de Firebase.");
-    auth = {
-        currentUser: { uid: 'mock-user-123' },
-        onAuthStateChanged: (cb) => {
-            setTimeout(() => cb({ uid: 'mock-user-123', isAnonymous: true }), 500);
-            return () => {};
-        },
-        signInAnonymously: () => Promise.resolve({ user: { uid: 'mock-user-123' } })
-    };
-    
-    db = {
-        collection: (path) => ({ path }),
-        onSnapshot: (query, cb) => {
-            const load = () => {
-                let data = JSON.parse(localStorage.getItem('av_planner_projects') || '[]');
-                const seedData = [
-                    { title: "Hack #1: El 'Frankenstein'", category: "Educativo", description: "Mejores puntajes de distintas rendiciones.", script: "¡El sistema toma tus mejores resultados!", status: "Idea", id: "local-seed-1", createdAt: new Date().toISOString(), team: "MKT", location: "Estudio A", dueDate: "2026-06-01" },
-                    { title: "Foco Estratégico", category: "Social Media", description: "Prepararse para rendir al máximo.", script: "Asegura una o dos pruebas.", status: "Idea", id: "local-seed-2", createdAt: new Date().toISOString(), team: "MKT", location: "Remoto", dueDate: "2026-06-05" },
-                ];
-                let needsSync = false;
-                seedData.forEach(seed => {
-                    if (!data.find(p => p.title === seed.title)) {
-                        data.push(seed);
-                        needsSync = true;
-                    }
-                });
-                if (needsSync) localStorage.setItem('av_planner_projects', JSON.stringify(data));
-                cb({ docs: data.map(d => ({ id: d.id, data: () => d })) });
-            };
-            load();
-            window.addEventListener('storage', load);
-            return () => window.removeEventListener('storage', load);
-        },
-        addDoc: async (col, data) => {
-            const current = JSON.parse(localStorage.getItem('av_planner_projects') || '[]');
-            const newDoc = { ...data, id: 'local-' + Date.now() };
-            current.push(newDoc);
-            localStorage.setItem('av_planner_projects', JSON.stringify(current));
-            window.dispatchEvent(new Event('storage'));
-            return { id: newDoc.id };
-        },
-        updateDoc: async (docRef, data) => {
-            const current = JSON.parse(localStorage.getItem('av_planner_projects') || '[]');
-            const index = current.findIndex(p => p.id === docRef.id);
-            if (index !== -1) {
-                current[index] = { ...current[index], ...data };
-                localStorage.setItem('av_planner_projects', JSON.stringify(current));
-                window.dispatchEvent(new Event('storage'));
-            }
-        },
-        deleteDoc: async (docRef) => {
-            const current = JSON.parse(localStorage.getItem('av_planner_projects') || '[]');
-            const filtered = current.filter(p => p.id !== docRef.id);
-            localStorage.setItem('av_planner_projects', JSON.stringify(filtered));
-            window.dispatchEvent(new Event('storage'));
-        },
-        doc: (db, ...path) => ({ id: path[path.length - 1] })
-    };
-} else {
-    console.log("🚀 Conectado a la NUBE de Firebase:", firebaseConfig.projectId);
-    const app = initializeApp(firebaseConfig);
-    auth = getAuth(app);
-    db = getFirestore(app);
+// Automatic refresh for Sheets
+if (isSheets) {
+    console.log("📊 Modo SOBERANO (Google Sheets) activo.");
+    setInterval(loadData, 30000);
 }
 
-const appId = import.meta.env.VITE_APP_ID || 'av-planner-default';
+const saveProject = async (projectData) => {
+    const payload = { ...projectData, status: 'Idea', createdAt: new Date().toISOString(), lastEditor: window.appState.userName || 'Anónimo' };
+    
+    if (isSheets) {
+        const fullPayload = { action: 'save', ...payload, id: 'id-' + Date.now() };
+        await fetch(sheetsUrl, { method: 'POST', mode: 'no-cors', body: JSON.stringify(fullPayload) });
+        setTimeout(loadData, 1000);
+    } else {
+        const current = JSON.parse(localStorage.getItem('av_planner_projects') || '[]');
+        const newDoc = { ...payload, id: 'local-' + Date.now() };
+        current.push(newDoc);
+        localStorage.setItem('av_planner_projects', JSON.stringify(current));
+        loadData();
+    }
+};
+
+const updateProject = async (projectId, newData) => {
+    const payload = { ...newData, lastEditor: window.appState.userName || 'Anónimo' };
+    
+    if (isSheets) {
+        const fullPayload = { action: 'update', id: projectId, ...payload };
+        await fetch(sheetsUrl, { method: 'POST', mode: 'no-cors', body: JSON.stringify(fullPayload) });
+        setTimeout(loadData, 1000);
+    } else {
+        const current = JSON.parse(localStorage.getItem('av_planner_projects') || '[]');
+        const index = current.findIndex(p => p.id === projectId);
+        if (index !== -1) {
+            current[index] = { ...current[index], ...payload };
+            localStorage.setItem('av_planner_projects', JSON.stringify(current));
+            loadData();
+        }
+    }
+};
+
+const deleteProject = async (projectId) => {
+    if (!confirm("¿Estás seguro?")) return;
+    
+    if (isSheets) {
+        await fetch(sheetsUrl, { method: 'POST', mode: 'no-cors', body: JSON.stringify({ action: 'delete', id: projectId }) });
+        setTimeout(loadData, 1000);
+    } else {
+        const current = JSON.parse(localStorage.getItem('av_planner_projects') || '[]');
+        const filtered = current.filter(p => p.id !== projectId);
+        localStorage.setItem('av_planner_projects', JSON.stringify(filtered));
+        loadData();
+    }
+    window.setView('dashboard');
+};
 
 window.appState = {
-    user: null,
-    userName: '', // Always empty on init to force name entry
+    user: { uid: 'sovereign-user' },
+    userName: '', 
     projects: [],
     currentProject: null,
     view: 'dashboard',
@@ -96,110 +115,12 @@ window.appState = {
     activeTab: 'guion'
 };
 
-const initAuth = async () => {
-    if (isMock) return;
-    try {
-        if (typeof window.__initial_auth_token !== 'undefined' && window.__initial_auth_token) {
-            await signInWithCustomToken(auth, window.__initial_auth_token);
-        } else {
-            await signInAnonymously(auth);
-        }
-    } catch (error) {
-        console.error("❌ Error en Autenticación Firebase:", error.code, error.message);
-    }
-};
-
-onAuthStateChanged(auth, (user) => {
-    window.appState.user = user;
-    if (user) {
-        loadData();
-    }
-});
-
-let unsubscribe = null;
-const loadData = () => {
-    if (isMock) {
-        if (unsubscribe) unsubscribe();
-        unsubscribe = db.onSnapshot({}, (snapshot) => {
-            window.appState.projects = snapshot.docs.map(doc => ({ ...doc.data() }));
-            
-            if (window.appState.view === 'detail' && window.appState.currentProject) {
-                const updatedProject = window.appState.projects.find(p => p.id === window.appState.currentProject.id);
-                if (updatedProject) window.appState.currentProject = updatedProject;
-            }
-            
-            renderApp();
-        });
-        return;
-    }
-    
-    const q = collection(db, 'artifacts', appId, 'public', 'data', 'projects');
-    if (unsubscribe) unsubscribe();
-    unsubscribe = onSnapshot(q, (snapshot) => {
-        window.appState.projects = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-        
-        // --- Auto-Seeding ---
-        const originalIdeas = [
-            { title: "Hack #1: El 'Frankenstein'", category: "Educativo", description: "Mejores puntajes de distintas rendiciones.", script: "¡El sistema toma tus mejores resultados!" },
-            { title: "Foco Estratégico", category: "Social Media", description: "Prepararse para rendir al máximo.", script: "Asegura una o dos pruebas." }
-        ];
-
-        let hasNewSeed = false;
-        originalIdeas.forEach(seed => {
-            const exists = window.appState.projects.find(p => p.title === seed.title);
-            if (!exists) {
-                saveProject({ ...seed, team: "Equipo AV", dueDate: "2026-06-01", lastEditor: "Sistema" });
-                hasNewSeed = true;
-            }
-        });
-
-        if (hasNewSeed) return;
-        
-        if (window.appState.view === 'detail' && window.appState.currentProject) {
-            const updatedProject = window.appState.projects.find(p => p.id === window.appState.currentProject.id);
-            if (updatedProject) window.appState.currentProject = updatedProject;
-        }
-        
-        renderApp();
-    });
-};
-
-const saveProject = async (projectData) => {
-    if (!window.appState.user) return;
-    const payload = { ...projectData, status: 'Idea', createdAt: new Date().toISOString(), lastEditor: window.appState.userName || 'Anónimo' };
-    if (isMock) await db.addDoc({}, payload);
-    else await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'projects'), payload);
-};
-
-const updateProject = async (projectId, newData) => {
-    if (!window.appState.user) return;
-    const payload = { ...newData, lastEditor: window.appState.userName || 'Anónimo' };
-    
-    // Optimistic local update
-    const index = window.appState.projects.findIndex(p => p.id === projectId);
-    if (index !== -1) {
-        window.appState.projects[index] = { ...window.appState.projects[index], ...payload };
-        if (window.appState.currentProject && window.appState.currentProject.id === projectId) {
-            window.appState.currentProject = window.appState.projects[index];
-        }
-    }
-
-    if (isMock) await db.updateDoc({ id: projectId }, payload);
-    else await updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'projects', projectId), payload);
-};
-
-const deleteProject = async (projectId) => {
-    if (!window.appState.user) return;
-    if (!confirm("¿Estás seguro?")) return;
-    if (isMock) await db.deleteDoc({ id: projectId });
-    else await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'projects', projectId));
-};
-
 window.saveProject = saveProject;
 window.updateProject = updateProject;
 window.deleteProject = deleteProject;
 window.renderApp = () => renderApp();
 window.loadData = loadData;
+
 window.formatScriptBold = () => {
     document.execCommand('bold', false, null);
 };
@@ -318,11 +239,9 @@ const getStatusBadge = (status) => {
     </span>`;
 };
 
-// --- Core Rendering ---
 const renderApp = () => {
     const root = document.getElementById('app');
     
-    // Add print styles dynamically
     if (!document.getElementById('print-styles')) {
         const style = document.createElement('style');
         style.id = 'print-styles';
@@ -737,7 +656,6 @@ window.onpopstate = (event) => {
 };
 
 window.onload = async () => { 
-    await initAuth(); 
     if (window.location.hash === '') {
         history.replaceState({ view: 'dashboard' }, '', '#dashboard');
     } else {
@@ -748,5 +666,5 @@ window.onload = async () => {
             window.appState.view = 'detail';
         }
     }
-    renderApp(); 
+    await loadData();
 };

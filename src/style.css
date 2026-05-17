@@ -3,6 +3,38 @@
 @tailwind utilities;
 
 @layer base {
+  @font-face {
+    font-family: 'Montserrat';
+    font-style: normal;
+    font-weight: 100 900;
+    font-display: swap;
+    src: url('/fonts/montserrat-normal.woff2') format('woff2');
+  }
+
+  @font-face {
+    font-family: 'Montserrat';
+    font-style: italic;
+    font-weight: 100 900;
+    font-display: swap;
+    src: url('/fonts/montserrat-italic.woff2') format('woff2');
+  }
+
+  @font-face {
+    font-family: 'JetBrains Mono';
+    font-style: normal;
+    font-weight: 100 800;
+    font-display: swap;
+    src: url('/fonts/jetbrains-mono-normal.woff2') format('woff2');
+  }
+
+  @font-face {
+    font-family: 'JetBrains Mono';
+    font-style: italic;
+    font-weight: 100 800;
+    font-display: swap;
+    src: url('/fonts/jetbrains-mono-italic.woff2') format('woff2');
+  }
+
   body {
     @apply bg-brand-paper text-brand-dark font-sans min-h-screen;
     -webkit-font-smoothing: antialiased;
