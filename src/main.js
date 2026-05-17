@@ -58,16 +58,16 @@ window.formatScript = (cmd) => {
     if (cmd === 'scene') {
         const node = document.createElement('div');
         node.className = 'script-scene';
-        node.style.cssText = 'margin: 30px 0; border-top: 2px dashed rgba(247, 148, 30, 0.2); padding-top: 15px; font-weight: bold; color: #F7941E; text-align: center; font-size: 10px; letter-spacing: 0.3em;';
+        node.style.cssText = 'margin: 2em 0; border-top: 2px dashed rgba(247,148,30,0.3); padding-top: 1em; font-weight: bold; color: #f7941e; text-align: center; font-size: 10px; letter-spacing: 0.3em;';
         node.innerHTML = '--- CORTE DE ESCENA ---';
         range.insertNode(node);
         range.collapse(false);
     } else if (cmd === 'highlight') {
         const span = document.createElement('span');
-        span.style.backgroundColor = '#000';
-        span.style.color = '#fff';
-        span.style.padding = '0 4px';
-        span.style.display = 'inline';
+        span.style.backgroundColor = 'black';
+        span.style.color = 'white';
+        span.style.padding = '0.1em 0.3em';
+        span.style.borderRadius = '2px';
         range.surroundContents(span);
     } else {
         document.execCommand(cmd, false, null);
@@ -81,54 +81,44 @@ window.downloadPDF = async (event) => {
 
     const btn = event.currentTarget;
     const oldText = btn.innerText;
-    btn.innerText = "PROCESANDO...";
+    btn.innerText = "CAPTURING...";
     btn.disabled = true;
 
     try {
         const container = document.createElement('div');
-        container.style.width = '210mm';
-        container.style.minHeight = '297mm';
-        container.style.padding = '25mm';
-        container.style.backgroundColor = 'white';
-        container.style.position = 'fixed';
-        container.style.top = '0';
-        container.style.left = '-300mm';
-        container.style.zIndex = '-1000';
+        container.style.cssText = 'width: 800px; padding: 60px; background: white; position: fixed; top: 0; left: -2000px; z-index: -999;';
         
         const header = document.createElement('div');
-        header.style.cssText = 'border-bottom: 3px solid #003A7A; margin-bottom: 15mm; padding-bottom: 5mm;';
-        header.innerHTML = '<h1 style="margin:0; font-family: Montserrat, sans-serif; font-size: 28px; color: #003A7A; font-weight: bold; letter-spacing: -0.5px;">' + p.title.toUpperCase() + '</h1><p style="margin:8px 0 0 0; font-family: Montserrat, sans-serif; font-size: 11px; color: #666; font-weight: bold; letter-spacing: 3px; text-transform: uppercase;">GUION TECNICO / AV CONTENT PLANNER</p>';
+        header.style.cssText = 'border-bottom: 4px solid #003a7a; margin-bottom: 40px; padding-bottom: 10px;';
+        header.innerHTML = '<h1 style="margin:0; font-family: Montserrat, sans-serif; font-size: 28px; color: #003a7a; font-weight: 900;">' + p.title.toUpperCase() + '</h1><p style="margin:5px 0 0 0; font-family: Montserrat, sans-serif; font-size: 11px; color: #666; font-weight: 700; letter-spacing: 3px;">GUION TECNICO / AV CONTENT PLANNER</p>';
         
         const content = document.createElement('div');
         content.innerHTML = el.innerHTML;
-        content.style.cssText = 'font-family: Courier, monospace; font-size: 13px; line-height: 1.8; color: #000; text-align: left; white-space: pre-wrap;';
+        content.style.cssText = 'font-family: Courier, monospace; font-size: 14px; line-height: 1.6; color: black;';
         
         container.appendChild(header);
         container.appendChild(content);
         document.body.appendChild(container);
 
         const canvas = await html2canvas(container, {
-            scale: 2.5,
+            scale: 2,
             useCORS: true,
-            logging: false,
-            backgroundColor: '#ffffff',
-            windowWidth: container.scrollWidth,
-            windowHeight: container.scrollHeight
+            backgroundColor: 'white',
+            logging: false
         });
 
         const imgData = canvas.toDataURL('image/png');
         const pdf = new jsPDF('p', 'mm', 'a4');
         const pdfW = pdf.internal.pageSize.getWidth();
-        const pdfH = pdf.internal.pageSize.getHeight();
-        const imgW = pdfW;
+        const imgW = pdfW - 20; // 10mm margins
         const imgH = (canvas.height * imgW) / canvas.width;
 
-        pdf.addImage(imgData, 'PNG', 0, 0, imgW, imgH, undefined, 'FAST');
+        pdf.addImage(imgData, 'PNG', 10, 10, imgW, imgH);
         pdf.save("GUION_" + p.title.replace(/\s+/g, '_') + ".pdf");
         
         document.body.removeChild(container);
     } catch (e) {
-        console.error("PDF Fail:", e);
+        console.error("PDF Fail", e);
         alert("Error al generar PDF");
     } finally {
         btn.innerText = oldText;
@@ -139,7 +129,7 @@ window.downloadPDF = async (event) => {
 window.shareScript = async () => {
     const p = window.appState.currentProject; const content = document.getElementById('scriptContent').innerText;
     if (navigator.share) { try { await navigator.share({ title: "GUION: " + p.title, text: content, url: window.location.href }); } catch (e) {} }
-    else { navigator.clipboard.writeText(content); alert("Enlace copiado! 📋"); }
+    else { navigator.clipboard.writeText(content); alert("Copiado! 📋"); }
 };
 
 const getStatusBadge = (status) => {
@@ -151,7 +141,7 @@ const getStatusBadge = (status) => {
         'Finalizado': { bg: 'bg-brand-accent', text: 'text-brand-dark', icon: '✅' }
     };
     const c = config[status] || { bg: 'bg-white', text: 'text-brand-dark', icon: '❓' };
-    return '<span class="swiss-badge ' + c.bg + ' ' + c.text + ' border-2 border-brand-hairline shadow-sm px-3 py-1 text-[9px] font-bold"><span class="mr-1">' + c.icon + '</span> ' + status + '</span>';
+    return '<span class="swiss-badge ' + c.bg + ' ' + c.text + ' border-2 border-brand-hairline px-3 py-1 text-[9px] font-bold"><span>' + c.icon + '</span> ' + status + '</span>';
 };
 
 const renderApp = () => {
@@ -162,7 +152,7 @@ const renderApp = () => {
         document.head.appendChild(style);
     }
     if (!window.appState.userName) {
-        root.innerHTML = '<div class="flex items-center justify-center min-h-screen p-10 bg-brand-paper"><div class="max-w-md w-full border-2 border-brand-hairline bg-white p-10 rounded-2xl shadow-soft text-center"><div class="mb-10"><div class="w-12 h-1.5 bg-brand-primary mx-auto mb-6"></div><h1 class="text-3xl font-bold tracking-tight text-brand-dark">Puntaje Nacional</h1><p class="text-[10px] font-bold uppercase tracking-widest mt-2 text-brand-gray">Terminal de Produccion AV</p></div><form id="loginForm" class="space-y-8"><div><label class="block text-[10px] font-bold uppercase tracking-widest text-brand-dark mb-2 text-left">ID de Operador</label><input type="text" id="userNameInput" required placeholder="Ingresa tu nombre..." class="swiss-input border-2"></div><button type="submit" class="btn-swiss-primary w-full py-4 text-sm font-bold shadow-lg">ACCEDER AL SISTEMA</button></form></div></div>';
+        root.innerHTML = '<div class="flex items-center justify-center min-h-screen p-10 bg-brand-paper"><div class="max-w-md w-full border-2 border-brand-hairline bg-white p-10 rounded-2xl shadow-soft text-center"><div class="mb-10 text-center"><div class="w-12 h-1.5 bg-brand-primary mx-auto mb-6"></div><h1 class="text-3xl font-bold tracking-tight text-brand-dark">Puntaje Nacional</h1><p class="text-[10px] font-bold uppercase tracking-widest mt-2 text-brand-gray">Terminal de Produccion AV</p></div><form id="loginForm" class="space-y-8"><div><label class="block text-[10px] font-bold uppercase tracking-widest text-brand-dark mb-2 text-left">ID de Operador</label><input type="text" id="userNameInput" required placeholder="Ingresa tu nombre..." class="swiss-input border-2"></div><button type="submit" class="btn-swiss-primary w-full py-4 text-sm font-bold shadow-lg">ACCEDER AL SISTEMA</button></form></div></div>';
         document.getElementById('loginForm').onsubmit = (e) => { e.preventDefault(); const name = document.getElementById('userNameInput').value.trim(); if (name) { window.appState.userName = name; renderApp(); } };
         return;
     }
@@ -184,7 +174,7 @@ const renderApp = () => {
         };
     } else if (window.appState.view === 'detail') {
         const p = window.appState.currentProject; const images = p.storyboardImages || []; const activeTab = window.appState.activeTab;
-        root.innerHTML = '<div class="p-4 md:p-8 max-w-[1400px] mx-auto min-h-screen bg-brand-paper text-brand-dark"><div class="flex justify-between items-center mb-6"><button id="btnBackDetail" class="btn-swiss-outline text-[10px] border-2"><- DASHBOARD</button><div class="flex items-center gap-3"><span class="text-[9px] font-bold text-brand-gray uppercase">Ultimo Editor:</span><span class="text-[9px] font-bold bg-brand-dark text-white px-2 py-0.5 rounded uppercase tracking-wider">' + (p.lastEditor || 'Sistema') + '</span></div></div><div class="grid grid-cols-1 lg:grid-cols-12 gap-8"><div class="lg:col-span-4 lg-sidebar space-y-6"><div class="bg-white p-6 rounded-2xl border-2 border-brand-hairline shadow-soft space-y-4"><h1 class="text-2xl font-bold tracking-tight uppercase leading-tight">' + p.title + '</h1><p class="text-xs font-medium text-brand-gray leading-relaxed italic">' + p.description + '</p></div><div class="flex flex-col gap-2 detail-nav"><button onclick="window.setTab(\'guion\')" class="detail-nav-btn ' + (activeTab === 'guion' ? 'active' : '') + '"><span class="num">01</span><span class="label">GUION NARRATIVO</span><span class="icon">📝</span></button><button onclick="window.setTab(\'storyboard\')" class="detail-nav-btn ' + (activeTab === 'storyboard' ? 'active' : '') + '"><span class="num">02</span><span class="label">REGISTRO VISUAL</span><span class="icon">🎨</span></button><button onclick="window.setTab(\'gestion\')" class="detail-nav-btn ' + (activeTab === 'gestion' ? 'active' : '') + '"><span class="num">03</span><span class="label">AJUSTES</span><span class="icon">⚙️</span></button></div></div><div class="lg:col-span-8 min-h-[600px]"><div class="bg-white rounded-2xl border-2 border-brand-hairline shadow-focus flex flex-col h-full overflow-hidden">' + (activeTab === 'guion' ? '<div class="p-3 border-b-2 border-brand-hairline bg-brand-light flex justify-between items-center work-header"><div class="flex gap-2"><button onclick="window.formatScript(\'scene\')" class="btn-swiss-outline py-1 px-3 text-[9px] font-bold bg-white border-2">ESCENA</button><button onclick="window.formatScript(\'bold\')" class="btn-swiss-outline py-1 px-3 text-[9px] font-bold bg-white border-2">B</button><button onclick="window.formatScript(\'strikethrough\')" class="btn-swiss-outline py-1 px-3 text-[9px] font-bold bg-white border-2 line-through">S</button><button onclick="window.formatScript(\'highlight\')" class="btn-swiss-outline py-1 px-3 text-[9px] font-bold bg-black text-white border-2">H</button><button onclick="document.execCommand(\'undo\')" class="btn-swiss-outline py-1 px-3 text-[9px] font-bold bg-white border-2">UNDO</button></div><div class="flex gap-2"><button onclick="window.shareScript()" class="p-2 hover:bg-white rounded text-lg">🔗</button><button onclick="window.downloadPDF(event)" class="btn-swiss-outline py-1 px-3 text-[9px] font-bold bg-white border-2">PDF</button><button id="btnSaveScript" class="btn-swiss-primary py-1 px-5 text-[9px] font-bold shadow-md">GUARDAR</button></div></div><div id="scriptContent" class="p-12 text-base text-brand-dark min-h-[600px] outline-none bg-brand-paper/20 overflow-y-auto" contenteditable="true" style="font-family: Courier, monospace;">' + (p.script || 'ESCENA 01 - ...') + '</div>' : '') + (activeTab === 'storyboard' ? '<div class="p-8 space-y-6"><div class="flex justify-between items-center border-b-2 border-brand-hairline pb-4"><h3 class="text-lg font-bold uppercase">Storyboard</h3><button id="btnSaveSB" class="btn-swiss-primary py-1.5 px-4 text-[9px] font-bold">GUARDAR</button></div><div class="grid grid-cols-2 gap-4">' + images.map((img, idx) => '<div onclick="window.openLightbox(' + idx + ')" class="aspect-video border-2 border-brand-dark relative cursor-pointer overflow-hidden rounded-lg"><img src="' + img + '" class="w-full h-full object-cover"></div>').join('') + '<div onclick="document.getElementById(\'sbUpload\').click()" class="aspect-video border-2 border-dashed border-brand-hairline flex flex-col items-center justify-center cursor-pointer hover:bg-brand-primary/5 rounded-lg group"><span class="text-4xl font-bold">+</span></div><input type="file" id="sbUpload" class="hidden" accept="image/jpeg, image/png" multiple onchange="window.handleImageUpload(event, \'' + p.id + '\')"></div></div>' : '') + (activeTab === 'gestion' ? '<div class="p-8 space-y-8 flex-1 flex flex-col h-full"><h3 class="text-lg font-bold uppercase border-b-2 border-brand-hairline pb-4">Ajustes de Proyecto</h3><div class="grid grid-cols-2 gap-6"><div><label class="block text-[9px] font-bold uppercase mb-2">Responsable</label><input type="text" id="teamInput" value="' + (p.team || '') + '" class="swiss-input font-bold border-2"></div><div><label class="block text-[9px] font-bold uppercase mb-2">Fecha</label><input type="date" id="dueDateInput" value="' + (p.dueDate || '') + '" class="swiss-input font-bold border-2"></div></div><div><label class="block text-[9px] font-bold uppercase mb-2">Estado</label><select id="statusSelect" class="swiss-input font-bold border-2"><option value="Idea" ' + (p.status === 'Idea' ? 'selected' : '') + '>Idea</option><option value="Guionizado" ' + (p.status === 'Guionizado' ? 'selected' : '') + '>Guionizado</option><option value="Storyboard" ' + (p.status === 'Storyboard' ? 'selected' : '') + '>Storyboard</option><option value="Produccion" ' + (p.status === 'Produccion' ? 'selected' : '') + '>Produccion</option><option value="Finalizado" ' + (p.status === 'Finalizado' ? 'selected' : '') + '>Finalizado</option></select></div><div class="flex-1"></div><div class="flex gap-4 pt-6 shrink-0"><button id="btnSaveDetail" class="btn-swiss-primary flex-1 py-6 font-bold uppercase text-lg shadow-2xl">GUARDAR EN EXCEL</button><button onclick="window.deleteProject(\'' + p.id + '\')" class="btn-swiss-outline py-6 px-10 border-brand-accent text-brand-accent border-2 font-bold hover:bg-brand-accent hover:text-white transition-all uppercase text-xs tracking-widest">Borrar</button></div></div>' : '') + '</div></div></div>' + (window.appState.lightbox ? '<div class="fixed inset-0 bg-brand-dark/95 z-[100] flex items-center justify-center p-8 backdrop-blur-md" onclick="window.appState.lightbox = null; renderApp();"><img src="' + window.appState.lightbox + '" class="max-w-full max-h-full border-4 border-white shadow-2xl rounded-lg"></div>' : '') + '</div>';
+        root.innerHTML = '<div class="p-4 md:p-8 max-w-[1400px] mx-auto min-h-screen bg-brand-paper text-brand-dark"><div class="flex justify-between items-center mb-6"><button id="btnBackDetail" class="btn-swiss-outline text-[10px] border-2"><- DASHBOARD</button><div class="flex items-center gap-3"><span class="text-[9px] font-bold text-brand-gray uppercase">Ultimo Editor:</span><span class="text-[9px] font-bold bg-brand-dark text-white px-2 py-0.5 rounded uppercase tracking-wider">' + (p.lastEditor || 'Sistema') + '</span></div></div><div class="grid grid-cols-1 lg:grid-cols-12 gap-8"><div class="lg:col-span-4 lg-sidebar space-y-6"><div class="bg-white p-6 rounded-2xl border-2 border-brand-hairline shadow-soft space-y-4"><h1 class="text-2xl font-bold tracking-tight uppercase leading-tight">' + p.title + '</h1><p class="text-xs font-medium text-brand-gray leading-relaxed italic">' + p.description + '</p></div><div class="flex flex-col gap-2 detail-nav"><button onclick="window.setTab(\'guion\')" class="detail-nav-btn ' + (activeTab === 'guion' ? 'active' : '') + '"><span class="num">01</span><span class="label">GUION NARRATIVO</span><span class="icon">📝</span></button><button onclick="window.setTab(\'storyboard\')" class="detail-nav-btn ' + (activeTab === 'storyboard' ? 'active' : '') + '"><span class="num">02</span><span class="label">REGISTRO VISUAL</span><span class="icon">🎨</span></button><button onclick="window.setTab(\'gestion\')" class="detail-nav-btn ' + (activeTab === 'gestion' ? 'active' : '') + '"><span class="num">03</span><span class="label">AJUSTES</span><span class="icon">⚙️</span></button></div></div><div class="lg:col-span-8 min-h-[600px]"><div class="bg-white rounded-2xl border-2 border-brand-hairline shadow-focus flex flex-col h-full overflow-hidden">' + (activeTab === 'guion' ? '<div class="p-3 border-b-2 border-brand-hairline bg-brand-light flex justify-between items-center work-header"><div class="flex gap-2"><button onclick="window.formatScript(\'scene\')" class="btn-swiss-outline py-1 px-3 text-[9px] font-bold bg-white border-2">ESCENA</button><button onclick="window.formatScript(\'bold\')" class="btn-swiss-outline py-1 px-3 text-[9px] font-bold bg-white border-2">B</button><button onclick="window.formatScript(\'strikethrough\')" class="btn-swiss-outline py-1 px-3 text-[9px] font-bold bg-white border-2 line-through">S</button><button onclick="window.formatScript(\'highlight\')" class="btn-swiss-outline py-1 px-3 text-[9px] font-bold bg-black text-white border-2">H</button><button onclick="document.execCommand(\'undo\')" class="btn-swiss-outline py-1 px-3 text-[9px] font-bold bg-white border-2">UNDO</button></div><div class="flex gap-2"><button onclick="window.shareScript()" class="p-2 hover:bg-white rounded text-lg text-brand-dark underline font-bold">SHARE</button><button onclick="window.downloadPDF(event)" class="btn-swiss-outline py-1 px-3 text-[9px] font-bold bg-white border-2">PDF</button><button id="btnSaveScript" class="btn-swiss-primary py-1 px-5 text-[9px] font-bold shadow-md">GUARDAR</button></div></div><div id="scriptContent" class="p-12 text-base text-brand-dark min-h-[600px] outline-none bg-brand-paper/20 overflow-y-auto" contenteditable="true" style="font-family: Courier, monospace;">' + (p.script || 'ESCENA 01 - ...') + '</div>' : '') + (activeTab === 'storyboard' ? '<div class="p-8 space-y-6"><div class="flex justify-between items-center border-b-2 border-brand-hairline pb-4"><h3 class="text-lg font-bold uppercase">Storyboard</h3><button id="btnSaveSB" class="btn-swiss-primary py-1.5 px-4 text-[9px] font-bold">GUARDAR</button></div><div class="grid grid-cols-2 gap-4">' + images.map((img, idx) => '<div onclick="window.openLightbox(' + idx + ')" class="aspect-video border-2 border-brand-dark relative cursor-pointer overflow-hidden rounded-lg"><img src="' + img + '" class="w-full h-full object-cover"></div>').join('') + '<div onclick="document.getElementById(\'sbUpload\').click()" class="aspect-video border-2 border-dashed border-brand-hairline flex flex-col items-center justify-center cursor-pointer hover:bg-brand-primary/5 rounded-lg group"><span class="text-4xl font-bold">+</span></div><input type="file" id="sbUpload" class="hidden" accept="image/jpeg, image/png" multiple onchange="window.handleImageUpload(event, \'' + p.id + '\')"></div></div>' : '') + (activeTab === 'gestion' ? '<div class="p-8 space-y-8 flex-1 flex flex-col h-full"><h3 class="text-lg font-bold uppercase border-b-2 border-brand-hairline pb-4">Ajustes de Proyecto</h3><div class="grid grid-cols-2 gap-6"><div><label class="block text-[9px] font-bold uppercase mb-2">Responsable</label><input type="text" id="teamInput" value="' + (p.team || '') + '" class="swiss-input font-bold border-2"></div><div><label class="block text-[9px] font-bold uppercase mb-2">Fecha</label><input type="date" id="dueDateInput" value="' + (p.dueDate || '') + '" class="swiss-input font-bold border-2"></div></div><div><label class="block text-[9px] font-bold uppercase mb-2">Estado</label><select id="statusSelect" class="swiss-input font-bold border-2"><option value="Idea" ' + (p.status === 'Idea' ? 'selected' : '') + '>Idea</option><option value="Guionizado" ' + (p.status === 'Guionizado' ? 'selected' : '') + '>Guionizado</option><option value="Storyboard" ' + (p.status === 'Storyboard' ? 'selected' : '') + '>Storyboard</option><option value="Produccion" ' + (p.status === 'Produccion' ? 'selected' : '') + '>Produccion</option><option value="Finalizado" ' + (p.status === 'Finalizado' ? 'selected' : '') + '>Finalizado</option></select></div><div class="flex-1"></div><div class="flex gap-4 pt-6 shrink-0"><button id="btnSaveDetail" class="btn-swiss-primary flex-1 py-6 font-bold uppercase text-lg shadow-2xl">GUARDAR EN EXCEL</button><button onclick="window.deleteProject(\'' + p.id + '\')" class="btn-swiss-outline py-6 px-10 border-brand-accent text-brand-accent border-2 font-bold hover:bg-brand-accent hover:text-white transition-all uppercase text-xs tracking-widest">Borrar</button></div></div>' : '') + '</div></div></div>' + (window.appState.lightbox ? '<div class="fixed inset-0 bg-brand-dark/95 z-[100] flex items-center justify-center p-8 backdrop-blur-md" onclick="window.appState.lightbox = null; renderApp();"><img src="' + window.appState.lightbox + '" class="max-w-full max-h-full border-4 border-white shadow-2xl rounded-lg"></div>' : '') + '</div>';
 
         document.getElementById('btnBackDetail').onclick = () => { window.isEditing = false; window.setView('dashboard'); };
         const syncAction = async () => {
