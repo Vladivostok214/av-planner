@@ -105,11 +105,33 @@
   .detail-nav-btn {
     @apply flex items-center gap-5 px-8 py-6 bg-brand-light border-2 border-brand-hairline rounded-2xl transition-all duration-300 hover:border-brand-primary hover:shadow-md text-brand-gray text-left w-full;
   }
-  
+
   .detail-nav-btn.active {
     @apply border-brand-primary bg-brand-primary text-white shadow-xl transform translate-x-2;
   }
-  
+
+  .work-header {
+    @apply sticky top-0 z-20 backdrop-blur-md bg-brand-light/90 shadow-sm border-b-2 border-brand-hairline;
+  }
+
+  .loading-overlay {
+    @apply fixed inset-0 z-[200] bg-brand-paper/60 backdrop-blur-sm flex items-center justify-center pointer-events-none opacity-0 transition-opacity duration-300;
+  }
+
+  .loading-overlay.active {
+    @apply pointer-events-auto opacity-100;
+  }
+
+  /* Accessibility fix for delete button in dark mode */
+  .dark .btn-delete-contrast {
+    @apply border-rose-400 text-rose-400 hover:bg-rose-400 hover:text-white;
+  }
+  }
+
+  /* LOADING SPINNER */
+  .spinner {
+  @apply w-12 h-12 border-4 border-brand-hairline border-t-brand-primary rounded-full animate-spin;
+  }
   .detail-nav-btn .num {
     @apply text-[10px] font-black opacity-30 uppercase tracking-widest;
   }
