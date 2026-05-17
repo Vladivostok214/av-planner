@@ -16,6 +16,7 @@ const loadData = async () => {
         window.appState.projects = data.map(p => ({
             ...p,
             status: p.status || p.estado || 'Idea',
+            dueDate: p.duedate || p.dueDate || '',
             createdAt: p.createdat || p.createdAt || new Date().toISOString(),
             updatedAt: p.updatedat || p.updatedAt || p.createdat || p.createdAt || new Date().toISOString()
         }));
