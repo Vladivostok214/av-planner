@@ -49,7 +49,7 @@
 @layer components {
   /* SUNSAMA-INSPIRED LIST SYSTEM WITH MODERN TOUCH */
   .list-row {
-    @apply bg-gradient-to-r from-white to-brand-paper/50 border-2 border-brand-hairline p-5 flex flex-col md:flex-row items-center gap-6 transition-all duration-300 hover:shadow-xl hover:border-brand-primary/50 hover:bg-gradient-to-r hover:from-white hover:to-brand-primary/5 cursor-pointer relative overflow-hidden rounded-xl;
+    @apply border-2 border-brand-hairline p-5 flex flex-col md:flex-row items-center gap-6 transition-all duration-300 hover:shadow-xl hover:border-brand-primary/50 cursor-pointer relative overflow-hidden rounded-xl;
   }
 
   .list-row-active-accent {
