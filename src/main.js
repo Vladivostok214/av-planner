@@ -259,7 +259,12 @@ const renderApp = () => {
         return;
     }
     if (window.appState.view === 'dashboard') {
-        let filtered = window.appState.projects.filter(p => { const q = window.appState.searchQuery.toLowerCase(); return p.title.toLowerCase().includes(q) || (p.team && p.team.toLowerCase().includes(q)); });
+        let filtered = window.appState.projects.filter(p => { 
+            const q = (window.appState.searchQuery || '').toLowerCase(); 
+            const title = (p.title || '').toLowerCase();
+            const team = (p.team || '').toLowerCase();
+            return title.includes(q) || team.includes(q); 
+        });
         filtered.sort((a, b) => new Date(b.updatedAt || b.createdAt || 0) - new Date(a.updatedAt || a.createdAt || 0));
         
         let dashboardContent = '<div class="p-6 md:p-10 max-w-[1300px] mx-auto min-h-screen"><header class="mb-10 flex flex-col md:flex-row justify-between items-start md:items-end gap-6 border-b-2 border-brand-hairline pb-8"><div><h1 class="text-2xl font-bold text-brand-dark mb-1">PANEL DE PRODUCCION</h1><p class="text-[10px] font-bold text-brand-gray tracking-widest uppercase">Operador: <span class="text-brand-dark underline font-bold">' + window.appState.userName + '</span></p></div><div class="flex flex-wrap items-center gap-3 w-full md:w-auto"><div class="flex-1 md:flex-none flex items-center gap-2 border-2 border-brand-hairline bg-brand-light px-4 py-2 rounded-lg shadow-sm"><input type="text" id="searchInput" value="' + window.appState.searchQuery + '" placeholder="Buscar..." class="bg-transparent outline-none font-bold text-xs w-full md:w-32"></div><button id="btnNewIdea" class="btn-swiss-primary shadow-md flex-1 md:flex-none">+ NUEVO</button><button onclick="window.toggleDarkMode()" class="p-2 bg-brand-light border-2 border-brand-hairline rounded-lg hover:border-brand-primary transition-colors text-sm shadow-sm" title="Alternar Tema">🌙</button><button onclick="location.reload()" class="btn-swiss-outline py-2 px-4 text-[10px] border-2">SALIR</button></div></header>';
