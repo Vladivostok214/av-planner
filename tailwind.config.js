@@ -9,14 +9,14 @@ export default {
     extend: {
       colors: {
         brand: {
-          primary: 'var(--color-primary)', 
-          accent: 'var(--color-accent)',  
-          dark: 'var(--color-dark)',
-          paper: 'var(--color-paper)',   
-          hairline: 'var(--color-hairline)', 
-          light: 'var(--color-light)',
-          tint: 'var(--color-tint)',    
-          gray: 'var(--color-gray)', 
+          primary: 'rgb(var(--color-primary) / <alpha-value>)', 
+          accent: 'rgb(var(--color-accent) / <alpha-value>)',  
+          dark: 'rgb(var(--color-dark) / <alpha-value>)',
+          paper: 'rgb(var(--color-paper) / <alpha-value>)',   
+          hairline: 'rgb(var(--color-hairline) / <alpha-value>)', 
+          light: 'rgb(var(--color-light) / <alpha-value>)',
+          tint: 'rgb(var(--color-tint) / <alpha-value>)',    
+          gray: 'rgb(var(--color-gray) / <alpha-value>)', 
         }
       },
       fontFamily: {

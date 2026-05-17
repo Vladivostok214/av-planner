@@ -4,25 +4,25 @@
 
 @layer base {
   :root {
-    --color-primary: #003A7A;
-    --color-accent: #F7941E;
-    --color-dark: #050D20;
-    --color-paper: #FBFBFA;
-    --color-hairline: #D1D5DB;
-    --color-light: #FFFFFF;
-    --color-tint: #D1E1FF;
-    --color-gray: #475569;
+    --color-primary: 0 58 122; /* #003A7A */
+    --color-accent: 247 148 30; /* #F7941E */
+    --color-dark: 5 13 32; /* #050D20 */
+    --color-paper: 251 251 250; /* #FBFBFA */
+    --color-hairline: 209 213 219; /* #D1D5DB */
+    --color-light: 255 255 255; /* #FFFFFF */
+    --color-tint: 209 225 255; /* #D1E1FF */
+    --color-gray: 71 85 105; /* #475569 */
   }
 
   .dark {
-    --color-primary: #3b82f6; /* Lighter blue for dark mode contrast */
-    --color-accent: #F7941E;
-    --color-dark: #FFFFFF; /* Text becomes white */
-    --color-paper: #0a1128; /* Deep dark blue background */
-    --color-hairline: #1e293b; /* Dark slate borders */
-    --color-light: #111c40; /* Cards and elements background */
-    --color-tint: #1e3a8a;
-    --color-gray: #94a3b8; /* Lighter secondary text */
+    --color-primary: 59 130 246; /* #3b82f6 */
+    --color-accent: 247 148 30; /* #F7941E */
+    --color-dark: 255 255 255; /* #FFFFFF */
+    --color-paper: 10 17 40; /* #0a1128 */
+    --color-hairline: 30 41 59; /* #1e293b */
+    --color-light: 17 28 64; /* #111c40 */
+    --color-tint: 30 58 138; /* #1e3a8a */
+    --color-gray: 148 163 184; /* #94a3b8 */
   }
 
   @font-face {
