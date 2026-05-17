@@ -229,11 +229,11 @@ const renderApp = () => {
                 } catch(e) {} 
             }
             
-            let bgClass = 'bg-gradient-to-r from-white to-brand-paper/50 hover:to-brand-primary/5'; // Default Idea
+            let bgClass = 'bg-gradient-to-r from-brand-light to-brand-paper/50 hover:to-brand-primary/5'; // Default Idea
             if (['Guionizado', 'Storyboard', 'Produccion'].includes(p.status)) {
-                bgClass = 'bg-gradient-to-r from-white to-yellow-500/10 hover:to-yellow-500/20';
+                bgClass = 'bg-gradient-to-r from-brand-light to-yellow-500/10 hover:to-yellow-500/20';
             } else if (p.status === 'Finalizado') {
-                bgClass = 'bg-gradient-to-r from-white to-green-500/10 hover:to-green-500/20';
+                bgClass = 'bg-gradient-to-r from-brand-light to-green-500/10 hover:to-green-500/20';
             }
 
             return '<div class="project-row list-row group flex flex-col md:flex-row items-center gap-6 ' + bgClass + '"><div data-id="' + p.id + '" class="flex-1 flex flex-col md:flex-row items-center gap-6 w-full cursor-pointer"><div class="w-full md:flex-1 text-center md:text-left"><h3 class="text-lg font-bold text-brand-dark group-hover:text-brand-primary transition-colors">' + p.title + '</h3></div><div class="w-full md:w-32 flex justify-center md:justify-start shrink-0">' + getStatusBadge(p.status) + '</div><div class="w-full md:w-32 flex flex-row md:flex-col justify-center gap-4 md:gap-0 shrink-0"><span class="text-[10px] font-bold text-brand-dark truncate">' + (p.team || '---') + '</span><span class="text-[8px] font-bold text-brand-gray uppercase">' + dS + '</span></div><div class="w-full md:w-40 flex items-center justify-center gap-3 shrink-0"><div class="flex-1 h-2 bg-brand-hairline rounded-full overflow-hidden border"><div class="h-full bg-brand-primary" style="width: ' + pr + '%"></div></div><span class="text-[9px] font-bold text-brand-dark w-8 text-left">' + Math.round(pr) + '%</span></div></div><button onclick="window.deleteProject(\'' + p.id + '\')" class="w-full md:w-auto mt-2 md:mt-0 btn-swiss-outline py-2 px-4 border-red-500 text-red-500 hover:bg-red-500 hover:text-white text-[10px] opacity-100 md:opacity-0 group-hover:opacity-100 transition-opacity flex justify-center items-center gap-2 shadow-sm shrink-0"><span>BORRAR</span></button></div>'; 
