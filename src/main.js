@@ -17,20 +17,59 @@ const loadData = async () => {
         showLoading();
         const resp = await fetch(sheetsUrl);
         const data = await resp.json();
-        window.appState.projects = data.map(p => ({
-            ...p,
-            status: p.status || p.estado || 'Idea',
-            dueDate: p.duedate || p.dueDate || '',
-            createdAt: p.createdat || p.createdAt || new Date().toISOString(),
-            updatedAt: p.updatedat || p.updatedAt || p.createdat || p.createdAt || new Date().toISOString(),
-            storyboardImages: p.storyboardimages || p.storyboardImages || ''
-        }));
+        
+        if (!Array.isArray(data)) {
+            console.error("Data is not an array:", data);
+            return;
+        }
+
+        // Helper ultra-robusto para encontrar valores
+        const findSafe = (obj, keywords) => {
+            const keys = Object.keys(obj);
+            for (let k of keys) {
+                const normalizedK = k.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").trim();
+                if (keywords.some(kw => normalizedK.includes(kw))) {
+                    const val = obj[k];
+                    return (val === null || val === undefined) ? '' : val;
+                }
+            }
+            return '';
+        };
+
+        const clean = (val, fallback = '') => {
+            if (val === null || val === undefined || val === 'undefined' || val === 'null' || val === '') return fallback;
+            return val;
+        };
+
+        window.appState.projects = data.map(rawP => {
+            const mapped = {
+                id: clean(findSafe(rawP, ['id']) || rawP.id, 'id-' + Math.random()),
+                title: clean(findSafe(rawP, ['tit', 'name']) || rawP.title || rawP.titulo, 'Sin Titulo'),
+                description: clean(findSafe(rawP, ['desc', 'brief']) || rawP.description || rawP.descripcion, ''),
+                team: clean(findSafe(rawP, ['equipo', 'team', 'resp']) || rawP.team || rawP.equipo, '---'),
+                cast: clean(findSafe(rawP, ['cast', 'talento', 'actor']) || rawP.cast || rawP.talento, ''),
+                status: clean(findSafe(rawP, ['stat', 'est']) || rawP.status || rawP.estado, 'Idea'),
+                dueDate: clean(findSafe(rawP, ['due', 'fech', 'limit']) || rawP.dueDate || rawP.duedate, ''),
+                script: clean(findSafe(rawP, ['guion', 'script']) || rawP.script || rawP.guion, ''),
+                storyboardImages: clean(findSafe(rawP, ['story', 'imag', 'foto']) || rawP.storyboardImages || rawP.storyboardimages, '')
+            };
+            mapped.createdAt = clean(findSafe(rawP, ['creat', 'creac']) || rawP.createdAt, new Date().toISOString());
+            mapped.updatedAt = clean(findSafe(rawP, ['update', 'actualiz']) || rawP.updatedAt, mapped.createdAt);
+            return mapped;
+        }).filter(p => p.title !== 'Sin Titulo'); 
+
+        console.log("Mapped Projects:", window.appState.projects);
+
         if (window.appState.view === 'detail' && window.appState.currentProject) {
             const updated = window.appState.projects.find(p => p.id === window.appState.currentProject.id);
             if (updated) window.appState.currentProject = updated;
         }
         renderApp();
-    } catch (e) { console.error(e); } finally { hideLoading(); }
+    } catch (e) { 
+        console.error("Critical Load Fail:", e); 
+    } finally { 
+        hideLoading(); 
+    }
 };
 
 const updateProject = async (projectId, newData) => {
@@ -293,7 +332,10 @@ const renderApp = () => {
                     bgClass = 'bg-gradient-to-r from-brand-light to-green-500/30 border-green-500/40 hover:to-green-500/40';
                 }
 
-                return '<div class="project-row list-row group flex flex-col md:flex-row items-center gap-6 ' + bgClass + '"><div data-id="' + p.id + '" class="flex-1 flex flex-col md:flex-row items-center gap-6 w-full cursor-pointer"><div class="w-full md:flex-1 text-center md:text-left"><h3 class="text-lg font-bold text-brand-dark group-hover:text-brand-primary transition-colors">' + p.title + '</h3></div><div class="w-full md:w-32 flex justify-center md:justify-start shrink-0">' + getStatusBadge(p.status) + '</div><div class="w-full md:w-32 flex flex-row md:flex-col justify-center gap-4 md:gap-0 shrink-0"><span class="text-[10px] font-bold text-brand-dark truncate">' + (p.team || '---') + '</span><span class="text-[8px] font-bold text-brand-gray uppercase">' + dS + '</span></div><div class="w-full md:w-40 flex items-center justify-center gap-3 shrink-0"><div class="flex-1 h-2 bg-brand-hairline rounded-full overflow-hidden border"><div class="h-full bg-brand-primary" style="width: ' + pr + '%"></div></div><span class="text-[9px] font-bold text-brand-dark w-8 text-left">' + Math.round(pr) + '%</span></div></div><button onclick="window.deleteProject(\'' + p.id + '\')" class="w-full md:w-auto mt-2 md:mt-0 btn-swiss-outline btn-delete-contrast py-2 px-4 border-red-500 text-red-500 hover:bg-red-500 hover:text-white text-[10px] opacity-100 md:opacity-0 group-hover:opacity-100 transition-opacity flex justify-center items-center gap-2 shadow-sm shrink-0"><span>BORRAR</span></button></div>'; 
+                const titleText = (p.title && String(p.title) !== 'undefined') ? p.title : 'Proyecto sin nombre';
+                const teamText = (p.team && String(p.team) !== 'undefined') ? p.team : '---';
+
+                return '<div class="project-row list-row group flex flex-col md:flex-row items-center gap-6 ' + bgClass + '"><div data-id="' + p.id + '" class="flex-1 flex flex-col md:flex-row items-center gap-6 w-full cursor-pointer"><div class="w-full md:flex-1 text-center md:text-left"><h3 class="text-lg font-bold text-brand-dark group-hover:text-brand-primary transition-colors">' + titleText + '</h3></div><div class="w-full md:w-32 flex justify-center md:justify-start shrink-0">' + getStatusBadge(p.status) + '</div><div class="w-full md:w-32 flex flex-row md:flex-col justify-center gap-4 md:gap-0 shrink-0"><span class="text-[10px] font-bold text-brand-dark truncate">' + teamText + '</span><span class="text-[8px] font-bold text-brand-gray uppercase">' + dS + '</span></div><div class="w-full md:w-40 flex items-center justify-center gap-3 shrink-0"><div class="flex-1 h-2 bg-brand-hairline rounded-full overflow-hidden border"><div class="h-full bg-brand-primary" style="width: ' + pr + '%"></div></div><span class="text-[9px] font-bold text-brand-dark w-8 text-left">' + Math.round(pr) + '%</span></div></div><button onclick="window.deleteProject(\'' + p.id + '\')" class="w-full md:w-auto mt-2 md:mt-0 btn-swiss-outline btn-delete-contrast py-2 px-4 border-red-500 text-red-500 hover:bg-red-500 hover:text-white text-[10px] opacity-100 md:opacity-0 group-hover:opacity-100 transition-opacity flex justify-center items-center gap-2 shadow-sm shrink-0"><span>BORRAR</span></button></div>'; 
             }).join('') + '</div>';
         }
         root.innerHTML = dashboardContent + '</div>';
