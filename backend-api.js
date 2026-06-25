@@ -89,14 +89,65 @@ function doPost(e) {
 }
 
 /**
- * Busca el índice de una columna basándose en el nombre (ignorando mayúsculas/minúsculas).
+ * Busca el índice de una columna basándose en el nombre (ignorando acentos, mayúsculas/minúsculas y espacios).
+ * Incorpora un mapa de sinónimos bilingües (Inglés/Español) para máxima tolerancia a fallos de caché.
  */
 function findColumn(headers, key) {
-  var k = key.toLowerCase();
+  var k = normalizeString(key);
+  
+  var synonyms = {
+    'title': 'titulo',
+    'titulo': 'titulo',
+    'category': 'categoria',
+    'categoria': 'categoria',
+    'status': 'estado',
+    'estado': 'estado',
+    'team': 'lider',
+    'lider': 'lider',
+    'responsable': 'lider',
+    'description': 'descripcion',
+    'descripcion': 'descripcion',
+    'brief': 'descripcion',
+    'script': 'guion',
+    'guion': 'guion',
+    'createdat': 'creado',
+    'creado': 'creado',
+    'lasteditor': 'editor',
+    'editor': 'editor',
+    'updatedat': 'updatedat',
+    'platform': 'platform',
+    'plataforma': 'platform',
+    'cast': 'cast',
+    'talento': 'cast',
+    'duedate': 'duedate',
+    'fechalimite': 'duedate',
+    'drivefolderlink': 'drivefolderlink',
+    'drive': 'drivefolderlink',
+    'publishedurl': 'publishedurl',
+    'publicacion': 'publishedurl',
+    'storyboardimages': 'storyboardimages'
+  };
+  
+  var standardKey = synonyms[k] || k;
+  
   for (var i = 0; i < headers.length; i++) {
-    if (headers[i].toString().toLowerCase() === k) return i;
+    var headerNorm = normalizeString(headers[i]);
+    var standardHeader = synonyms[headerNorm] || headerNorm;
+    if (standardHeader === standardKey) return i;
   }
   return -1;
+}
+
+/**
+ * Normaliza una cadena eliminando acentos, diacríticos, convirtiendo a minúsculas y limpiando espacios.
+ */
+function normalizeString(str) {
+  if (!str) return "";
+  return str.toString()
+            .toLowerCase()
+            .normalize("NFD")
+            .replace(/[\u0300-\u036f]/g, "")
+            .trim();
 }
 
 function response(msg) {
