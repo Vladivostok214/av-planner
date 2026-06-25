@@ -17,8 +17,10 @@ function doGet(e) {
   for (var i = 1; i < data.length; i++) {
     var obj = {};
     for (var j = 0; j < headers.length; j++) {
-      // Normaliza los encabezados a minúsculas para el JSON de salida
-      obj[headers[j].toLowerCase()] = data[i][j];
+      var headerName = headers[j].toString().toLowerCase().trim();
+      if (headerName) {
+        obj[headerName] = data[i][j];
+      }
     }
     jsonArray.push(obj);
   }

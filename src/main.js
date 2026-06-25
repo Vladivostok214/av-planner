@@ -46,12 +46,15 @@ const loadData = async () => {
                 id: clean(findSafe(rawP, ['id']) || rawP.id, 'id-' + Math.random()),
                 title: clean(findSafe(rawP, ['tit', 'name']) || rawP.title || rawP.titulo, 'Sin Titulo'),
                 description: clean(findSafe(rawP, ['desc', 'brief']) || rawP.description || rawP.descripcion, ''),
-                team: clean(findSafe(rawP, ['equipo', 'team', 'resp']) || rawP.team || rawP.equipo, '---'),
+                team: clean(findSafe(rawP, ['equipo', 'team', 'resp', 'lider']) || rawP.team || rawP.equipo || rawP.lider || rawP.líder, '---'),
                 cast: clean(findSafe(rawP, ['cast', 'talento', 'actor']) || rawP.cast || rawP.talento, ''),
                 status: clean(findSafe(rawP, ['stat', 'est']) || rawP.status || rawP.estado, 'Idea'),
                 dueDate: clean(findSafe(rawP, ['due', 'fech', 'limit']) || rawP.dueDate || rawP.duedate, ''),
                 script: clean(findSafe(rawP, ['guion', 'script']) || rawP.script || rawP.guion, ''),
-                storyboardImages: clean(findSafe(rawP, ['story', 'imag', 'foto']) || rawP.storyboardImages || rawP.storyboardimages, '')
+                storyboardImages: clean(findSafe(rawP, ['story', 'imag', 'foto']) || rawP.storyboardImages || rawP.storyboardimages, ''),
+                platform: clean(findSafe(rawP, ['plat']) || rawP.platform || rawP.plataforma, ''),
+                driveFolderLink: clean(findSafe(rawP, ['drive']) || rawP.drivefolderlink || rawP.driveFolderLink, ''),
+                publishedUrl: clean(findSafe(rawP, ['publi', 'url']) || rawP.publishedurl || rawP.publishedUrl, '')
             };
             mapped.createdAt = clean(findSafe(rawP, ['creat', 'creac']) || rawP.createdAt, new Date().toISOString());
             mapped.updatedAt = clean(findSafe(rawP, ['update', 'actualiz']) || rawP.updatedAt, mapped.createdAt);
@@ -72,6 +75,27 @@ const loadData = async () => {
     }
 };
 
+const preparePayloadForSheets = (payload) => {
+    const mapped = { ...payload };
+    if (payload.title !== undefined) mapped['título'] = payload.title;
+    if (payload.description !== undefined) mapped['descripción'] = payload.description;
+    if (payload.status !== undefined) mapped['estado'] = payload.status;
+    if (payload.team !== undefined) mapped['líder'] = payload.team;
+    if (payload.script !== undefined) mapped['guion'] = payload.script;
+    if (payload.createdAt !== undefined) mapped['creado'] = payload.createdAt;
+    if (payload.lastEditor !== undefined) mapped['editor'] = payload.lastEditor;
+    if (payload.updatedAt !== undefined) mapped['updatedat'] = payload.updatedAt;
+    if (payload.platform !== undefined) mapped['platform'] = payload.platform;
+    if (payload.cast !== undefined) mapped['cast'] = payload.cast;
+    if (payload.dueDate !== undefined) mapped['duedate'] = payload.dueDate;
+    if (payload.driveFolderLink !== undefined) mapped['drivefolderlink'] = payload.driveFolderLink;
+    if (payload.publishedUrl !== undefined) mapped['publishedurl'] = payload.publishedUrl;
+    if (payload.storyboardImages !== undefined) {
+        mapped['storyboardimages'] = payload.storyboardImages;
+    }
+    return mapped;
+};
+
 const updateProject = async (projectId, newData) => {
     const payload = { ...newData, lastEditor: window.appState.userName || 'Anonimo', updatedAt: new Date().toISOString() };
     console.log("SENDING TO SHEETS:", payload); // Debugging
@@ -84,7 +108,8 @@ const updateProject = async (projectId, newData) => {
     }
     if (isSheets) {
         try {
-            await fetch(sheetsUrl, { method: 'POST', mode: 'no-cors', body: JSON.stringify({ action: 'update', id: projectId, ...payload }) });
+            const sheetsPayload = preparePayloadForSheets({ action: 'update', id: projectId, ...payload });
+            await fetch(sheetsUrl, { method: 'POST', mode: 'no-cors', body: JSON.stringify(sheetsPayload) });
             window.isEditing = false;
         } catch (e) { console.error("Sheets Error:", e); }
     } else {
@@ -357,7 +382,8 @@ const renderApp = () => {
             window.appState.projects.unshift(payload);
             showLoading();
             if (isSheets) { 
-                await fetch(sheetsUrl, { method: 'POST', mode: 'no-cors', body: JSON.stringify({ action: 'save', ...payload }) }); 
+                const sheetsPayload = preparePayloadForSheets({ action: 'save', ...payload });
+                await fetch(sheetsUrl, { method: 'POST', mode: 'no-cors', body: JSON.stringify(sheetsPayload) }); 
                 setTimeout(loadData, 1500);
             } else { 
                 const c = JSON.parse(localStorage.getItem('av_planner_projects') || '[]'); 
